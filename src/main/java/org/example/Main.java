@@ -1,5 +1,8 @@
 public class Main{
     public static void main(String[] args){
-        System.out.println("Da tao nhanh dang nhap");
+
+        System.out.println("khoa beo");
+        System.out.printf("xem sex");
+
     }
 }
