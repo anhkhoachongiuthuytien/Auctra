@@ -52,44 +52,29 @@ public class Auction extends Entity {
         return item;
     }
 
-    public void setItem(Item item) {
-        this.item = item;
-    }
 
     public Seller getSeller() {
         return seller;
     }
 
-    public void setSeller(Seller seller) {
-        this.seller = seller;
-    }
 
     public double getCurrentPrice() {
         return currentPrice;
     }
 
-    public void setCurrentPrice(double currentPrice) {
-        this.currentPrice = currentPrice;
-    }
 
     public boolean isOpen() {
         return open;
     }
 
-    public void setOpen(boolean open) {
-        this.open = open;
-    }
 
     public List<BidTransaction> getBids() {
         return bids;
     }
 
-    public void setBids(List<BidTransaction> bids) {
-        this.bids = bids;
-    }
 
     public Bidder getWinner() {
-        return winner;
+        return this.winner;
     }
 
     public void setWinner(Bidder winner) {
