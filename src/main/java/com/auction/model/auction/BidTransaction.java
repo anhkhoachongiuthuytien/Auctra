@@ -6,7 +6,7 @@ public class BidTransaction {
     private Bidder bidder;
     private double amount;
     private LocalDateTime bidTime;
-    public BidTransaction( Bidder bidder, double amount, LocalDateTime bidTime){
+    public BidTransaction( Bidder bidder, double amount){
         this.bidder = bidder;
         this.amount = amount;
         this.bidTime = LocalDateTime.now();
