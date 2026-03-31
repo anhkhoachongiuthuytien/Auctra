@@ -1,11 +1,15 @@
 package com.auction.model.item;
+import com.auction.model.base.Entity;
 
-public class Item {
+public class Item extends Entity {
     private String name;
     private String description;
     private double startingPrice;
 
-    public Item(String name, String  description, double startingPrice) {
+    public Item() {}
+
+    public Item(String id, String name, String  description, double  startingPrice) {
+        super(id);
         this.name = name;
         this.description = description;
         this.startingPrice = startingPrice;
