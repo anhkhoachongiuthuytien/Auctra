@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 
-public class InMemoryItemDaoTest implements ItemDao{
+public class InMemoryItemDao implements ItemDao{
     HashMap<String, Item> database = new HashMap<>();
     public void save(Item item){
         database.put(item.getId(), Item);

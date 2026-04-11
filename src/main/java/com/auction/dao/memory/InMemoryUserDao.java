@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 
-public class InMemoryUserDaoTest implements UserDao{
+public class InMemoryUserDao implements UserDao{
     HashMap<String, User> database = new HashMap<>();
     public void save(User user){
         database.put(user.getId(), User);
