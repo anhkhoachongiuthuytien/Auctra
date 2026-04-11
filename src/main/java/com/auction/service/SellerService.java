@@ -1,0 +1,46 @@
+package com.auction.service;
+
+import com.auction.dao.AuctionDao;
+import com.auction.dao.ItemDao;
+import com.auction.exception.AuctionException;
+import com.auction.model.auction.Auction;
+import com.auction.model.item.Item;
+import com.auction.model.user.Seller;
+import com.auction.util.IdGenerator;
+
+public class SellerService {
+    private final ItemDao itemDao;
+    private final AuctionDao auctionDao;
+
+    public SellerService(ItemDao itemDao, AuctionDao auctionDao) {
+        this.itemDao = itemDao;
+        this.auctionDao = auctionDao;
+    }
+
+    public Item createItem(String name, String description, double startingPrice) {
+        Item item = new Item(IdGenerator.generateId(), name, description, startingPrice);
+        itemDao.save(item);
+        return item;
+    }
+
+    public Auction createAuction(Item item, Seller seller) {
+        if (item == null) {
+            throw new AuctionException("Item not found");
+        }
+        if (seller == null) {
+            throw new AuctionException("Seller not found");
+        }
+
+        Auction auction = new Auction(IdGenerator.generateId(), item, seller);
+        auctionDao.save(auction);
+        return auction;
+    }
+
+    public Item getItemById(String itemId) {
+        Item item = itemDao.findById(itemId);
+        if (item == null) {
+            throw new AuctionException("Item not found");
+        }
+        return item;
+    }
+}

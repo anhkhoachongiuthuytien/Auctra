@@ -1,10 +1,10 @@
 package com.auction.dao;
-import package com.auction.model.user.User;
+import com.auction.model.user.User;
 import java.util.List;
 
-public interface ItemDao {
+public interface UserDao {
     void save(User user);
     User findById(String id);
-    User findByEmail(string email);
+    User findByEmail(String email);
     List<User> findAll();
 }

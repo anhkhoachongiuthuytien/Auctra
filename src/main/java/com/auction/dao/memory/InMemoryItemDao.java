@@ -1,15 +1,15 @@
-package com.auction.dao;
-import com.auction.dao.ItemDdao;
+package com.auction.dao.memory;
+import com.auction.dao.ItemDao;
 import com.auction.model.item.Item;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 
-public class InMemoryItemDaoTest implements ItemDao{
+public class InMemoryItemDao implements ItemDao {
     HashMap<String, Item> database = new HashMap<>();
     public void save(Item item){
-        database.put(item.getId(), Item);
+        database.put(item.getId(), item);
     }
     public Item findById(String id){
         return database.get(id);
