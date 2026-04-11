@@ -5,23 +5,28 @@ import com.auction.exception.AuctionException;
 import com.auction.model.auction.Auction;
 import com.auction.model.item.Item;
 import com.auction.model.user.Seller;
+import com.auction.util.IdGenerator;
 
 public class AuctionService {
-    private AuctionDao auctionDao;
-    public AuctionService(AuctionDao autionDao){
-        this.auctionDao = autionDao;
+    private final AuctionDao auctionDao;
+
+    public AuctionService(AuctionDao auctionDao) {
+        this.auctionDao = auctionDao;
     }
-    public Auction createdAuction(Item item, Seller seller) {
-        Auction auction = new Auction(Id.Generator.generateId(), item, seller);
+
+    public Auction createAuction(Item item, Seller seller) {
+        Auction auction = new Auction(IdGenerator.generateId(), item, seller);
         auctionDao.save(auction);
         return auction;
     }
-    public void openAution(String auctionId){
-        Auction auction = auctionDao.fingById(auctionId);
+
+    public void openAuction(String auctionId) {
+        Auction auction = auctionDao.findById(auctionId);
         if (auction == null) throw new AuctionException("Auction not found");
         auction.openAuction();
     }
-    public void closeAution(String auctionId){
+
+    public void closeAuction(String auctionId) {
         Auction auction = auctionDao.findById(auctionId);
         if (auction == null) throw new AuctionException("Auction not found");
         auction.closeAuction();

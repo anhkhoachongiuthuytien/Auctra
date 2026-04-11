@@ -1,5 +1,5 @@
 package com.auction.dao;
-import com.auction.model.user.User;
+import  com.auction.model.user.User;
 import java.util.List;
 
 public interface UserDao {
