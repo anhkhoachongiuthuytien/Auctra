@@ -7,6 +7,7 @@ import com.auction.model.auction.Auction;
 import com.auction.model.item.Item;
 import com.auction.model.user.Seller;
 import com.auction.util.IdGenerator;
+import com.auction.factory.ItemFactory;
 
 public class SellerService {
     private final ItemDao itemDao;
@@ -17,8 +18,9 @@ public class SellerService {
         this.auctionDao = auctionDao;
     }
 
-    public Item createItem(String name, String description, double startingPrice) {
-        Item item = new Item(IdGenerator.generateId(), name, description, startingPrice);
+    public Item createItem(String type, String name, String description, double startingPrice) {
+        String id = IdGenerator.generateId();
+        Item item = ItemFactory.createItem(type, id, name, description, startingPrice);
         itemDao.save(item);
         return item;
     }
