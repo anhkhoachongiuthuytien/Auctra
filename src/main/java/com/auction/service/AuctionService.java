@@ -20,15 +20,25 @@ public class AuctionService {
         return auction;
     }
 
-    public void openAuction(String auctionId) {
+    public void startAuction(String auctionId) {
         Auction auction = auctionDao.findById(auctionId);
         if (auction == null) throw new AuctionException("Auction not found");
-        auction.openAuction();
+        auction.start();
     }
 
-    public void closeAuction(String auctionId) {
+    public void finishAuction(String auctionId) {
         Auction auction = auctionDao.findById(auctionId);
         if (auction == null) throw new AuctionException("Auction not found");
-        auction.closeAuction();
+        auction.finish();
+    }
+    public void cancelAuction(String auctionId){
+        Auction auction = auctionDao.findById(auctionId);
+        if (auction == null) throw new AuctionException("Auction not found");
+        auction.cancel();
+    }
+    public void markAuctionPaid(String auctionId){
+        Auction auction = auctionDao.findById(auctionId);
+        if (auction == null) throw new AuctionException("Auction not found");
+        auction.markPaid();
     }
 }
