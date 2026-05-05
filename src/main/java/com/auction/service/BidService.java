@@ -20,13 +20,15 @@ public class BidService {
         if (auction == null) {
             throw new AuctionException("Auction not found");
         }
-        if (!auction.isOpen()) {
-            throw new AuctionClosedException("Auction is closed");
+        synchronized (auction) {
+            if (!auction.isOpen()) {
+                throw new AuctionClosedException("Auction is closed");
+            }
+            if (amount <= auction.getCurrentPrice()) {
+                throw new InvalidBidException("Bid must be higher");
+            }
+            BidTransaction bid = new BidTransaction(bidder, amount);
+            auction.addBid(bid);
         }
-        if (amount <= auction.getCurrentPrice()) {
-            throw new InvalidBidException("Bid must be higher");
-        }
-        BidTransaction bid = new BidTransaction(bidder, amount);
-        auction.addBid(bid);
     }
 }
