@@ -9,7 +9,7 @@ import javafx.scene.Parent;
 public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/login-view.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/auction-list-view.fxml"));
         Parent root = fxmlLoader.load();
         Scene scene = new Scene(root, 800, 600);
         primaryStage.setTitle("Hệ thống đấu giá");
