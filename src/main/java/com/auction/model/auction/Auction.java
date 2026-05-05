@@ -1,5 +1,9 @@
 package com.auction.model.auction;
 
+import com.auction.enums.AuctionStatus;
+import com.auction.exception.AuctionClosedException;
+import com.auction.exception.AuctionException;
+import com.auction.exception.InvalidBidException;
 import com.auction.model.base.Entity;
 import com.auction.model.item.Item;
 import com.auction.model.user.Bidder;
@@ -12,13 +16,13 @@ public class Auction extends Entity {
     private Item item;
     private Seller seller;
     private double currentPrice;
-    private boolean open;
+    private AuctionStatus status;
     private List<BidTransaction> bids;
     private Bidder winner;
 
     public Auction() {
         this.bids = new ArrayList<>();
-        this.open = false;
+        this.status = AuctionStatus.CREATED;
         this.winner = null;
     }
 
@@ -27,25 +31,61 @@ public class Auction extends Entity {
         this.item = item;
         this.seller = seller;
         this.currentPrice = item.getStartingPrice();
-        this.open = false;
+        this.status = AuctionStatus.CREATED;
         this.bids = new ArrayList<>();
         this.winner = null;
     }
 
-    public void openAuction() {
-        this.open = true;
+    public void start() {
+        if (this.status == AuctionStatus.CREATED){
+            this.status = AuctionStatus.OPEN;
+        }
+        else{
+            throw new AuctionException("Cannot start auction from status: " + status);
+        }
     }
 
-    public void closeAuction() {
-        this.open = false;
+    public void finish() {
+        if (this.status == AuctionStatus.OPEN){
+            this.status = AuctionStatus.FINISHED;
+        }
+        else{
+            throw new AuctionException("Cannot finish auction from status: " + status);
+        }
     }
+
+    public void cancel(){
+        if (this.status == AuctionStatus.CREATED || this.status == AuctionStatus.OPEN){
+            this.status = AuctionStatus.CANCELED;
+        }
+        else{
+            throw new AuctionException("Cannot cancel auction from status: " + status);
+        }
+    }
+    public void markPaid(){
+        if (this.status == AuctionStatus.FINISHED){
+            this.status = AuctionStatus.PAID;
+        }
+        else{
+            throw new AuctionException("Cannot mark auction as paid from status: " + status);
+        }
+    }
+
 
     public void addBid(BidTransaction bid) {
-        if (bid != null) {
-            this.bids.add(bid);
-            this.currentPrice = bid.getAmount();
-            this.winner = bid.getBidder();
+        if (this.status != AuctionStatus.OPEN) {
+            throw new AuctionClosedException("Auction is not open for bidding");
         }
+        if (bid == null) {
+            throw new InvalidBidException("Bid cannot be null");
+        }
+        if (bid.getAmount() <= this.currentPrice) {
+            throw new InvalidBidException("Bid amount must be higher than current price");
+        }
+
+        this.bids.add(bid);
+        this.currentPrice = bid.getAmount();
+        this.winner = bid.getBidder();
     }
 
     public Item getItem() {
@@ -64,9 +104,11 @@ public class Auction extends Entity {
 
 
     public boolean isOpen() {
-        return open;
+        return this.status == AuctionStatus.OPEN;
     }
-
+    public AuctionStatus getStatus(){
+        return this.status;
+    }
 
     public List<BidTransaction> getBids() {
         return bids;
@@ -88,7 +130,7 @@ public class Auction extends Entity {
                 ", item=" + item +
                 ", seller=" + seller +
                 ", currentPrice=" + currentPrice +
-                ", open=" + open +
+                ", status=" + status +
                 ", bids=" + bids +
                 ", winner=" + winner +
                 '}';
