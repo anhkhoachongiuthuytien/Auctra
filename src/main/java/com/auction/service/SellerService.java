@@ -2,6 +2,7 @@ package com.auction.service;
 
 import com.auction.dao.AuctionDao;
 import com.auction.dao.ItemDao;
+import com.auction.enums.ItemType;
 import com.auction.exception.AuctionException;
 import com.auction.model.auction.Auction;
 import com.auction.model.item.Item;
@@ -18,7 +19,7 @@ public class SellerService {
         this.auctionDao = auctionDao;
     }
 
-    public Item createItem(String type, String name, String description, double startingPrice) {
+    public Item createItem(ItemType type, String name, String description, double startingPrice) {
         String id = IdGenerator.generateId();
         Item item = ItemFactory.createItem(type, id, name, description, startingPrice);
         itemDao.save(item);

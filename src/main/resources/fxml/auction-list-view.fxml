@@ -1,32 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
+<BorderPane prefHeight="600.0" prefWidth="900.0"
+            xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.auction.controller.AuctionController">
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1">
-   <center>
-      <TableView prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-        <columns>
-          <TableColumn prefWidth="75.0" text="Tên sản phẩm" />
-          <TableColumn prefWidth="75.0" text="Giá hiện tại" />
-            <TableColumn prefWidth="75.0" text="Thời gian kết thúc" />
-        </columns>
-      </TableView>
-   </center>
-   <bottom>
-      <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-         <children>
-            <Button id="btnDetail" mnemonicParsing="false" text="Xem chi tiết" />
-            <Button id="btnBid" mnemonicParsing="false" text="Đấu giá ngay" />
-         </children>
-         <opaqueInsets>
-            <Insets />
-         </opaqueInsets>
-      </HBox>
-   </bottom>
+    <!-- Thanh trên: tiêu đề + nút logout -->
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-padding: 12 16 12 16; -fx-background-color: #2c3e50;">
+            <Label text="Hệ thống đấu giá" style="-fx-text-fill: white; -fx-font-size: 16; -fx-font-weight: bold;"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="lblUsername" text="Xin chào, ..." style="-fx-text-fill: #aaa; -fx-font-size: 13;"/>
+            <Button fx:id="btnLogout" text="Đăng xuất" onAction="#handleLogout"
+                    style="-fx-background-color: #e74c3c; -fx-text-fill: white;"/>
+        </HBox>
+    </top>
+
+    <!-- Giữa: bảng danh sách -->
+    <center>
+        <TableView fx:id="auctionTable" BorderPane.alignment="CENTER">
+            <columns>
+                <!-- fx:id BẮT BUỘC để controller inject được -->
+                <TableColumn fx:id="colName"   prefWidth="300" text="Tên sản phẩm"/>
+                <TableColumn fx:id="colPrice"  prefWidth="180" text="Giá hiện tại"/>
+                <TableColumn fx:id="colStatus" prefWidth="130" text="Trạng thái"/>
+                <TableColumn fx:id="colTime"   prefWidth="200" text="Thời gian kết thúc"/>
+            </columns>
+            <placeholder>
+                <Label text="Chưa có phiên đấu giá nào"/>
+            </placeholder>
+        </TableView>
+    </center>
+
+    <!-- Dưới: nút hành động -->
+    <bottom>
+        <HBox spacing="10" alignment="CENTER_RIGHT" style="-fx-padding: 12 16;">
+            <Button fx:id="btnDetail" text="Xem chi tiết" onAction="#handleDetail" disable="true"/>
+            <Button fx:id="btnBid" text="Đấu giá ngay" onAction="#handleBid"
+                    style="-fx-background-color: #27ae60; -fx-text-fill: white;" disable="true"/>
+        </HBox>
+    </bottom>
 </BorderPane>

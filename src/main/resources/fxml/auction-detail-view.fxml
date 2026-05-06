@@ -1,14 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<VBox alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.auction.controller.BidController">
+   <padding>
+      <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
+   </padding>
 
+   <Label text="CHI TIẾT PHIÊN ĐẤU GIÁ">
+      <font>
+         <Font name="System Bold" size="24.0" />
+      </font>
+   </Label>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1">
-   <center>
-      <VBox prefHeight="333.0" prefWidth="600.0" BorderPane.alignment="CENTER" />
-   </center>
-   <bottom>
-      <Button mnemonicParsing="false" prefHeight="62.0" prefWidth="111.0" text="Button" BorderPane.alignment="CENTER" />
-   </bottom>
-</BorderPane>
+   <Label fx:id="lblItemName" text="Tên sản phẩm">
+      <font>
+         <Font size="18.0" />
+      </font>
+   </Label>
+
+   <Label text="GIÁ HIỆN TẠI:" />
+   <Label fx:id="lblCurrentPrice" text="0" textFill="#2e8b57">
+      <font>
+         <Font name="System Bold" size="36.0" />
+      </font>
+   </Label>
+
+   <HBox alignment="CENTER" spacing="15.0">
+      <TextField fx:id="txtBidAmount" prefHeight="35.0" prefWidth="220.0" promptText="Nhập số tiền bạn muốn đấu..." />
+      <Button mnemonicParsing="false" onAction="#handlePlaceBid" prefHeight="35.0" style="-fx-background-color: #4CAF50; -fx-text-fill: white;" text="ĐẶT GIÁ (BID)" />
+   </HBox>
+</VBox>
