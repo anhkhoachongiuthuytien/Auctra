@@ -8,119 +8,162 @@ import com.auction.model.base.Entity;
 import com.auction.model.item.Item;
 import com.auction.model.user.Bidder;
 import com.auction.model.user.Seller;
+import com.auction.observer.BidEvent;
+import com.auction.observer.BidObserver;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class Auction extends Entity {
-    private Item item;
-    private Seller seller;
+    private final Item item;
+    private final Seller seller;
     private double currentPrice;
     private AuctionStatus status;
-    private List<BidTransaction> bids;
+    private final List<BidTransaction> bids;
     private Bidder winner;
+    private final List<BidObserver> bidObservers;
+    private final ReentrantLock stateLock;
 
     public Auction() {
-        this.bids = new ArrayList<>();
-        this.status = AuctionStatus.CREATED;
-        this.winner = null;
+        this(null, null, null);
     }
 
     public Auction(String id, Item item, Seller seller) {
         super(id);
         this.item = item;
         this.seller = seller;
-        this.currentPrice = item.getStartingPrice();
-        this.status = AuctionStatus.CREATED;
+        this.currentPrice = item == null ? 0.0 : item.getStartingPrice();
+        this.status = AuctionStatus.OPEN;
         this.bids = new ArrayList<>();
         this.winner = null;
+        this.bidObservers = new CopyOnWriteArrayList<>();
+        this.stateLock = new ReentrantLock();
     }
 
     public void start() {
-        if (this.status == AuctionStatus.CREATED){
-            this.status = AuctionStatus.OPEN;
-        }
-        else{
+        stateLock.lock();
+        try {
+            if (status == AuctionStatus.OPEN) {
+                status = AuctionStatus.RUNNING;
+                return;
+            }
             throw new AuctionException("Cannot start auction from status: " + status);
+        } finally {
+            stateLock.unlock();
         }
     }
 
     public void finish() {
-        if (this.status == AuctionStatus.OPEN){
-            this.status = AuctionStatus.FINISHED;
-        }
-        else{
+        stateLock.lock();
+        try {
+            if (status == AuctionStatus.RUNNING) {
+                status = AuctionStatus.FINISHED;
+                return;
+            }
             throw new AuctionException("Cannot finish auction from status: " + status);
+        } finally {
+            stateLock.unlock();
         }
     }
 
-    public void cancel(){
-        if (this.status == AuctionStatus.CREATED || this.status == AuctionStatus.OPEN){
-            this.status = AuctionStatus.CANCELED;
-        }
-        else{
+    public void cancel() {
+        stateLock.lock();
+        try {
+            if (status == AuctionStatus.OPEN || status == AuctionStatus.RUNNING || status == AuctionStatus.FINISHED) {
+                status = AuctionStatus.CANCELED;
+                return;
+            }
             throw new AuctionException("Cannot cancel auction from status: " + status);
-        }
-    }
-    public void markPaid(){
-        if (this.status == AuctionStatus.FINISHED){
-            this.status = AuctionStatus.PAID;
-        }
-        else{
-            throw new AuctionException("Cannot mark auction as paid from status: " + status);
+        } finally {
+            stateLock.unlock();
         }
     }
 
+    public void markPaid() {
+        stateLock.lock();
+        try {
+            if (status == AuctionStatus.FINISHED) {
+                status = AuctionStatus.PAID;
+                return;
+            }
+            throw new AuctionException("Cannot mark auction as paid from status: " + status);
+        } finally {
+            stateLock.unlock();
+        }
+    }
+
+    public void addObserver(BidObserver observer) {
+        if (observer != null) {
+            bidObservers.add(observer);
+        }
+    }
+
+    public void removeObserver(BidObserver observer) {
+        bidObservers.remove(observer);
+    }
 
     public void addBid(BidTransaction bid) {
-        if (this.status != AuctionStatus.OPEN) {
-            throw new AuctionClosedException("Auction is not open for bidding");
-        }
-        if (bid == null) {
-            throw new InvalidBidException("Bid cannot be null");
-        }
-        if (bid.getAmount() <= this.currentPrice) {
-            throw new InvalidBidException("Bid amount must be higher than current price");
+        stateLock.lock();
+        try {
+            if (status != AuctionStatus.RUNNING) {
+                throw new AuctionClosedException("Auction is not open for bidding");
+            }
+            if (bid == null) {
+                throw new InvalidBidException("Bid cannot be null");
+            }
+            if (bid.getAmount() <= currentPrice) {
+                throw new InvalidBidException("Bid amount must be higher than current price");
+            }
+
+            bids.add(bid);
+            currentPrice = bid.getAmount();
+            winner = bid.getBidder();
+        } finally {
+            stateLock.unlock();
         }
 
-        this.bids.add(bid);
-        this.currentPrice = bid.getAmount();
-        this.winner = bid.getBidder();
+        notifyBidPlaced(bid);
     }
 
     public Item getItem() {
         return item;
     }
 
-
     public Seller getSeller() {
         return seller;
     }
-
 
     public double getCurrentPrice() {
         return currentPrice;
     }
 
-
     public boolean isOpen() {
-        return this.status == AuctionStatus.OPEN;
+        return status == AuctionStatus.RUNNING;
     }
-    public AuctionStatus getStatus(){
-        return this.status;
+
+    public AuctionStatus getStatus() {
+        return status;
     }
 
     public List<BidTransaction> getBids() {
         return bids;
     }
 
-
     public Bidder getWinner() {
-        return this.winner;
+        return winner;
     }
 
     public void setWinner(Bidder winner) {
         this.winner = winner;
+    }
+
+    private void notifyBidPlaced(BidTransaction bid) {
+        BidEvent event = new BidEvent(this, bid, currentPrice, winner);
+        for (BidObserver observer : bidObservers) {
+            observer.onBidPlaced(event);
+        }
     }
 
     @Override

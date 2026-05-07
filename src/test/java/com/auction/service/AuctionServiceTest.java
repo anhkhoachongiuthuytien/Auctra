@@ -36,7 +36,7 @@ class AuctionServiceTest {
         assertNotNull(auction.getId());
         assertEquals(item, auction.getItem());
         assertEquals(seller, auction.getSeller());
-        assertEquals(AuctionStatus.CREATED, auction.getStatus());
+        assertEquals(AuctionStatus.OPEN, auction.getStatus());
         assertEquals(auction, auctionDao.findById(auction.getId()));
     }
 
@@ -46,7 +46,7 @@ class AuctionServiceTest {
 
         auctionService.startAuction(auction.getId());
 
-        assertEquals(AuctionStatus.OPEN, auction.getStatus());
+        assertEquals(AuctionStatus.RUNNING, auction.getStatus());
     }
 
     @Test
@@ -77,6 +77,13 @@ class AuctionServiceTest {
         auctionService.markAuctionPaid(auction.getId());
 
         assertEquals(AuctionStatus.PAID, auction.getStatus());
+    }
+
+    @Test
+    void testListAuctions() {
+        auctionService.createAuction(item, seller);
+
+        assertEquals(1, auctionService.listAuctions().size());
     }
 
     @Test

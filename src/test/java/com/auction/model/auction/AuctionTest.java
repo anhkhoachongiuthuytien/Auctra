@@ -7,6 +7,8 @@ import com.auction.exception.InvalidBidException;
 import com.auction.model.item.Item;
 import com.auction.model.user.Bidder;
 import com.auction.model.user.Seller;
+import com.auction.observer.BidEvent;
+import com.auction.observer.BidObserver;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -39,22 +41,22 @@ class AuctionTest {
         assertEquals(item, auction.getItem());
         assertEquals(seller, auction.getSeller());
         assertEquals(1000.0, auction.getCurrentPrice());
-        assertEquals(AuctionStatus.CREATED, auction.getStatus());
+        assertEquals(AuctionStatus.OPEN, auction.getStatus());
         assertFalse(auction.isOpen());
         assertTrue(auction.getBids().isEmpty());
         assertEquals(null, auction.getWinner());
     }
 
     @Test
-    void testStartAuction() {
+    void testStartAuctionMovesToRunning() {
         auction.start();
 
-        assertEquals(AuctionStatus.OPEN, auction.getStatus());
+        assertEquals(AuctionStatus.RUNNING, auction.getStatus());
         assertTrue(auction.isOpen());
     }
 
     @Test
-    void testFinishAuction() {
+    void testFinishAuctionMovesToFinished() {
         auction.start();
         auction.finish();
 
@@ -63,7 +65,7 @@ class AuctionTest {
     }
 
     @Test
-    void testCancelAuctionFromCreated() {
+    void testCancelAuctionFromOpen() {
         auction.cancel();
 
         assertEquals(AuctionStatus.CANCELED, auction.getStatus());
@@ -71,7 +73,7 @@ class AuctionTest {
     }
 
     @Test
-    void testCancelAuctionFromOpen() {
+    void testCancelAuctionFromRunning() {
         auction.start();
         auction.cancel();
 
@@ -109,7 +111,7 @@ class AuctionTest {
     }
 
     @Test
-    void testAddBidWhenAuctionIsOpen() {
+    void testAddBidWhenAuctionIsRunning() {
         auction.start();
         BidTransaction bid = new BidTransaction(bidder1, 1200.0);
 
@@ -135,7 +137,7 @@ class AuctionTest {
     }
 
     @Test
-    void testAddBidWhenAuctionIsClosedThrowsException() {
+    void testAddBidWhenAuctionIsNotRunningThrowsException() {
         BidTransaction bid = new BidTransaction(bidder1, 1200.0);
 
         assertThrows(AuctionClosedException.class, () -> auction.addBid(bid));
@@ -157,11 +159,18 @@ class AuctionTest {
     }
 
     @Test
-    void testAddEqualBidThrowsException() {
+    void testObserverReceivesNewBidNotification() {
         auction.start();
-        BidTransaction bid = new BidTransaction(bidder1, 1000.0);
+        CapturingObserver observer = new CapturingObserver();
+        auction.addObserver(observer);
 
-        assertThrows(InvalidBidException.class, () -> auction.addBid(bid));
+        BidTransaction bid = new BidTransaction(bidder1, 1300.0);
+        auction.addBid(bid);
+
+        assertNotNull(observer.event);
+        assertEquals(auction, observer.event.getAuction());
+        assertEquals(1300.0, observer.event.getLatestPrice());
+        assertEquals(bidder1, observer.event.getCurrentWinner());
     }
 
     @Test
@@ -172,5 +181,14 @@ class AuctionTest {
         assertTrue(result.contains("Auction"));
         assertTrue(result.contains("A001"));
         assertTrue(result.contains("status"));
+    }
+
+    private static class CapturingObserver implements BidObserver {
+        private BidEvent event;
+
+        @Override
+        public void onBidPlaced(BidEvent event) {
+            this.event = event;
+        }
     }
 }

@@ -2,12 +2,13 @@ package com.auction.service;
 
 import com.auction.dao.AuctionDao;
 import com.auction.dao.ItemDao;
+import com.auction.enums.ItemType;
 import com.auction.exception.AuctionException;
+import com.auction.factory.ItemFactory;
 import com.auction.model.auction.Auction;
 import com.auction.model.item.Item;
 import com.auction.model.user.Seller;
 import com.auction.util.IdGenerator;
-import com.auction.factory.ItemFactory;
 
 public class SellerService {
     private final ItemDao itemDao;
@@ -19,6 +20,10 @@ public class SellerService {
     }
 
     public Item createItem(String type, String name, String description, double startingPrice) {
+        return createItem(ItemType.fromString(type), name, description, startingPrice);
+    }
+
+    public Item createItem(ItemType type, String name, String description, double startingPrice) {
         String id = IdGenerator.generateId();
         Item item = ItemFactory.createItem(type, id, name, description, startingPrice);
         itemDao.save(item);
