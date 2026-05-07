@@ -5,6 +5,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
@@ -17,6 +18,7 @@
     <Label styleClass="screen-title" text="Auction List"/>
     <Label fx:id="welcomeLabel" wrapText="true"/>
     <Label fx:id="summaryLabel" styleClass="info-label" wrapText="true"/>
+    <Label fx:id="actionMessageLabel" styleClass="info-label" wrapText="true"/>
 
     <TableView fx:id="auctionTable" prefHeight="420.0">
         <columns>
@@ -29,6 +31,9 @@
     </TableView>
 
     <HBox spacing="12.0">
+        <TextField fx:id="bidAmountField" prefWidth="180.0" promptText="Bid amount"/>
+        <Button fx:id="placeBidButton" mnemonicParsing="false" onAction="#handlePlaceBid" text="Place Bid"/>
+        <Button fx:id="finishAuctionButton" mnemonicParsing="false" onAction="#handleFinishAuction" text="Finish Auction"/>
         <Button mnemonicParsing="false" onAction="#handleRefresh" text="Refresh"/>
         <Button mnemonicParsing="false" onAction="#handleBackToLogin" text="Back to Login"/>
     </HBox>
