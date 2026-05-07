@@ -1,0 +1,24 @@
+.root {
+    -fx-font-family: "Segoe UI";
+    -fx-background-color: linear-gradient(to bottom, #f7f9fc, #edf2f7);
+}
+
+.screen-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+}
+
+.info-label {
+    -fx-text-fill: #36506c;
+}
+
+.button {
+    -fx-background-color: #1f6feb;
+    -fx-text-fill: white;
+    -fx-background-radius: 8px;
+    -fx-padding: 8px 16px;
+}
+
+.table-view {
+    -fx-background-radius: 10px;
+}

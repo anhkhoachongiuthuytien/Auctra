@@ -18,8 +18,6 @@ class BidServiceTest {
 
     private InMemoryAuctionDao auctionDao;
     private BidService bidService;
-    private Item item;
-    private Seller seller;
     private Bidder bidder1;
     private Bidder bidder2;
     private Auction auction;
@@ -29,8 +27,8 @@ class BidServiceTest {
         auctionDao = new InMemoryAuctionDao();
         bidService = new BidService(auctionDao);
 
-        item = new Item("I001", "Laptop", "Gaming laptop", 1000.0);
-        seller = new Seller("S001", "sellerA", "seller@gmail.com");
+        Item item = new Item("I001", "Laptop", "Gaming laptop", 1000.0);
+        Seller seller = new Seller("S001", "sellerA", "seller@gmail.com");
         bidder1 = new Bidder("B001", "bidderA", "a@gmail.com");
         bidder2 = new Bidder("B002", "bidderB", "b@gmail.com");
 
@@ -40,7 +38,7 @@ class BidServiceTest {
 
     @Test
     void testPlaceValidBid() {
-        auction.openAuction();
+        auction.start();
 
         bidService.placeBid(auction.getId(), bidder1, 1200.0);
 
@@ -63,7 +61,7 @@ class BidServiceTest {
 
     @Test
     void testPlaceLowerBidThrowsException() {
-        auction.openAuction();
+        auction.start();
 
         assertThrows(InvalidBidException.class, () ->
                 bidService.placeBid(auction.getId(), bidder1, 900.0));
@@ -71,7 +69,7 @@ class BidServiceTest {
 
     @Test
     void testPlaceEqualBidThrowsException() {
-        auction.openAuction();
+        auction.start();
 
         assertThrows(InvalidBidException.class, () ->
                 bidService.placeBid(auction.getId(), bidder1, 1000.0));
@@ -79,7 +77,7 @@ class BidServiceTest {
 
     @Test
     void testPlaceMultipleValidBids() {
-        auction.openAuction();
+        auction.start();
 
         bidService.placeBid(auction.getId(), bidder1, 1200.0);
         bidService.placeBid(auction.getId(), bidder2, 1500.0);
