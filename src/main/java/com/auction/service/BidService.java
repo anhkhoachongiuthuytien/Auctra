@@ -39,6 +39,7 @@ public class BidService {
             }
             BidTransaction bid = new BidTransaction(bidder, amount);
             auction.addBid(bid);
+            auctionDao.save(auction);
         }
     }
 }

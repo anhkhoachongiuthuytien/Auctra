@@ -1,8 +1,9 @@
 package com.auction.app;
 
-import com.auction.dao.memory.InMemoryAuctionDao;
-import com.auction.dao.memory.InMemoryItemDao;
-import com.auction.dao.memory.InMemoryUserDao;
+import com.auction.dao.sqlite.SqliteAuctionDao;
+import com.auction.dao.sqlite.SqliteItemDao;
+import com.auction.dao.sqlite.SqliteUserDao;
+import com.auction.db.DatabaseManager;
 import com.auction.model.auction.Auction;
 import com.auction.model.item.Item;
 import com.auction.model.user.Bidder;
@@ -14,18 +15,22 @@ import com.auction.service.BidService;
 import com.auction.service.SellerService;
 
 public class AppContext {
-    private final InMemoryUserDao userDao;
-    private final InMemoryItemDao itemDao;
-    private final InMemoryAuctionDao auctionDao;
+    private final DatabaseManager databaseManager;
+    private final SqliteUserDao userDao;
+    private final SqliteItemDao itemDao;
+    private final SqliteAuctionDao auctionDao;
     private final AuthService authService;
     private final SellerService sellerService;
     private final AuctionService auctionService;
     private final BidService bidService;
 
     public AppContext() {
-        this.userDao = new InMemoryUserDao();
-        this.itemDao = new InMemoryItemDao();
-        this.auctionDao = new InMemoryAuctionDao();
+        this.databaseManager = new DatabaseManager("jdbc:sqlite:auction-system.db");
+        this.databaseManager.initializeSchema();
+
+        this.userDao = new SqliteUserDao(databaseManager);
+        this.itemDao = new SqliteItemDao(databaseManager);
+        this.auctionDao = new SqliteAuctionDao(databaseManager, itemDao, userDao);
         this.authService = new AuthService(userDao);
         this.sellerService = new SellerService(itemDao, auctionDao);
         this.auctionService = new AuctionService(auctionDao);
@@ -47,21 +52,24 @@ public class AppContext {
     }
 
     private void seedData() {
-        Seller seller = authService.registerSeller("seller_demo", "seller@auction.local");
-        Bidder bidder = authService.registerBidder("bidder_demo", "bidder@auction.local");
-        authService.registerAdmin("admin_demo", "admin@auction.local");
+        if (!auctionService.listAuctions().isEmpty()) {
+            return;
+        }
+
+        ensureDemoUsers();
+
+        Seller seller = (Seller) authService.login("seller@auction.local");
+        Bidder bidder = (Bidder) authService.login("bidder@auction.local");
 
         Item laptop = sellerService.createItem("Electronics", "Gaming Laptop", "RTX laptop for concurrent bidding demo", 1500.0);
         Item car = sellerService.createItem("Vehicle", "Used Sedan", "Auction state machine sample", 8000.0);
         Item art = sellerService.createItem("Art", "Landscape Painting", "Observer pattern sample item", 500.0);
 
+        Auction.addGlobalObserver(new ConsoleBidObserver());
+
         Auction laptopAuction = auctionService.createAuction(laptop, seller);
         Auction carAuction = auctionService.createAuction(car, seller);
         Auction artAuction = auctionService.createAuction(art, seller);
-
-        laptopAuction.addObserver(new ConsoleBidObserver());
-        carAuction.addObserver(new ConsoleBidObserver());
-        artAuction.addObserver(new ConsoleBidObserver());
 
         auctionService.startAuction(laptopAuction.getId());
         auctionService.startAuction(artAuction.getId());
@@ -71,5 +79,17 @@ public class AppContext {
         auctionService.startAuction(carAuction.getId());
         auctionService.finishAuction(carAuction.getId());
         auctionService.markAuctionPaid(carAuction.getId());
+    }
+
+    private void ensureDemoUsers() {
+        if (!authService.emailExists("seller@auction.local")) {
+            authService.registerSeller("seller_demo", "seller@auction.local");
+        }
+        if (!authService.emailExists("bidder@auction.local")) {
+            authService.registerBidder("bidder_demo", "bidder@auction.local");
+        }
+        if (!authService.emailExists("admin@auction.local")) {
+            authService.registerAdmin("admin_demo", "admin@auction.local");
+        }
     }
 }
