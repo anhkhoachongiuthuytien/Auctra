@@ -1,108 +1,108 @@
-# Bao Cao Tuan 8: Kiem thu, Ngoai le va GUI nang cao
+# Báo Cáo Tuần 8: Kiểm Thử, Ngoại Lệ Và GUI Nâng Cao
 
-## Muc tieu tuan 8
+## Mục tiêu tuần 8
 
-Theo tieu chi cua tuan 8, he thong can:
+Theo tiêu chí của tuần 8, hệ thống cần:
 
-- co custom exceptions ro rang
-- xu ly ngoai le cho dat gia thap, dau gia khi phien dong, loi du lieu
-- co unit test JUnit cho logic chinh
-- refactor code theo huong sach hon, giam code smell, ap dung SOLID/MVC ro hon
-- tiep tuc hoan thien GUI JavaFX va tach logic khoi controller
+- có custom exceptions rõ ràng
+- xử lý ngoại lệ cho đặt giá thấp, đấu giá khi phiên đóng, lỗi dữ liệu
+- có unit test JUnit cho logic chính
+- refactor code theo hướng sạch hơn, giảm code smell, áp dụng SOLID/MVC rõ hơn
+- tiếp tục hoàn thiện GUI JavaFX và tách logic khỏi controller
 
-## Thay doi da thuc hien
+## Thay đổi đã thực hiện
 
-### 1. Bo sung va chuan hoa exception
+### 1. Bổ sung và chuẩn hóa exception
 
-Da giu cac exception da co:
+Đã giữ các exception đã có:
 
 - [InvalidBidException.java](/D:/BaitaplonTest/src/main/java/com/auction/exception/InvalidBidException.java)
 - [AuctionClosedException.java](/D:/BaitaplonTest/src/main/java/com/auction/exception/AuctionClosedException.java)
 - [AuthenticationException.java](/D:/BaitaplonTest/src/main/java/com/auction/exception/AuthenticationException.java)
 
-Da bo sung:
+Đã bổ sung:
 
 - [ValidationException.java](/D:/BaitaplonTest/src/main/java/com/auction/exception/ValidationException.java)
 
-`ValidationException` duoc dung cho cac loi du lieu dau vao:
+`ValidationException` được dùng cho các lỗi dữ liệu đầu vào:
 
-- email rong
-- username rong
-- bidder null
-- auction id rong
-- gia bid <= 0
-- item name/description rong
-- starting price <= 0
+- email rỗng
+- username rỗng
+- bidder `null`
+- auction id rỗng
+- giá bid `<= 0`
+- item name/description rỗng
+- starting price `<= 0`
 
-### 2. Tang cuong xu ly ngoai le o service layer
+### 2. Tăng cường xử lý ngoại lệ ở service layer
 
-Da cap nhat:
+Đã cập nhật:
 
 - [AuthService.java](/D:/BaitaplonTest/src/main/java/com/auction/service/AuthService.java)
 - [BidService.java](/D:/BaitaplonTest/src/main/java/com/auction/service/BidService.java)
 - [SellerService.java](/D:/BaitaplonTest/src/main/java/com/auction/service/SellerService.java)
 
-Noi dung chinh:
+Nội dung chính:
 
-- `AuthService` kiem tra username/email rong truoc khi register va login
-- `BidService` kiem tra:
-  - `auctionId` khong rong
-  - `bidder` khong null
-  - `amount` hop le va > 0
-- `SellerService` kiem tra:
-  - `ItemType` khong null
-  - `name` khong rong
-  - `description` khong rong
-  - `startingPrice` > 0
+- `AuthService` kiểm tra username/email rỗng trước khi register và login
+- `BidService` kiểm tra:
+  - `auctionId` không rỗng
+  - `bidder` không `null`
+  - `amount` hợp lệ và `> 0`
+- `SellerService` kiểm tra:
+  - `ItemType` không `null`
+  - `name` không rỗng
+  - `description` không rỗng
+  - `startingPrice` `> 0`
 
-### 3. Refactor GUI theo huong MVC ro hon
+### 3. Refactor GUI theo hướng MVC rõ hơn
 
-Tuan 7 da co FXML va controller co ban, nhung controller van chua tach logic ro rang. Tuan 8 da refactor them mot tang `presentation`.
+Tuần 7 đã có FXML và controller cơ bản, nhưng controller vẫn chưa tách logic rõ ràng. Tuần 8 đã refactor thêm một tầng `presentation`.
 
-Da bo sung:
+Đã bổ sung:
 
 - [LoginViewModel.java](/D:/BaitaplonTest/src/main/java/com/auction/presentation/LoginViewModel.java)
 - [AuctionListViewModel.java](/D:/BaitaplonTest/src/main/java/com/auction/presentation/AuctionListViewModel.java)
 
-Controller duoc lam mong hon:
+Controller được làm mỏng hơn:
 
 - [AuthController.java](/D:/BaitaplonTest/src/main/java/com/auction/controller/AuthController.java)
 - [AuctionController.java](/D:/BaitaplonTest/src/main/java/com/auction/controller/AuctionController.java)
 
 Sau refactor:
 
-- controller chu yeu doc input tu view va cap nhat message len UI
-- `viewmodel` xu ly login, tai danh sach, dat gia va finish auction
-- cac message loi duoc tra ve co cau truc qua `result object`
+- controller chủ yếu đọc input từ view và cập nhật message lên UI
+- `viewmodel` xử lý login, tải danh sách, đặt giá và finish auction
+- các message lỗi được trả về có cấu trúc qua `result object`
 
-### 4. Nang cap GUI JavaFX
+### 4. Nâng cấp GUI JavaFX
 
-Da cap nhat:
+Đã cập nhật:
 
 - [login-view.fxml](/D:/BaitaplonTest/src/main/resources/fxml/login-view.fxml)
 - [auction-list-view.fxml](/D:/BaitaplonTest/src/main/resources/fxml/auction-list-view.fxml)
 
-GUI hien tai co:
+GUI hiện tại có:
 
-- login bang email
-- hien message loi/ket qua tren UI
-- danh sach auction
-- nhap `bid amount`
-- nut `Place Bid`
-- nut `Finish Auction`
+- login bằng email
+- hiển thị message lỗi/kết quả trên UI
+- danh sách auction
+- nhập `bid amount`
+- nút `Place Bid`
+- nút `Finish Auction`
 - `Refresh`
 - `Back to Login`
 
-Hanh vi UI:
+Hành vi UI:
 
-- account `Bidder` duoc dat gia
-- account khac se bi khoa nut bid
-- nut `Finish Auction` duoc dung cho account khong phai bidder
-- ngoai le tu service duoc hien thi thanh message tren man hinh
+- account `Bidder` được đặt giá
+- account khác sẽ bị khóa nút bid
+- nút `Finish Auction` được dùng cho account không phải bidder
+- ngoại lệ từ service được hiển thị thành message trên màn hình
 
-### 5. Mo rong unit test
+### 5. Mở rộng unit test
 
-Da bo sung va hoan thien cac file test:
+Đã bổ sung và hoàn thiện các file test:
 
 - [AuthServiceTest.java](/D:/BaitaplonTest/src/test/java/com/auction/service/AuthServiceTest.java)
 - [SellerServiceTest.java](/D:/BaitaplonTest/src/test/java/com/auction/service/SellerServiceTest.java)
@@ -111,63 +111,63 @@ Da bo sung va hoan thien cac file test:
 - [InMemoryItemDaoTest.java](/D:/BaitaplonTest/src/test/java/com/auction/dao/InMemoryItemDaoTest.java)
 - [InMemoryAuctionDaoTest.java](/D:/BaitaplonTest/src/test/java/com/auction/dao/InMemoryAuctionDaoTest.java)
 
-Ngoai ra, cac test tu tuan 7 van duoc giu va tiep tuc pass:
+Ngoài ra, các test từ tuần 7 vẫn được giữ và tiếp tục pass:
 
 - [AuctionTest.java](/D:/BaitaplonTest/src/test/java/com/auction/model/auction/AuctionTest.java)
 - [AuctionServiceTest.java](/D:/BaitaplonTest/src/test/java/com/auction/service/AuctionServiceTest.java)
 - [ConcurrentBidTest.java](/D:/BaitaplonTest/src/test/java/com/auction/concurrency/ConcurrentBidTest.java)
 
-### 6. Ket qua kiem thu
+### 6. Kết quả kiểm thử
 
-Da xac minh bang Maven:
+Đã xác minh bằng Maven:
 
 ```powershell
 mvn test
 ```
 
-Ket qua:
+Kết quả:
 
 - `Tests run: 59`
 - `Failures: 0`
 - `Errors: 0`
 - `BUILD SUCCESS`
 
-## Danh gia theo tieu chi tuan 8
+## Đánh giá theo tiêu chí tuần 8
 
-1. `Tao custom exceptions`
-- Dat
+1. `Tạo custom exceptions`
+- Đạt
 
-2. `Xu ly ngoai le cho dat gia thap hon hien tai, dau gia khi phien dong, loi du lieu`
-- Dat
+2. `Xử lý ngoại lệ cho đặt giá thấp hơn hiện tại, đấu giá khi phiên đóng, lỗi dữ liệu`
+- Đạt
 
-3. `Viet unit test JUnit cho logic dau gia`
-- Dat
+3. `Viết unit test JUnit cho logic đấu giá`
+- Đạt
 
-4. `Refactor code, loai bo code smell, ap dung SOLID`
-- Dat o muc phu hop voi cau truc hien tai
+4. `Refactor code, loại bỏ code smell, áp dụng SOLID`
+- Đạt ở mức phù hợp với cấu trúc hiện tại
 
-5. `[Tu hoc] Hoan thien GUI JavaFX, ap dung MVC, tach logic khoi Controller, dung FXML`
-- Dat o muc tot hon tuan 7
+5. `[Tự học] Hoàn thiện GUI JavaFX, áp dụng MVC, tách logic khỏi Controller, dùng FXML`
+- Đạt ở mức tốt hơn tuần 7
 
-## Gioi han hien tai
+## Giới hạn hiện tại
 
-- chua co password that, login van theo email
-- chua co persistence database that
-- `BidController` va `SellerController` van chua duoc mo rong
-- `auction detail` va `seller view` van chua phat trien day du
+- chưa có password thật, login vẫn theo email
+- chưa có persistence database thật
+- `BidController` và `SellerController` vẫn chưa được mở rộng
+- `auction detail` và `seller view` vẫn chưa phát triển đầy đủ
 
-## Tong ket
+## Tổng kết
 
-Sau tuan 8, project da tien mot buoc ro rang ve chat luong code:
+Sau tuần 8, project đã tiến một bước rõ ràng về chất lượng code:
 
-- validation va exception ro hon
-- test suite day hon
-- GUI da co xu ly hanh dong va loi that
-- controller da mong hon nhờ tach logic sang `presentation/viewmodel`
+- validation và exception rõ hơn
+- test suite dày hơn
+- GUI đã có xử lý hành động và lỗi thật
+- controller đã mỏng hơn nhờ tách logic sang `presentation/viewmodel`
 
-Trang thai hien tai phu hop de demo cho noi dung:
+Trạng thái hiện tại phù hợp để demo cho nội dung:
 
 - testing
 - exception handling
 - refactor
-- JavaFX MVC co ban
+- JavaFX MVC cơ bản

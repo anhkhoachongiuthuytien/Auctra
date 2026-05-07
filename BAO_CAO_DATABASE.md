@@ -1,165 +1,165 @@
-# BAO CAO DATABASE
+# Báo Cáo Database
 
-## 1. Muc tieu
+## 1. Mục tiêu
 
-Bo sung tang luu tru du lieu that cho he thong dau gia de thay the cach luu tam bang bo nho. Phan nay phuc vu muc tieu cham tien do: co thiet ke database, co lop ket noi giua ung dung va database, va mo ta duoc luong `client -> service -> database`.
+Bổ sung tầng lưu trữ dữ liệu thật cho hệ thống đấu giá để thay thế cách lưu tạm bằng bộ nhớ. Phần này phục vụ mục tiêu chấm tiến độ: có thiết kế database, có lớp kết nối giữa ứng dụng và database, và mô tả được luồng `client -> service -> database`.
 
-## 2. Lua chon cong nghe
+## 2. Lựa chọn công nghệ
 
-- Database duoc chon: `SQLite`
-- Thu vien JDBC: `org.xerial:sqlite-jdbc:3.50.1.0`
+- Database được chọn: `SQLite`
+- Thư viện JDBC: `org.xerial:sqlite-jdbc:3.50.1.0`
 
-Ly do chon SQLite:
+Lý do chọn SQLite:
 
-- khong can cai dat server database rieng
-- de demo va de nop bai tien do
-- phu hop voi cau truc Java hien tai dung DAO
-- co the nang cap len MySQL/PostgreSQL sau ma khong can doi service layer qua nhieu
+- không cần cài đặt server database riêng
+- dễ demo và dễ nộp bài tiến độ
+- phù hợp với cấu trúc Java hiện tại dùng DAO
+- có thể nâng cấp lên MySQL/PostgreSQL sau mà không cần đổi service layer quá nhiều
 
-## 3. Cau truc database
+## 3. Cấu trúc database
 
-Schema duoc dat tai [schema.sql](D:/BaitaplonTest/src/main/resources/db/schema.sql).
+Schema được đặt tại [schema.sql](/D:/BaitaplonTest/src/main/resources/db/schema.sql).
 
-### Bang `users`
+### Bảng `users`
 
-- `id`: khoa chinh
-- `username`: ten hien thi
-- `email`: duy nhat
-- `role`: vai tro `SELLER`, `BIDDER`, `ADMIN`
+- `id`: khóa chính
+- `username`: tên hiển thị
+- `email`: duy nhất
+- `role`: vai trò `SELLER`, `BIDDER`, `ADMIN`
 
-### Bang `items`
+### Bảng `items`
 
-- `id`: khoa chinh
-- `name`: ten vat pham
-- `description`: mo ta
-- `starting_price`: gia khoi diem
-- `type`: loai vat pham `ART`, `VEHICLE`, `ELECTRONICS`
+- `id`: khóa chính
+- `name`: tên vật phẩm
+- `description`: mô tả
+- `starting_price`: giá khởi điểm
+- `type`: loại vật phẩm `ART`, `VEHICLE`, `ELECTRONICS`
 
-### Bang `auctions`
+### Bảng `auctions`
 
-- `id`: khoa chinh
-- `item_id`: khoa ngoai sang `items`
-- `seller_id`: khoa ngoai sang `users`
-- `current_price`: gia hien tai
-- `status`: trang thai phien dau gia
-- `winner_id`: khoa ngoai sang `users`, cho phep `NULL`
+- `id`: khóa chính
+- `item_id`: khóa ngoại sang `items`
+- `seller_id`: khóa ngoại sang `users`
+- `current_price`: giá hiện tại
+- `status`: trạng thái phiên đấu giá
+- `winner_id`: khóa ngoại sang `users`, cho phép `NULL`
 
-### Bang `bids`
+### Bảng `bids`
 
-- `id`: khoa chinh tu tang
-- `auction_id`: khoa ngoai sang `auctions`
-- `bidder_id`: khoa ngoai sang `users`
-- `amount`: muc gia dat
-- `bid_time`: thoi diem dat gia
+- `id`: khóa chính tự tăng
+- `auction_id`: khóa ngoại sang `auctions`
+- `bidder_id`: khóa ngoại sang `users`
+- `amount`: mức giá đặt
+- `bid_time`: thời điểm đặt giá
 
-## 4. Tang ket noi database
+## 4. Tầng kết nối database
 
-Da bo sung cac thanh phan sau:
+Đã bổ sung các thành phần sau:
 
-- [DatabaseManager.java](D:/BaitaplonTest/src/main/java/com/auction/db/DatabaseManager.java): tao ket noi JDBC, bat foreign key, khoi tao schema
-- [DbMappers.java](D:/BaitaplonTest/src/main/java/com/auction/db/DbMappers.java): map du lieu giua object Java va gia tri luu trong bang
-- [SqliteUserDao.java](D:/BaitaplonTest/src/main/java/com/auction/dao/sqlite/SqliteUserDao.java)
-- [SqliteItemDao.java](D:/BaitaplonTest/src/main/java/com/auction/dao/sqlite/SqliteItemDao.java)
-- [SqliteAuctionDao.java](D:/BaitaplonTest/src/main/java/com/auction/dao/sqlite/SqliteAuctionDao.java)
+- [DatabaseManager.java](/D:/BaitaplonTest/src/main/java/com/auction/db/DatabaseManager.java): tạo kết nối JDBC, bật foreign key, khởi tạo schema
+- [DbMappers.java](/D:/BaitaplonTest/src/main/java/com/auction/db/DbMappers.java): map dữ liệu giữa object Java và giá trị lưu trong bảng
+- [SqliteUserDao.java](/D:/BaitaplonTest/src/main/java/com/auction/dao/sqlite/SqliteUserDao.java)
+- [SqliteItemDao.java](/D:/BaitaplonTest/src/main/java/com/auction/dao/sqlite/SqliteItemDao.java)
+- [SqliteAuctionDao.java](/D:/BaitaplonTest/src/main/java/com/auction/dao/sqlite/SqliteAuctionDao.java)
 
-Cac DAO nay giu nguyen interface hien co, nen service layer khong bi thay doi lon. Day la diem quan trong de giu code de mo rong va de chuyen doi giua `in-memory` va `database-backed` implementation.
+Các DAO này giữ nguyên interface hiện có, nên service layer không bị thay đổi lớn. Đây là điểm quan trọng để giữ code dễ mở rộng và dễ chuyển đổi giữa `in-memory` và `database-backed` implementation.
 
-## 5. Thay doi trong kien truc he thong
+## 5. Thay đổi trong kiến trúc hệ thống
 
-Kien truc hien tai duoc tach thanh 3 tang:
+Kiến trúc hiện tại được tách thành 3 tầng:
 
 1. `Client`
    - JavaFX GUI
-   - nguoi dung thao tac tren man hinh `Login` va `Auction List`
+   - người dùng thao tác trên màn hình `Login` và `Auction List`
 
 2. `Server / Business layer`
    - `AuthService`, `AuctionService`, `BidService`, `SellerService`
-   - xu ly nghiep vu, validation, exception, concurrency
+   - xử lý nghiệp vụ, validation, exception, concurrency
 
 3. `Database layer`
    - `DatabaseManager`
-   - cac `Sqlite*Dao`
-   - schema va du lieu SQLite
+   - các `Sqlite*Dao`
+   - schema và dữ liệu SQLite
 
-Luong xu ly tong quat:
+Luồng xử lý tổng quát:
 
 `JavaFX Controller -> ViewModel -> Service -> DAO -> SQLite`
 
-Phan khoi tao trung tam duoc cau hinh trong [AppContext.java](D:/BaitaplonTest/src/main/java/com/auction/app/AppContext.java). File nay hien dang:
+Phần khởi tạo trung tâm được cấu hình trong [AppContext.java](/D:/BaitaplonTest/src/main/java/com/auction/app/AppContext.java). File này hiện đang:
 
-- tao `DatabaseManager("jdbc:sqlite:auction-system.db")`
-- khoi tao schema neu chua ton tai
-- gan `SqliteUserDao`, `SqliteItemDao`, `SqliteAuctionDao` vao cac service
-- seed du lieu demo neu database chua co auction
+- tạo `DatabaseManager("jdbc:sqlite:auction-system.db")`
+- khởi tạo schema nếu chưa tồn tại
+- gán `SqliteUserDao`, `SqliteItemDao`, `SqliteAuctionDao` vào các service
+- seed dữ liệu demo nếu database chưa có auction
 
-## 6. Du lieu demo
+## 6. Dữ liệu demo
 
-He thong hien tai tu dong tao cac tai khoan va auction mau khi database trong:
+Hệ thống hiện tại tự động tạo các tài khoản và auction mẫu khi database trống:
 
 - `seller@auction.local`
 - `bidder@auction.local`
 - `admin@auction.local`
 
-Du lieu nay giup demo nhanh cac luong:
+Dữ liệu này giúp demo nhanh các luồng:
 
-- dang nhap
-- xem danh sach auction
-- dat gia
-- ket thuc phien
-- luu lai lich su bid sau khi tat app
+- đăng nhập
+- xem danh sách auction
+- đặt giá
+- kết thúc phiên
+- lưu lại lịch sử bid sau khi tắt app
 
-## 7. Dieu chinh model va service de ho tro persistence
+## 7. Điều chỉnh model và service để hỗ trợ persistence
 
-De luu va phuc hoi du lieu day du, da bo sung:
+Để lưu và phục hồi dữ liệu đầy đủ, đã bổ sung:
 
-- [Auction.java](D:/BaitaplonTest/src/main/java/com/auction/model/auction/Auction.java)
-  - them `restoreState(...)` de nap lai trang thai, winner va lich su bid tu database
-  - them `global observer` de giu co che notify khi app tai lai doi tuong auction
-- [BidTransaction.java](D:/BaitaplonTest/src/main/java/com/auction/model/auction/BidTransaction.java)
-  - them constructor co `bidTime` de phuc hoi bid tu du lieu da luu
-- [AuctionService.java](D:/BaitaplonTest/src/main/java/com/auction/service/AuctionService.java)
-  - sau moi thay doi trang thai se goi `auctionDao.save(...)`
-- [BidService.java](D:/BaitaplonTest/src/main/java/com/auction/service/BidService.java)
-  - sau khi dat gia hop le se luu lai auction va bids xuong database
+- [Auction.java](/D:/BaitaplonTest/src/main/java/com/auction/model/auction/Auction.java)
+  - thêm `restoreState(...)` để nạp lại trạng thái, winner và lịch sử bid từ database
+  - thêm `global observer` để giữ cơ chế notify khi app tải lại đối tượng auction
+- [BidTransaction.java](/D:/BaitaplonTest/src/main/java/com/auction/model/auction/BidTransaction.java)
+  - thêm constructor có `bidTime` để phục hồi bid từ dữ liệu đã lưu
+- [AuctionService.java](/D:/BaitaplonTest/src/main/java/com/auction/service/AuctionService.java)
+  - sau mỗi thay đổi trạng thái sẽ gọi `auctionDao.save(...)`
+- [BidService.java](/D:/BaitaplonTest/src/main/java/com/auction/service/BidService.java)
+  - sau khi đặt giá hợp lệ sẽ lưu lại auction và bids xuống database
 
-## 8. Kiem thu va xac minh
+## 8. Kiểm thử và xác minh
 
-Da bo sung integration test:
+Đã bổ sung integration test:
 
-- [SqlitePersistenceTest.java](D:/BaitaplonTest/src/test/java/com/auction/db/SqlitePersistenceTest.java)
+- [SqlitePersistenceTest.java](/D:/BaitaplonTest/src/test/java/com/auction/db/SqlitePersistenceTest.java)
 
-Noi dung test:
+Nội dung test:
 
-- tao database tam
-- khoi tao schema
-- luu seller, bidder, item, auction
+- tạo database tạm
+- khởi tạo schema
+- lưu seller, bidder, item, auction
 - start auction
-- dat bid
-- load lai auction tu SQLite
-- kiem tra gia hien tai, winner va lich su bid
+- đặt bid
+- load lại auction từ SQLite
+- kiểm tra giá hiện tại, winner và lịch sử bid
 
-Ket qua xac minh:
+Kết quả xác minh:
 
-- lenh `mvn test` da chay thanh cong
-- tong cong `60 tests`
+- lệnh `mvn test` đã chạy thành công
+- tổng cộng `60 tests`
 - `0 failures`, `0 errors`
 
-## 9. Danh gia hien trang
+## 9. Đánh giá hiện trạng
 
-Phan database hien da dat muc tieu tien do:
+Phần database hiện đã đạt mục tiêu tiến độ:
 
-- co schema ro rang
-- co tang DAO su dung database that
-- co luong ket noi tu GUI den database
-- co test xac minh persistence
+- có schema rõ ràng
+- có tầng DAO sử dụng database thật
+- có luồng kết nối từ GUI đến database
+- có test xác minh persistence
 
-Nhung van con cac huong mo rong tiep theo:
+Nhưng vẫn còn các hướng mở rộng tiếp theo:
 
-- bo sung migration/versioning cho schema
-- tach server thanh process rieng neu can dung mo hinh client-server that
-- them polling hoac socket de ho tro realtime update
-- them man hinh tao item, tao auction va chi tiet auction day du hon
+- bổ sung migration/versioning cho schema
+- tách server thành process riêng nếu cần dùng mô hình client-server thật
+- thêm polling hoặc socket để hỗ trợ realtime update
+- thêm màn hình tạo item, tạo auction và chi tiết auction đầy đủ hơn
 
-## 10. Ket luan
+## 10. Kết luận
 
-Project da duoc nang cap tu mo hinh `in-memory` sang mo hinh co `SQLite database`. Cau truc hien tai phu hop de demo tien do bai tap lon, dong thoi giu duoc kha nang mo rong cho cac tuan sau ma khong can viet lai toan bo service layer.
+Project đã được nâng cấp từ mô hình `in-memory` sang mô hình có `SQLite database`. Cấu trúc hiện tại phù hợp để demo tiến độ bài tập lớn, đồng thời giữ được khả năng mở rộng cho các tuần sau mà không cần viết lại toàn bộ service layer.

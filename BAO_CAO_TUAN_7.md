@@ -1,38 +1,38 @@
-# Bao Cao Tuan 7: Da Luong Va Song Song
+# Báo Cáo Tuần 7: Đa Luồng Và Song Song
 
-## Muc tieu tuan 7
+## Mục tiêu tuần 7
 
-Theo tieu chi cua bai giang tuan nay, he thong can:
+Theo tiêu chí của bài giảng tuần này, hệ thống cần:
 
-- trien khai `Observer Pattern` de notify khi co bid moi
-- co logic nghiep vu tao phien dau gia, dat gia va kiem tra hop le
-- co logic chuyen trang thai `OPEN -> RUNNING -> FINISHED -> PAID/CANCELED`
-- xu ly `concurrent bidding`, tranh race condition va lost update
-- su dung `synchronized` va `ReentrantLock` cho cac thao tac critical
-- tu hoc JavaFX de co cac man hinh co ban nhu `Login` va `Danh sach`
+- triển khai `Observer Pattern` để notify khi có bid mới
+- có logic nghiệp vụ tạo phiên đấu giá, đặt giá và kiểm tra hợp lệ
+- có logic chuyển trạng thái `OPEN -> RUNNING -> FINISHED -> PAID/CANCELED`
+- xử lý `concurrent bidding`, tránh race condition và lost update
+- sử dụng `synchronized` và `ReentrantLock` cho các thao tác critical
+- tự học JavaFX để có các màn hình cơ bản như `Login` và `Danh sách`
 
-## Thay doi da thuc hien
+## Thay đổi đã thực hiện
 
-### 1. Observer Pattern cho bid moi
+### 1. Observer Pattern cho bid mới
 
-Da bo sung package [src/main/java/com/auction/observer](/D:/BaitaplonTest/src/main/java/com/auction/observer) gom:
+Đã bổ sung package [src/main/java/com/auction/observer](/D:/BaitaplonTest/src/main/java/com/auction/observer) gồm:
 
 - [BidObserver.java](/D:/BaitaplonTest/src/main/java/com/auction/observer/BidObserver.java)
 - [BidEvent.java](/D:/BaitaplonTest/src/main/java/com/auction/observer/BidEvent.java)
 - [ConsoleBidObserver.java](/D:/BaitaplonTest/src/main/java/com/auction/observer/ConsoleBidObserver.java)
 
-Trong [Auction.java](/D:/BaitaplonTest/src/main/java/com/auction/model/auction/Auction.java), moi auction hien co:
+Trong [Auction.java](/D:/BaitaplonTest/src/main/java/com/auction/model/auction/Auction.java), mỗi auction hiện có:
 
-- danh sach observer
+- danh sách observer
 - `addObserver(...)`
 - `removeObserver(...)`
 - `notifyBidPlaced(...)`
 
-Khi co bid hop le moi, auction se tao `BidEvent` va notify cho observer.
+Khi có bid hợp lệ mới, auction sẽ tạo `BidEvent` và notify cho observer.
 
-### 2. Hoan thien logic nghiep vu dau gia
+### 2. Hoàn thiện logic nghiệp vụ đấu giá
 
-Da giu va chinh lai cac service chinh:
+Đã giữ và chỉnh lại các service chính:
 
 - [AuctionService.java](/D:/BaitaplonTest/src/main/java/com/auction/service/AuctionService.java)
 - [BidService.java](/D:/BaitaplonTest/src/main/java/com/auction/service/BidService.java)
@@ -40,18 +40,18 @@ Da giu va chinh lai cac service chinh:
 - [ItemFactory.java](/D:/BaitaplonTest/src/main/java/com/auction/factory/ItemFactory.java)
 - [ItemType.java](/D:/BaitaplonTest/src/main/java/com/auction/enums/ItemType.java)
 
-Ket qua:
+Kết quả:
 
-- tao item theo `ART`, `ELECTRONICS`, `VEHICLE`
-- tao auction va luu vao `InMemoryAuctionDao`
-- dat gia co validate:
-  - auction phai ton tai
-  - auction phai dang cho phep bid
-  - gia moi phai cao hon gia hien tai
+- tạo item theo `ART`, `ELECTRONICS`, `VEHICLE`
+- tạo auction và lưu vào `InMemoryAuctionDao`
+- đặt giá có validate:
+  - auction phải tồn tại
+  - auction phải đang cho phép bid
+  - giá mới phải cao hơn giá hiện tại
 
-### 3. Chinh state machine theo tieu chi tuan 7
+### 3. Chỉnh state machine theo tiêu chí tuần 7
 
-Da cap nhat [AuctionStatus.java](/D:/BaitaplonTest/src/main/java/com/auction/enums/AuctionStatus.java) thanh:
+Đã cập nhật [AuctionStatus.java](/D:/BaitaplonTest/src/main/java/com/auction/enums/AuctionStatus.java) thành:
 
 - `OPEN`
 - `RUNNING`
@@ -59,31 +59,31 @@ Da cap nhat [AuctionStatus.java](/D:/BaitaplonTest/src/main/java/com/auction/enu
 - `PAID`
 - `CANCELED`
 
-Da cap nhat [Auction.java](/D:/BaitaplonTest/src/main/java/com/auction/model/auction/Auction.java) de chay theo flow:
+Đã cập nhật [Auction.java](/D:/BaitaplonTest/src/main/java/com/auction/model/auction/Auction.java) để chạy theo flow:
 
-- auction moi tao ra o trang thai `OPEN`
-- `start()` chuyen `OPEN -> RUNNING`
-- `finish()` chuyen `RUNNING -> FINISHED`
-- `markPaid()` chuyen `FINISHED -> PAID`
-- `cancel()` cho phep huy tu `OPEN`, `RUNNING` hoac `FINISHED`
+- auction mới tạo ra ở trạng thái `OPEN`
+- `start()` chuyển `OPEN -> RUNNING`
+- `finish()` chuyển `RUNNING -> FINISHED`
+- `markPaid()` chuyển `FINISHED -> PAID`
+- `cancel()` cho phép hủy từ `OPEN`, `RUNNING` hoặc `FINISHED`
 
-Bid chi duoc chap nhan khi auction o `RUNNING`.
+Bid chỉ được chấp nhận khi auction ở `RUNNING`.
 
 ### 4. Concurrent bidding
 
-Da giu va nang cap phan xu ly bid dong thoi:
+Đã giữ và nâng cấp phần xử lý bid đồng thời:
 
-- [BidService.java](/D:/BaitaplonTest/src/main/java/com/auction/service/BidService.java) su dung `synchronized (auction)` de bao ve critical section o service layer
-- [Auction.java](/D:/BaitaplonTest/src/main/java/com/auction/model/auction/Auction.java) su dung `ReentrantLock` de bao ve state transition va thao tac them bid o model layer
+- [BidService.java](/D:/BaitaplonTest/src/main/java/com/auction/service/BidService.java) sử dụng `synchronized (auction)` để bảo vệ critical section ở service layer
+- [Auction.java](/D:/BaitaplonTest/src/main/java/com/auction/model/auction/Auction.java) sử dụng `ReentrantLock` để bảo vệ state transition và thao tác thêm bid ở model layer
 
-Muc dich:
+Mục đích:
 
-- tranh hai thread cap nhat gia cung luc ma bo sot update
-- dam bao `currentPrice`, `winner`, `bids` duoc cap nhat nhat quan
+- tránh hai thread cập nhật giá cùng lúc mà bỏ sót update
+- đảm bảo `currentPrice`, `winner`, `bids` được cập nhật nhất quán
 
-### 5. synchronized va ReentrantLock
+### 5. `synchronized` và `ReentrantLock`
 
-Da dap ung ca hai yeu cau:
+Đã đáp ứng cả hai yêu cầu:
 
 - `synchronized`
   - [BidService.java](/D:/BaitaplonTest/src/main/java/com/auction/service/BidService.java)
@@ -91,11 +91,11 @@ Da dap ung ca hai yeu cau:
 - `ReentrantLock`
   - [Auction.java](/D:/BaitaplonTest/src/main/java/com/auction/model/auction/Auction.java)
 
-### 6. JavaFX co ban: Login va Danh sach
+### 6. JavaFX cơ bản: Login và Danh sách
 
-Da bo sung wiring JavaFX toi thieu de app khong con dung o mot `Label`.
+Đã bổ sung wiring JavaFX tối thiểu để app không còn dừng ở một `Label`.
 
-File moi/chinh:
+File mới/chính:
 
 - [Main.java](/D:/BaitaplonTest/src/main/java/com/auction/Main.java)
 - [AppContext.java](/D:/BaitaplonTest/src/main/java/com/auction/app/AppContext.java)
@@ -106,64 +106,64 @@ File moi/chinh:
 - [auction-list-view.fxml](/D:/BaitaplonTest/src/main/resources/fxml/auction-list-view.fxml)
 - [app.css](/D:/BaitaplonTest/src/main/resources/css/app.css)
 
-Hien tai app co:
+Hiện tại app có:
 
-- man hinh `Login`
-- man hinh `Auction List`
-- du lieu seed san de demo
-- 3 tai khoan demo:
+- màn hình `Login`
+- màn hình `Auction List`
+- dữ liệu seed sẵn để demo
+- 3 tài khoản demo:
   - `seller@auction.local`
   - `bidder@auction.local`
   - `admin@auction.local`
 
-## Kiem thu da thuc hien
+## Kiểm thử đã thực hiện
 
-Da cap nhat va compile lai test cho flow moi:
+Đã cập nhật và compile lại test cho flow mới:
 
 - [AuctionTest.java](/D:/BaitaplonTest/src/test/java/com/auction/model/auction/AuctionTest.java)
 - [AuctionServiceTest.java](/D:/BaitaplonTest/src/test/java/com/auction/service/AuctionServiceTest.java)
 - [BidServiceTest.java](/D:/BaitaplonTest/src/test/java/com/auction/service/BidServiceTest.java)
 - [ConcurrentBidTest.java](/D:/BaitaplonTest/src/test/java/com/auction/concurrency/ConcurrentBidTest.java)
 
-Ket qua xac minh:
+Kết quả xác minh:
 
 - `javac` compile pass cho `src/main/java`
 - `javac` compile pass cho `src/test/java`
-- chay JUnit Platform bang runner tam: `35/35 tests successful`
+- chạy JUnit Platform bằng runner tạm: `35/35 tests successful`
 
-## Danh gia theo tieu chi tuan 7
+## Đánh giá theo tiêu chí tuần 7
 
-1. `Observer Pattern de notify khi co bid moi`
-- Dat
+1. `Observer Pattern để notify khi có bid mới`
+- Đạt
 
-2. `Code logic nghiep vu: tao phien dau gia, dat gia, kiem tra hop le`
-- Dat
+2. `Code logic nghiệp vụ: tạo phiên đấu giá, đặt giá, kiểm tra hợp lệ`
+- Đạt
 
-3. `Logic chuyen trang thai OPEN -> RUNNING -> FINISHED -> PAID/CANCELED`
-- Dat
+3. `Logic chuyển trạng thái OPEN -> RUNNING -> FINISHED -> PAID/CANCELED`
+- Đạt
 
-4. `Xu ly dau gia dong thoi`
-- Dat o muc backend core
+4. `Xử lý đấu giá đồng thời`
+- Đạt ở mức backend core
 
-5. `Su dung synchronized, ReentrantLock`
-- Dat
+5. `Sử dụng synchronized, ReentrantLock`
+- Đạt
 
-6. `JavaFX co ban: Login, Danh sach`
-- Dat o muc toi thieu de demo
+6. `JavaFX cơ bản: Login, Danh sách`
+- Đạt ở mức tối thiểu để demo
 
-## Gioi han hien tai
+## Giới hạn hiện tại
 
-- chua co persistence that, van dung `in-memory DAO`
-- login moi o muc email-based, chua co password va phan quyen day du
-- man `auction detail` va `seller view` moi la placeholder
-- observer hien dang demo theo dang console notification
+- chưa có persistence thật, vẫn dùng `in-memory DAO`
+- login mới ở mức email-based, chưa có password và phân quyền đầy đủ
+- màn `auction detail` và `seller view` mới là placeholder
+- observer hiện đang demo theo dạng console notification
 
-## Tong ket
+## Tổng kết
 
-Sau dot thay doi nay, code hien tai da dap ung du bo tieu chi tuan 7 o muc phu hop de review va demo:
+Sau đợt thay đổi này, code hiện tại đã đáp ứng đủ bộ tiêu chí tuần 7 ở mức phù hợp để review và demo:
 
-- co observer cho bid moi
-- co state machine dung yeu cau
-- co concurrent bidding voi co che dong bo ro rang
-- co su dung ca `synchronized` va `ReentrantLock`
-- co giao dien JavaFX co ban cho `Login` va `Auction List`
+- có observer cho bid mới
+- có state machine đúng yêu cầu
+- có concurrent bidding với cơ chế đồng bộ rõ ràng
+- có sử dụng cả `synchronized` và `ReentrantLock`
+- có giao diện JavaFX cơ bản cho `Login` và `Auction List`
