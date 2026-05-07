@@ -14,7 +14,7 @@
 
     <Label styleClass="screen-title" text="Auction System Login"/>
     <Label wrapText="true" maxWidth="520.0"
-           text="Week 7 demo: login is email-based and the seeded data already includes users, auctions, observer notifications, and concurrent bidding logic."/>
+           text="Week 8 demo: login, validation, exception handling, unit testing, and JavaFX MVC-style controller/viewmodel separation."/>
     <TextField fx:id="emailField" maxWidth="320.0" promptText="Enter email"/>
     <Button mnemonicParsing="false" onAction="#handleLogin" prefWidth="160.0" text="Login"/>
     <Label fx:id="messageLabel" maxWidth="520.0" styleClass="info-label" wrapText="true"/>

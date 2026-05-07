@@ -4,6 +4,7 @@ import com.auction.dao.AuctionDao;
 import com.auction.dao.ItemDao;
 import com.auction.enums.ItemType;
 import com.auction.exception.AuctionException;
+import com.auction.exception.ValidationException;
 import com.auction.factory.ItemFactory;
 import com.auction.model.auction.Auction;
 import com.auction.model.item.Item;
@@ -24,6 +25,18 @@ public class SellerService {
     }
 
     public Item createItem(ItemType type, String name, String description, double startingPrice) {
+        if (type == null) {
+            throw new ValidationException("Item type must not be null");
+        }
+        if (name == null || name.trim().isEmpty()) {
+            throw new ValidationException("Item name must not be empty");
+        }
+        if (description == null || description.trim().isEmpty()) {
+            throw new ValidationException("Item description must not be empty");
+        }
+        if (Double.isNaN(startingPrice) || Double.isInfinite(startingPrice) || startingPrice <= 0) {
+            throw new ValidationException("Starting price must be greater than 0");
+        }
         String id = IdGenerator.generateId();
         Item item = ItemFactory.createItem(type, id, name, description, startingPrice);
         itemDao.save(item);

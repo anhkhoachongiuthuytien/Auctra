@@ -4,6 +4,7 @@ import com.auction.dao.memory.InMemoryAuctionDao;
 import com.auction.exception.AuctionClosedException;
 import com.auction.exception.AuctionException;
 import com.auction.exception.InvalidBidException;
+import com.auction.exception.ValidationException;
 import com.auction.model.auction.Auction;
 import com.auction.model.item.Item;
 import com.auction.model.user.Bidder;
@@ -85,5 +86,21 @@ class BidServiceTest {
         assertEquals(2, auction.getBids().size());
         assertEquals(1500.0, auction.getCurrentPrice());
         assertEquals(bidder2, auction.getWinner());
+    }
+
+    @Test
+    void testPlaceBidWithNullBidderThrowsValidationException() {
+        auction.start();
+
+        assertThrows(ValidationException.class, () ->
+                bidService.placeBid(auction.getId(), null, 1200.0));
+    }
+
+    @Test
+    void testPlaceBidWithInvalidAmountThrowsValidationException() {
+        auction.start();
+
+        assertThrows(ValidationException.class, () ->
+                bidService.placeBid(auction.getId(), bidder1, 0));
     }
 }
