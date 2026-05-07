@@ -17,6 +17,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Auction extends Entity {
+    private static final List<BidObserver> globalBidObservers = new CopyOnWriteArrayList<>();
     private final Item item;
     private final Seller seller;
     private double currentPrice;
@@ -100,6 +101,12 @@ public class Auction extends Entity {
         }
     }
 
+    public static void addGlobalObserver(BidObserver observer) {
+        if (observer != null && !globalBidObservers.contains(observer)) {
+            globalBidObservers.add(observer);
+        }
+    }
+
     public void removeObserver(BidObserver observer) {
         bidObservers.remove(observer);
     }
@@ -159,9 +166,20 @@ public class Auction extends Entity {
         this.winner = winner;
     }
 
+    public void restoreState(AuctionStatus status, double currentPrice, Bidder winner, List<BidTransaction> restoredBids) {
+        this.status = status;
+        this.currentPrice = currentPrice;
+        this.winner = winner;
+        this.bids.clear();
+        this.bids.addAll(restoredBids);
+    }
+
     private void notifyBidPlaced(BidTransaction bid) {
         BidEvent event = new BidEvent(this, bid, currentPrice, winner);
         for (BidObserver observer : bidObservers) {
+            observer.onBidPlaced(event);
+        }
+        for (BidObserver observer : globalBidObservers) {
             observer.onBidPlaced(event);
         }
     }

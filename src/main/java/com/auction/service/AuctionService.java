@@ -27,22 +27,26 @@ public class AuctionService {
     public void startAuction(String auctionId) {
         Auction auction = getAuctionById(auctionId);
         auction.start();
+        auctionDao.save(auction);
     }
 
     public void finishAuction(String auctionId) {
         Auction auction = getAuctionById(auctionId);
         auction.finish();
+        auctionDao.save(auction);
     }
 
     public void cancelAuction(String auctionId) {
         Auction auction = getAuctionById(auctionId);
         auction.cancel();
+        auctionDao.save(auction);
         AuctionManager.getInstance().removeActiveAuction(auction);
     }
 
     public void markAuctionPaid(String auctionId) {
         Auction auction = getAuctionById(auctionId);
         auction.markPaid();
+        auctionDao.save(auction);
         AuctionManager.getInstance().removeActiveAuction(auction);
     }
 
