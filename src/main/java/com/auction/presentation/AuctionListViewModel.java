@@ -39,12 +39,14 @@ public class AuctionListViewModel {
         }
 
         try {
+            // UI gửi amount dưới dạng text, nên ViewModel chịu trách nhiệm parse trước khi vào service.
             double amount = Double.parseDouble(amountText);
             bidService.placeBid(auction.getId(), bidder, amount);
             return ActionResult.success("Bid placed successfully.");
         } catch (NumberFormatException ex) {
             return ActionResult.failure("Bid amount must be a valid number.");
         } catch (AuctionException ex) {
+            // Service ném exception nghiệp vụ, còn ViewModel đổi chúng thành message thân thiện cho UI.
             return ActionResult.failure(ex.getMessage());
         }
     }

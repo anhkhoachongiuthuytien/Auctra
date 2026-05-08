@@ -21,6 +21,7 @@ public class DatabaseManager {
     public Connection getConnection() throws SQLException {
         Connection connection = DriverManager.getConnection(jdbcUrl);
         try (Statement statement = connection.createStatement()) {
+            // Bật foreign key trên từng connection để SQLite thật sự kiểm tra quan hệ giữa các bảng.
             statement.execute("PRAGMA foreign_keys = ON");
         }
         return connection;
@@ -28,6 +29,7 @@ public class DatabaseManager {
 
     public void initializeSchema() {
         try (Connection connection = getConnection(); Statement statement = connection.createStatement()) {
+            // Đọc schema.sql rồi chạy từng câu lệnh PRAGMA/CREATE TABLE theo thứ tự.
             for (String sql : loadSchemaSql().split(";")) {
                 String trimmed = sql.trim();
                 if (!trimmed.isEmpty()) {
@@ -40,6 +42,7 @@ public class DatabaseManager {
     }
 
     private String loadSchemaSql() {
+        // Nạp file schema từ resources để ứng dụng có thể tự khởi tạo database khi chạy lần đầu.
         InputStream inputStream = getClass().getResourceAsStream("/db/schema.sql");
         if (inputStream == null) {
             throw new IllegalStateException("Schema resource not found");

@@ -21,6 +21,7 @@ public class SqliteItemDao implements ItemDao {
 
     @Override
     public void save(Item item) {
+        // Upsert item để cùng một câu SQL xử lý cả thêm mới lẫn cập nhật vật phẩm.
         String sql = """
                 INSERT INTO items(id, name, description, starting_price, type)
                 VALUES (?, ?, ?, ?, ?)
@@ -46,6 +47,7 @@ public class SqliteItemDao implements ItemDao {
 
     @Override
     public Item findById(String id) {
+        // Tìm một item theo id để dựng lại auction hoặc mở chi tiết vật phẩm.
         String sql = "SELECT id, name, description, starting_price, type FROM items WHERE id = ?";
 
         try (Connection connection = databaseManager.getConnection();
@@ -70,6 +72,7 @@ public class SqliteItemDao implements ItemDao {
 
     @Override
     public List<Item> findAll() {
+        // Lấy toàn bộ item, sắp xếp theo tên để danh sách hiển thị dễ đọc hơn.
         String sql = "SELECT id, name, description, starting_price, type FROM items ORDER BY name";
         List<Item> items = new ArrayList<>();
 
@@ -94,6 +97,7 @@ public class SqliteItemDao implements ItemDao {
 
     @Override
     public void delete(String id) {
+        // Xóa item theo id khi vật phẩm không còn cần lưu trong hệ thống.
         String sql = "DELETE FROM items WHERE id = ?";
 
         try (Connection connection = databaseManager.getConnection();

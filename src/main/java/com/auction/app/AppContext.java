@@ -28,6 +28,7 @@ public class AppContext {
         this.databaseManager = new DatabaseManager("jdbc:sqlite:auction-system.db");
         this.databaseManager.initializeSchema();
 
+        // Tại đây app chọn implementation SQLite thật thay cho các DAO in-memory.
         this.userDao = new SqliteUserDao(databaseManager);
         this.itemDao = new SqliteItemDao(databaseManager);
         this.auctionDao = new SqliteAuctionDao(databaseManager, itemDao, userDao);
@@ -52,6 +53,7 @@ public class AppContext {
     }
 
     private void seedData() {
+        // Chỉ seed khi database chưa có auction nào để tránh nhân bản dữ liệu demo qua mỗi lần chạy app.
         if (!auctionService.listAuctions().isEmpty()) {
             return;
         }
@@ -65,6 +67,7 @@ public class AppContext {
         Item car = sellerService.createItem("Vehicle", "Used Sedan", "Auction state machine sample", 8000.0);
         Item art = sellerService.createItem("Art", "Landscape Painting", "Observer pattern sample item", 500.0);
 
+        // Global observer giúp demo ngay cơ chế observer mà không cần đăng ký thủ công ở từng màn hình.
         Auction.addGlobalObserver(new ConsoleBidObserver());
 
         Auction laptopAuction = auctionService.createAuction(laptop, seller);
@@ -82,6 +85,7 @@ public class AppContext {
     }
 
     private void ensureDemoUsers() {
+        // Kiểm tra theo email trước khi tạo để seedData có thể chạy lặp lại mà không làm trùng user.
         if (!authService.emailExists("seller@auction.local")) {
             authService.registerSeller("seller_demo", "seller@auction.local");
         }

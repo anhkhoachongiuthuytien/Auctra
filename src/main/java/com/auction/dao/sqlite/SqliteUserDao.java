@@ -21,6 +21,7 @@ public class SqliteUserDao implements UserDao {
 
     @Override
     public void save(User user) {
+        // Upsert user: nếu id đã tồn tại thì cập nhật thông tin thay vì thêm dòng trùng.
         String sql = """
                 INSERT INTO users(id, username, email, role)
                 VALUES (?, ?, ?, ?)
@@ -44,16 +45,19 @@ public class SqliteUserDao implements UserDao {
 
     @Override
     public User findById(String id) {
+        // Truy vấn một user theo khóa chính id.
         return findSingle("SELECT id, username, email, role FROM users WHERE id = ?", id);
     }
 
     @Override
     public User findByEmail(String email) {
+        // Truy vấn một user theo email để phục vụ login và kiểm tra email trùng.
         return findSingle("SELECT id, username, email, role FROM users WHERE email = ?", email);
     }
 
     @Override
     public List<User> findAll() {
+        // Lấy toàn bộ user và sắp xếp theo username để kết quả ổn định khi hiển thị.
         String sql = "SELECT id, username, email, role FROM users ORDER BY username";
         List<User> users = new ArrayList<>();
 
@@ -76,6 +80,7 @@ public class SqliteUserDao implements UserDao {
     }
 
     private User findSingle(String sql, String value) {
+        // Hàm dùng chung cho các truy vấn chỉ mong đợi tối đa một kết quả.
         try (Connection connection = databaseManager.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, value);

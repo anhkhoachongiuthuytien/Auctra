@@ -17,6 +17,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Auction extends Entity {
+    // Global observers được dùng cho các listener muốn nhận bid event của mọi auction,
+    // thay vì phải subscribe thủ công từng instance một.
     private static final List<BidObserver> globalBidObservers = new CopyOnWriteArrayList<>();
     private final Item item;
     private final Seller seller;
@@ -25,6 +27,7 @@ public class Auction extends Entity {
     private final List<BidTransaction> bids;
     private Bidder winner;
     private final List<BidObserver> bidObservers;
+    // stateLock bảo vệ các thay đổi trạng thái và currentPrice bên trong cùng một auction.
     private final ReentrantLock stateLock;
 
     public Auction() {
@@ -131,6 +134,7 @@ public class Auction extends Entity {
             stateLock.unlock();
         }
 
+        // Notify được đặt ngoài vùng lock để tránh giữ khóa trong lúc observer chạy code riêng.
         notifyBidPlaced(bid);
     }
 
@@ -167,6 +171,7 @@ public class Auction extends Entity {
     }
 
     public void restoreState(AuctionStatus status, double currentPrice, Bidder winner, List<BidTransaction> restoredBids) {
+        // Hàm này chỉ dùng khi dựng lại aggregate từ database, không dùng trong luồng bid thông thường.
         this.status = status;
         this.currentPrice = currentPrice;
         this.winner = winner;

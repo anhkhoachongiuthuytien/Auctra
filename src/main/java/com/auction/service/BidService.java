@@ -30,6 +30,8 @@ public class BidService {
         if (auction == null) {
             throw new AuctionException("Auction not found");
         }
+        // Khóa theo từng object auction để hai thread không cùng kiểm tra và cập nhật
+        // currentPrice trên cùng một phiên đấu giá tại cùng thời điểm.
         synchronized (auction) {
             if (!auction.isOpen()) {
                 throw new AuctionClosedException("Auction is closed");
@@ -39,6 +41,7 @@ public class BidService {
             }
             BidTransaction bid = new BidTransaction(bidder, amount);
             auction.addBid(bid);
+            // Sau khi domain model cập nhật xong, lưu ngay snapshot mới xuống persistence.
             auctionDao.save(auction);
         }
     }
