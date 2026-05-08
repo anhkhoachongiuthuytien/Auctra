@@ -22,6 +22,7 @@ class AuthServiceTest {
         authService = new AuthService(new InMemoryUserDao());
     }
 
+    // Đăng ký seller hợp lệ phải sinh id và lưu đúng email.
     @Test
     void testRegisterSellerSuccess() {
         Seller seller = authService.registerSeller("seller", "seller@test.com");
@@ -30,6 +31,7 @@ class AuthServiceTest {
         assertEquals("seller@test.com", seller.getEmail());
     }
 
+    // Đăng ký bidder hợp lệ phải tạo đúng kiểu user và dữ liệu cơ bản.
     @Test
     void testRegisterBidderSuccess() {
         Bidder bidder = authService.registerBidder("bidder", "bidder@test.com");
@@ -38,6 +40,7 @@ class AuthServiceTest {
         assertEquals("bidder@test.com", bidder.getEmail());
     }
 
+    // Email trùng phải bị chặn để giữ tính duy nhất của tài khoản.
     @Test
     void testRegisterWithDuplicateEmailThrowsAuthenticationException() {
         authService.registerSeller("seller", "dup@test.com");
@@ -46,12 +49,14 @@ class AuthServiceTest {
                 authService.registerBidder("bidder", "dup@test.com"));
     }
 
+    // Username rỗng phải bị validation ngay từ đầu.
     @Test
     void testRegisterWithBlankUsernameThrowsValidationException() {
         assertThrows(ValidationException.class, () ->
                 authService.registerSeller(" ", "seller@test.com"));
     }
 
+    // Login với email đã đăng ký phải trả về đúng user tương ứng.
     @Test
     void testLoginSuccess() {
         authService.registerBidder("bidder", "bidder@test.com");
@@ -59,17 +64,20 @@ class AuthServiceTest {
         assertEquals("bidder@test.com", authService.login("bidder@test.com").getEmail());
     }
 
+    // Email chưa tồn tại phải dẫn đến lỗi xác thực.
     @Test
     void testLoginWithUnknownEmailThrowsAuthenticationException() {
         assertThrows(AuthenticationException.class, () ->
                 authService.login("missing@test.com"));
     }
 
+    // Email rỗng không được phép đi qua tầng login.
     @Test
     void testLoginWithBlankEmailThrowsValidationException() {
         assertThrows(ValidationException.class, () -> authService.login(" "));
     }
 
+    // Hàm emailExists phải phản ánh đúng trạng thái dữ liệu đã đăng ký.
     @Test
     void testEmailExists() {
         authService.registerAdmin("admin", "admin@test.com");

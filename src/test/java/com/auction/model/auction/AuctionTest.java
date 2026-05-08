@@ -35,6 +35,7 @@ class AuctionTest {
         auction = new Auction("A001", item, seller);
     }
 
+    // Xác nhận constructor thiết lập đầy đủ trạng thái mặc định ban đầu của auction.
     @Test
     void testConstructorInitialState() {
         assertEquals("A001", auction.getId());
@@ -47,6 +48,7 @@ class AuctionTest {
         assertEquals(null, auction.getWinner());
     }
 
+    // Auction phải chuyển từ OPEN sang RUNNING khi được start hợp lệ.
     @Test
     void testStartAuctionMovesToRunning() {
         auction.start();
@@ -55,6 +57,7 @@ class AuctionTest {
         assertTrue(auction.isOpen());
     }
 
+    // Auction đang chạy phải chuyển sang FINISHED khi kết thúc phiên.
     @Test
     void testFinishAuctionMovesToFinished() {
         auction.start();
@@ -64,6 +67,7 @@ class AuctionTest {
         assertFalse(auction.isOpen());
     }
 
+    // Cho phép hủy auction ngay từ trạng thái OPEN.
     @Test
     void testCancelAuctionFromOpen() {
         auction.cancel();
@@ -72,6 +76,7 @@ class AuctionTest {
         assertFalse(auction.isOpen());
     }
 
+    // Cho phép hủy auction cả khi phiên đã được start.
     @Test
     void testCancelAuctionFromRunning() {
         auction.start();
@@ -81,6 +86,7 @@ class AuctionTest {
         assertFalse(auction.isOpen());
     }
 
+    // Chỉ auction đã finish mới được đánh dấu là đã thanh toán.
     @Test
     void testMarkPaidFromFinished() {
         auction.start();
@@ -91,6 +97,7 @@ class AuctionTest {
         assertFalse(auction.isOpen());
     }
 
+    // Không được start một auction đã ở sai trạng thái vòng đời.
     @Test
     void testStartAuctionFromWrongStatusThrowsException() {
         auction.start();
@@ -98,11 +105,13 @@ class AuctionTest {
         assertThrows(AuctionException.class, () -> auction.start());
     }
 
+    // Không được finish auction khi phiên chưa chạy.
     @Test
     void testFinishAuctionFromWrongStatusThrowsException() {
         assertThrows(AuctionException.class, () -> auction.finish());
     }
 
+    // Không được đánh dấu PAID nếu auction chưa hoàn tất.
     @Test
     void testMarkPaidFromWrongStatusThrowsException() {
         auction.start();
@@ -110,6 +119,7 @@ class AuctionTest {
         assertThrows(AuctionException.class, () -> auction.markPaid());
     }
 
+    // Một bid hợp lệ phải cập nhật số bid, current price và winner.
     @Test
     void testAddBidWhenAuctionIsRunning() {
         auction.start();
@@ -122,6 +132,7 @@ class AuctionTest {
         assertEquals(bidder1, auction.getWinner());
     }
 
+    // Nhiều bid hợp lệ liên tiếp phải luôn giữ bidder cuối cùng là người thắng tạm thời.
     @Test
     void testAddMultipleValidBids() {
         auction.start();
@@ -136,6 +147,7 @@ class AuctionTest {
         assertEquals(bidder2, auction.getWinner());
     }
 
+    // Không được nhận bid nếu auction chưa ở trạng thái RUNNING.
     @Test
     void testAddBidWhenAuctionIsNotRunningThrowsException() {
         BidTransaction bid = new BidTransaction(bidder1, 1200.0);
@@ -143,6 +155,7 @@ class AuctionTest {
         assertThrows(AuctionClosedException.class, () -> auction.addBid(bid));
     }
 
+    // Domain model phải từ chối bid null để tránh làm hỏng lịch sử đấu giá.
     @Test
     void testAddNullBidThrowsException() {
         auction.start();
@@ -150,6 +163,7 @@ class AuctionTest {
         assertThrows(InvalidBidException.class, () -> auction.addBid(null));
     }
 
+    // Giá bid thấp hơn current price phải bị chặn bởi rule nghiệp vụ.
     @Test
     void testAddLowerBidThrowsException() {
         auction.start();
@@ -158,6 +172,7 @@ class AuctionTest {
         assertThrows(InvalidBidException.class, () -> auction.addBid(bid));
     }
 
+    // Observer phải được notify khi hệ thống ghi nhận một bid mới.
     @Test
     void testObserverReceivesNewBidNotification() {
         auction.start();
@@ -173,6 +188,7 @@ class AuctionTest {
         assertEquals(bidder1, observer.event.getCurrentWinner());
     }
 
+    // toString cần chứa thông tin chính để thuận tiện cho debug và log.
     @Test
     void testToString() {
         String result = auction.toString();

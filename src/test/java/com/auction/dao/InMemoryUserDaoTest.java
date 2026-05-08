@@ -20,21 +20,25 @@ class InMemoryUserDaoTest {
         userDao.save(seller);
     }
 
+    // Đảm bảo tìm theo id trả về đúng user đã được lưu.
     @Test
     void testFindById() {
         assertEquals(seller, userDao.findById("S001"));
     }
 
+    // Đảm bảo truy vấn theo email hoạt động đúng với dữ liệu hiện có.
     @Test
     void testFindByEmail() {
         assertEquals(seller, userDao.findByEmail("seller@test.com"));
     }
 
+    // Kiểm tra danh sách người dùng phản ánh đúng số phần tử được lưu.
     @Test
     void testFindAll() {
         assertEquals(1, userDao.findAll().size());
     }
 
+    // Khi email không tồn tại, DAO phải trả về null thay vì ném lỗi.
     @Test
     void testFindMissingUserReturnsNull() {
         assertNull(userDao.findByEmail("missing@test.com"));

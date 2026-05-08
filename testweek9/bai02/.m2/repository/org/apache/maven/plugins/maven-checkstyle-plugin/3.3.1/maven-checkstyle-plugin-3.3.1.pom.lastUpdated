@@ -1,0 +1,4 @@
+#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
+#Fri May 08 02:02:39 GMT+07:00 2026
+@default-central-https\://repo.maven.apache.org/maven2/.lastUpdated=1778180559680
+https\://repo.maven.apache.org/maven2/.error=Could not transfer artifact org.apache.maven.plugins\:maven-checkstyle-plugin\:pom\:3.3.1 from/to central (https\://repo.maven.apache.org/maven2)\: D\:\\BaitaplonTest\\testweek9\\bai02\\.m2\\repository\\org\\apache\\maven\\plugins\\maven-checkstyle-plugin\\3.3.1\\maven-checkstyle-plugin-3.3.1.pom.5735566943682965475.tmp.67626724054383773.tmp

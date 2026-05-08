@@ -26,6 +26,7 @@ class SellerServiceTest {
         seller = new Seller("S001", "seller", "seller@test.com");
     }
 
+    // Seller phải tạo được item hợp lệ với id và thông tin cơ bản đầy đủ.
     @Test
     void testCreateItemSuccess() {
         Item item = sellerService.createItem(ItemType.ART, "Painting", "Oil painting", 500.0);
@@ -34,12 +35,14 @@ class SellerServiceTest {
         assertEquals("Painting", item.getName());
     }
 
+    // Giá khởi điểm không hợp lệ phải bị tầng service từ chối.
     @Test
     void testCreateItemWithInvalidPriceThrowsValidationException() {
         assertThrows(ValidationException.class, () ->
                 sellerService.createItem(ItemType.ART, "Painting", "Oil painting", 0));
     }
 
+    // Khi có item hợp lệ, seller phải tạo được auction gắn đúng item và người bán.
     @Test
     void testCreateAuctionSuccess() {
         Item item = sellerService.createItem(ItemType.VEHICLE, "Sedan", "Used sedan", 10000.0);
@@ -50,6 +53,7 @@ class SellerServiceTest {
         assertEquals(seller, auction.getSeller());
     }
 
+    // Không được tạo auction nếu item đầu vào là null.
     @Test
     void testCreateAuctionWithNullItemThrowsAuctionException() {
         assertThrows(AuctionException.class, () ->

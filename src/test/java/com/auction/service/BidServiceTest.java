@@ -37,6 +37,7 @@ class BidServiceTest {
         auctionDao.save(auction);
     }
 
+    // Bid hợp lệ phải làm tăng current price và cập nhật winner.
     @Test
     void testPlaceValidBid() {
         auction.start();
@@ -48,18 +49,21 @@ class BidServiceTest {
         assertEquals(bidder1, auction.getWinner());
     }
 
+    // Service phải báo lỗi nếu client gửi auction id không tồn tại.
     @Test
     void testPlaceBidWhenAuctionNotFoundThrowsException() {
         assertThrows(AuctionException.class, () ->
                 bidService.placeBid("INVALID_ID", bidder1, 1200.0));
     }
 
+    // Auction chưa mở cho bidding thì mọi bid đều phải bị từ chối.
     @Test
     void testPlaceBidWhenAuctionClosedThrowsException() {
         assertThrows(AuctionClosedException.class, () ->
                 bidService.placeBid(auction.getId(), bidder1, 1200.0));
     }
 
+    // Bid thấp hơn giá hiện tại không được chấp nhận.
     @Test
     void testPlaceLowerBidThrowsException() {
         auction.start();
@@ -68,6 +72,7 @@ class BidServiceTest {
                 bidService.placeBid(auction.getId(), bidder1, 900.0));
     }
 
+    // Bid bằng đúng current price cũng phải bị chặn theo rule "phải cao hơn".
     @Test
     void testPlaceEqualBidThrowsException() {
         auction.start();
@@ -76,6 +81,7 @@ class BidServiceTest {
                 bidService.placeBid(auction.getId(), bidder1, 1000.0));
     }
 
+    // Nhiều bid hợp lệ liên tiếp phải để lại winner cuối cùng với giá cao nhất.
     @Test
     void testPlaceMultipleValidBids() {
         auction.start();
@@ -88,6 +94,7 @@ class BidServiceTest {
         assertEquals(bidder2, auction.getWinner());
     }
 
+    // Bidder null phải bị chặn trước khi truy cập vào domain model.
     @Test
     void testPlaceBidWithNullBidderThrowsValidationException() {
         auction.start();
@@ -96,6 +103,7 @@ class BidServiceTest {
                 bidService.placeBid(auction.getId(), null, 1200.0));
     }
 
+    // Amount không hợp lệ như 0 hoặc âm phải fail ở tầng validation.
     @Test
     void testPlaceBidWithInvalidAmountThrowsValidationException() {
         auction.start();

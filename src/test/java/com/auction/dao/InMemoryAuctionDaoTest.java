@@ -23,16 +23,19 @@ class InMemoryAuctionDaoTest {
         auctionDao.save(auction);
     }
 
+    // Đảm bảo DAO có thể tìm lại đúng auction đã lưu theo id.
     @Test
     void testFindById() {
         assertEquals(auction, auctionDao.findById("A001"));
     }
 
+    // Kiểm tra danh sách trả về phản ánh đúng số bản ghi đang có trong bộ nhớ.
     @Test
     void testFindAll() {
         assertEquals(1, auctionDao.findAll().size());
     }
 
+    // Kiểm tra thao tác xóa thực sự loại bỏ auction khỏi kho lưu trữ in-memory.
     @Test
     void testDelete() {
         auctionDao.delete("A001");

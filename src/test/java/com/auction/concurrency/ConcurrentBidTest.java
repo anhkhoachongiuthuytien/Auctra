@@ -40,6 +40,7 @@ class ConcurrentBidTest {
         auctionDao.save(auction);
     }
 
+    // Mô phỏng hai bidder cùng gửi bid gần như đồng thời để kiểm tra cơ chế đồng bộ.
     @Test
     void testTwoThreadsPlaceBidsConcurrently() throws InterruptedException {
         List<Throwable> errors = Collections.synchronizedList(new ArrayList<>());

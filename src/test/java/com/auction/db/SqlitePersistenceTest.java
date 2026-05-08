@@ -44,6 +44,7 @@ class SqlitePersistenceTest {
         Files.deleteIfExists(databasePath);
     }
 
+    // Kiểm tra toàn bộ aggregate Auction có thể lưu xuống SQLite rồi load lại đầy đủ trạng thái.
     @Test
     void testPersistAndReloadAuctionAggregate() {
         Seller seller = new Seller("S001", "seller", "seller@test.com");

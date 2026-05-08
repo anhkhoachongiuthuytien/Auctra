@@ -20,16 +20,19 @@ class InMemoryItemDaoTest {
         itemDao.save(item);
     }
 
+    // Đảm bảo item đã lưu có thể được truy xuất lại bằng id.
     @Test
     void testFindById() {
         assertEquals(item, itemDao.findById("I001"));
     }
 
+    // Kiểm tra DAO trả về đầy đủ các item hiện đang được lưu.
     @Test
     void testFindAll() {
         assertEquals(1, itemDao.findAll().size());
     }
 
+    // Kiểm tra thao tác delete làm item biến mất khỏi kết quả truy vấn tiếp theo.
     @Test
     void testDelete() {
         itemDao.delete("I001");
