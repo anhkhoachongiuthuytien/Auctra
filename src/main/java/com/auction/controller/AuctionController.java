@@ -86,7 +86,7 @@ public class AuctionController {
     private void handlePlaceBid() {
         AuctionListViewModel.ActionResult result =
                 viewModel.placeBid(currentUser, auctionTable.getSelectionModel().getSelectedItem(), bidAmountField.getText());
-        actionMessageLabel.setText(result.message());
+        showActionMessage(result);
         if (result.success()) {
             bidAmountField.clear();
             refreshTable();
@@ -97,7 +97,7 @@ public class AuctionController {
     private void handleFinishAuction() {
         AuctionListViewModel.ActionResult result =
                 viewModel.finishAuction(auctionTable.getSelectionModel().getSelectedItem());
-        actionMessageLabel.setText(result.message());
+        showActionMessage(result);
         if (result.success()) {
             refreshTable();
         }
@@ -123,5 +123,11 @@ public class AuctionController {
         List<Auction> auctions = viewModel.loadAuctions();
         auctionTable.setItems(FXCollections.observableArrayList(auctions));
         summaryLabel.setText(viewModel.getSummaryMessage(auctions));
+    }
+
+    private void showActionMessage(AuctionListViewModel.ActionResult result) {
+        actionMessageLabel.setText(result.message());
+        actionMessageLabel.getStyleClass().removeAll("error-label", "success-label");
+        actionMessageLabel.getStyleClass().add(result.success() ? "success-label" : "error-label");
     }
 }

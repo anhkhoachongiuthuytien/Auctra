@@ -1,8 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 
-<StackPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
-    <Label text="Seller view placeholder for week 7 self-study JavaFX."/>
-</StackPane>
+<VBox spacing="16.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.auction.controller.SellerController">
+    <padding>
+        <Insets top="24.0" right="24.0" bottom="24.0" left="24.0"/>
+    </padding>
+
+    <Label styleClass="screen-title" text="Seller Dashboard"/>
+    <Label fx:id="welcomeLabel" wrapText="true"/>
+    <Label fx:id="actionMessageLabel" styleClass="info-label" wrapText="true"/>
+
+    <HBox spacing="12.0">
+        <ComboBox fx:id="itemTypeComboBox" prefWidth="180.0"/>
+        <TextField fx:id="itemNameField" prefWidth="180.0" promptText="Item name"/>
+        <TextField fx:id="itemDescriptionField" prefWidth="220.0" promptText="Description"/>
+        <TextField fx:id="startingPriceField" prefWidth="140.0" promptText="Starting price"/>
+        <Button mnemonicParsing="false" onAction="#handleCreateAuction" text="Create Item + Auction"/>
+    </HBox>
+
+    <TableView fx:id="sellerAuctionTable" prefHeight="420.0">
+        <columns>
+            <TableColumn fx:id="auctionIdColumn" prefWidth="220.0" text="Auction ID"/>
+            <TableColumn fx:id="itemNameColumn" prefWidth="220.0" text="Item"/>
+            <TableColumn fx:id="statusColumn" prefWidth="180.0" text="Status"/>
+            <TableColumn fx:id="currentPriceColumn" prefWidth="160.0" text="Current Price"/>
+        </columns>
+    </TableView>
+
+    <HBox spacing="12.0">
+        <Button mnemonicParsing="false" onAction="#handleStartAuction" text="Start Auction"/>
+        <Button mnemonicParsing="false" onAction="#handleFinishAuction" text="Finish Auction"/>
+        <Button mnemonicParsing="false" onAction="#handleRefresh" text="Refresh"/>
+        <Button mnemonicParsing="false" onAction="#handleBackToLogin" text="Back to Login"/>
+    </HBox>
+</VBox>

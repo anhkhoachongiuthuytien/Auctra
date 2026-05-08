@@ -1,6 +1,7 @@
 package com.auction.presentation;
 
 import com.auction.exception.AuctionException;
+import com.auction.exception.InvalidBidException;
 import com.auction.model.auction.Auction;
 import com.auction.model.user.Bidder;
 import com.auction.model.user.User;
@@ -8,6 +9,7 @@ import com.auction.service.AuctionService;
 import com.auction.service.BidService;
 
 import java.util.List;
+import java.util.Locale;
 
 public class AuctionListViewModel {
     private final AuctionService auctionService;
@@ -45,6 +47,12 @@ public class AuctionListViewModel {
             return ActionResult.success("Bid placed successfully.");
         } catch (NumberFormatException ex) {
             return ActionResult.failure("Bid amount must be a valid number.");
+        } catch (InvalidBidException ex) {
+            return ActionResult.failure(
+                    "Bid must be higher than the current price (current: "
+                            + String.format(Locale.US, "%.2f", auction.getCurrentPrice())
+                            + ")."
+            );
         } catch (AuctionException ex) {
             // Service ném exception nghiệp vụ, còn ViewModel đổi chúng thành message thân thiện cho UI.
             return ActionResult.failure(ex.getMessage());

@@ -13,6 +13,7 @@ import com.auction.service.AuctionService;
 import com.auction.service.AuthService;
 import com.auction.service.BidService;
 import com.auction.service.SellerService;
+import com.auction.service.UserService;
 
 public class AppContext {
     private final DatabaseManager databaseManager;
@@ -23,6 +24,7 @@ public class AppContext {
     private final SellerService sellerService;
     private final AuctionService auctionService;
     private final BidService bidService;
+    private final UserService userService;
 
     public AppContext() {
         this.databaseManager = new DatabaseManager("jdbc:sqlite:auction-system.db");
@@ -36,6 +38,7 @@ public class AppContext {
         this.sellerService = new SellerService(itemDao, auctionDao);
         this.auctionService = new AuctionService(auctionDao);
         this.bidService = new BidService(auctionDao);
+        this.userService = new UserService(userDao);
 
         seedData();
     }
@@ -50,6 +53,14 @@ public class AppContext {
 
     public BidService getBidService() {
         return bidService;
+    }
+
+    public SellerService getSellerService() {
+        return sellerService;
+    }
+
+    public UserService getUserService() {
+        return userService;
     }
 
     private void seedData() {

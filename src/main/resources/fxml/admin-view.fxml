@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox spacing="16.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.auction.controller.AdminController">
+    <padding>
+        <Insets top="24.0" right="24.0" bottom="24.0" left="24.0"/>
+    </padding>
+
+    <Label styleClass="screen-title" text="Admin Dashboard"/>
+    <Label fx:id="welcomeLabel" wrapText="true"/>
+    <Label fx:id="actionMessageLabel" styleClass="info-label" wrapText="true"/>
+
+    <Label text="Users"/>
+    <TableView fx:id="userTable" prefHeight="180.0">
+        <columns>
+            <TableColumn fx:id="userIdColumn" prefWidth="200.0" text="User ID"/>
+            <TableColumn fx:id="usernameColumn" prefWidth="180.0" text="Username"/>
+            <TableColumn fx:id="emailColumn" prefWidth="260.0" text="Email"/>
+            <TableColumn fx:id="roleColumn" prefWidth="140.0" text="Role"/>
+        </columns>
+    </TableView>
+
+    <Label text="Auctions"/>
+    <TableView fx:id="auctionTable" prefHeight="260.0">
+        <columns>
+            <TableColumn fx:id="auctionIdColumn" prefWidth="200.0" text="Auction ID"/>
+            <TableColumn fx:id="itemColumn" prefWidth="220.0" text="Item"/>
+            <TableColumn fx:id="sellerColumn" prefWidth="180.0" text="Seller"/>
+            <TableColumn fx:id="statusColumn" prefWidth="140.0" text="Status"/>
+            <TableColumn fx:id="currentPriceColumn" prefWidth="140.0" text="Current Price"/>
+        </columns>
+    </TableView>
+
+    <HBox spacing="12.0">
+        <Button mnemonicParsing="false" onAction="#handleCancelAuction" text="Cancel Auction"/>
+        <Button mnemonicParsing="false" onAction="#handleMarkPaid" text="Mark Paid"/>
+        <Button mnemonicParsing="false" onAction="#handleRefresh" text="Refresh"/>
+        <Button mnemonicParsing="false" onAction="#handleBackToLogin" text="Back to Login"/>
+    </HBox>
+</VBox>

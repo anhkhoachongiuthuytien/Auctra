@@ -1,7 +1,11 @@
 package com.auction.app;
 
 import com.auction.controller.AuctionController;
+import com.auction.controller.AdminController;
 import com.auction.controller.AuthController;
+import com.auction.controller.SellerController;
+import com.auction.model.user.Admin;
+import com.auction.model.user.Seller;
 import com.auction.model.user.User;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -33,6 +37,34 @@ public class SceneNavigator {
         AuctionController controller = loader.getController();
         controller.init(appContext, this, user);
         setScene(root, "Auction System - Auction List");
+    }
+
+    public void showHome(User user) throws IOException {
+        if (user instanceof Seller seller) {
+            showSellerDashboard(seller);
+            return;
+        }
+        if (user instanceof Admin admin) {
+            showAdminDashboard(admin);
+            return;
+        }
+        showAuctionList(user);
+    }
+
+    public void showSellerDashboard(Seller seller) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/seller-view.fxml"));
+        Parent root = loader.load();
+        SellerController controller = loader.getController();
+        controller.init(appContext, this, seller);
+        setScene(root, "Auction System - Seller Dashboard");
+    }
+
+    public void showAdminDashboard(Admin admin) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/admin-view.fxml"));
+        Parent root = loader.load();
+        AdminController controller = loader.getController();
+        controller.init(appContext, this, admin);
+        setScene(root, "Auction System - Admin Dashboard");
     }
 
     private void setScene(Parent root, String title) {

@@ -38,7 +38,7 @@ public class AuthController {
         }
         try {
             User user = result.user();
-            navigator.showAuctionList(user);
+            navigator.showHome(user);
         } catch (IOException ex) {
             messageLabel.setText(ex.getMessage());
         }
