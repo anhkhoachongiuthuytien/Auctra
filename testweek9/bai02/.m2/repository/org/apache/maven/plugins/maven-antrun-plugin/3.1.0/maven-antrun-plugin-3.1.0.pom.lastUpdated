@@ -1,4 +1,0 @@
-#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
-#Fri May 08 02:02:40 GMT+07:00 2026
-@default-central-https\://repo.maven.apache.org/maven2/.lastUpdated=1778180560192
-https\://repo.maven.apache.org/maven2/.error=Could not transfer artifact org.apache.maven.plugins\:maven-antrun-plugin\:pom\:3.1.0 from/to central (https\://repo.maven.apache.org/maven2)\: D\:\\BaitaplonTest\\testweek9\\bai02\\.m2\\repository\\org\\apache\\maven\\plugins\\maven-antrun-plugin\\3.1.0\\maven-antrun-plugin-3.1.0.pom.10946868473172362320.tmp.14664665176191698873.tmp

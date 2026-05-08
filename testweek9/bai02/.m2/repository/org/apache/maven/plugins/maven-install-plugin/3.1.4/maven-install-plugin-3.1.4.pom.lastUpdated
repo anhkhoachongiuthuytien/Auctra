@@ -1,4 +1,0 @@
-#NOTE: This is a Maven Resolver internal implementation file, its format can be changed without prior notice.
-#Fri May 08 02:02:39 GMT+07:00 2026
-@default-central-https\://repo.maven.apache.org/maven2/.lastUpdated=1778180559964
-https\://repo.maven.apache.org/maven2/.error=Could not transfer artifact org.apache.maven.plugins\:maven-install-plugin\:pom\:3.1.4 from/to central (https\://repo.maven.apache.org/maven2)\: D\:\\BaitaplonTest\\testweek9\\bai02\\.m2\\repository\\org\\apache\\maven\\plugins\\maven-install-plugin\\3.1.4\\maven-install-plugin-3.1.4.pom.17184521353225155468.tmp.734828866513505815.tmp
