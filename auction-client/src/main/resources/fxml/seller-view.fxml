@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.Priority?>
+
+<StackPane fx:id="rootPane" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.auction.controller.SellerController">
+<BorderPane styleClass="admin-root">
+
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="20.0" styleClass="admin-top-nav">
+            <padding><Insets top="12" right="24" bottom="12" left="24"/></padding>
+            <HBox alignment="CENTER_LEFT" spacing="8">
+                <StackPane styleClass="app-logo">
+                    <Label styleClass="app-logo-text" text="A"/>
+                </StackPane>
+                <HBox alignment="CENTER_LEFT" spacing="0">
+                    <Label style="-fx-text-fill: #4285F4; -fx-font-size: 20; -fx-font-weight: bold;" text="A"/>
+                    <Label style="-fx-text-fill: #EA4335; -fx-font-size: 20; -fx-font-weight: bold;" text="u"/>
+                    <Label style="-fx-text-fill: #FBBC05; -fx-font-size: 20; -fx-font-weight: bold;" text="c"/>
+                    <Label style="-fx-text-fill: #4285F4; -fx-font-size: 20; -fx-font-weight: bold;" text="t"/>
+                    <Label style="-fx-text-fill: #34A853; -fx-font-size: 20; -fx-font-weight: bold;" text="r"/>
+                    <Label style="-fx-text-fill: #EA4335; -fx-font-size: 20; -fx-font-weight: bold;" text="a"/>
+                </HBox>
+            </HBox>
+
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <HBox alignment="CENTER" spacing="8">
+                <StackPane styleClass="admin-user-avatar">
+                    <Label fx:id="userInitialsLabel" styleClass="admin-user-avatar-text" text="S"/>
+                </StackPane>
+                <Label styleClass="admin-user-name" text="Seller"/>
+            </HBox>
+        </HBox>
+    </top>
+
+    <left>
+        <VBox spacing="4" styleClass="admin-sidebar" prefWidth="240">
+            <padding><Insets top="24" right="16" bottom="24" left="16"/></padding>
+            <Label style="-fx-text-fill: #5F6368; -fx-font-size: 11; -fx-font-weight: bold; -fx-padding: 0 0 12 18;" text="MENU"/>
+            <Button styleClass="nav-link-active" mnemonicParsing="false"
+                    text="&#x1F3EA;  Trang người bán" alignment="BASELINE_LEFT" maxWidth="Infinity"/>
+            <Region VBox.vgrow="ALWAYS"/>
+            <Button styleClass="nav-link" mnemonicParsing="false"
+                    onAction="#handleBackToLogin" text="&#x1F6AA;  Đăng xuất" alignment="BASELINE_LEFT" maxWidth="Infinity"/>
+        </VBox>
+    </left>
+
+    <center>
+        <VBox spacing="0" styleClass="admin-main-bg">
+            <HBox alignment="CENTER_LEFT" spacing="8" styleClass="admin-content-header">
+                <padding><Insets top="16" right="32" bottom="16" left="32"/></padding>
+                <Label styleClass="admin-breadcrumb-text" text="Trang chủ"/>
+                <Label styleClass="admin-breadcrumb-sep" text="›"/>
+                <Label styleClass="admin-breadcrumb-active" text="Người bán"/>
+            </HBox>
+
+            <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="admin-scroll">
+                <VBox spacing="20">
+                    <padding><Insets top="8" right="32" bottom="32" left="32"/></padding>
+
+                    <!-- Welcome -->
+                    <VBox spacing="6">
+                        <Label styleClass="admin-page-title" text="Trang người bán"/>
+                        <Label fx:id="welcomeLabel" styleClass="muted-label" wrapText="true"/>
+                        <Label fx:id="actionMessageLabel" styleClass="info-label" wrapText="true"/>
+                    </VBox>
+
+                    <!-- Create auction - 2 row layout -->
+                    <VBox styleClass="admin-card" spacing="0">
+                        <HBox alignment="CENTER_LEFT" spacing="12" styleClass="admin-card-header">
+                            <StackPane styleClass="icon-tile">
+                                <Label styleClass="icon-tile-text" text="➕"/>
+                            </StackPane>
+                            <VBox spacing="2">
+                                <Label styleClass="admin-card-title" text="Tạo phiên đấu giá mới"/>
+                                <Label styleClass="muted-label" text="Điền thông tin sản phẩm để bắt đầu bán"/>
+                            </VBox>
+                        </HBox>
+                        <VBox spacing="16" style="-fx-padding: 20;">
+                            <!-- Row 1: Type + Name -->
+                            <HBox spacing="12">
+                                <VBox spacing="4" prefWidth="180">
+                                    <Label styleClass="login-field-label" text="Loại sản phẩm"/>
+                                    <ComboBox fx:id="itemTypeComboBox" maxWidth="Infinity"/>
+                                </VBox>
+                                <VBox spacing="4" HBox.hgrow="ALWAYS">
+                                    <Label styleClass="login-field-label" text="Tên vật phẩm"/>
+                                    <TextField fx:id="itemNameField" promptText="Ví dụ: iPhone 15 Pro Max"/>
+                                </VBox>
+                            </HBox>
+                            <!-- Row 2: Description + Price -->
+                            <HBox spacing="12">
+                                <VBox spacing="4" HBox.hgrow="ALWAYS">
+                                    <Label styleClass="login-field-label" text="Mô tả"/>
+                                    <TextField fx:id="itemDescriptionField" promptText="Mô tả chi tiết sản phẩm..."/>
+                                </VBox>
+                                <VBox spacing="4" prefWidth="180">
+                                    <Label styleClass="login-field-label" text="Giá khởi điểm ($)"/>
+                                    <TextField fx:id="startingPriceField" promptText="100"/>
+                                </VBox>
+                            </HBox>
+                            <!-- Row 3: Image + Button -->
+                            <HBox spacing="12" alignment="CENTER_LEFT">
+                                <HBox spacing="8" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
+                                    <StackPane fx:id="imagePreviewPane" styleClass="image-preview-box"
+                                               prefWidth="56" prefHeight="56" minWidth="56" minHeight="56">
+                                        <ImageView fx:id="imagePreview" fitWidth="48" fitHeight="48" preserveRatio="true"/>
+                                        <Label fx:id="imagePlaceholderLabel" styleClass="muted-label" text="📸" style="-fx-font-size: 20;"/>
+                                    </StackPane>
+                                    <VBox spacing="2" alignment="CENTER_LEFT">
+                                        <Button styleClass="button-ghost button-row" mnemonicParsing="false"
+                                                onAction="#handleChooseImage" text="Chọn ảnh"/>
+                                        <Label fx:id="selectedImageLabel" styleClass="muted-label" style="-fx-font-size: 11;"/>
+                                    </VBox>
+                                    <Button fx:id="clearImageBtn" styleClass="button-icon" mnemonicParsing="false"
+                                            onAction="#handleClearImage" text="✕" disable="true"/>
+                                </HBox>
+                                <Button styleClass="button-primary" mnemonicParsing="false" prefHeight="40"
+                                        onAction="#handleCreateAuction" text="➕ Tạo phiên đấu giá"/>
+                            </HBox>
+                        </VBox>
+                    </VBox>
+
+                    <!-- Seller auctions table -->
+                    <VBox styleClass="admin-card" spacing="0" VBox.vgrow="ALWAYS">
+                        <HBox alignment="CENTER_LEFT" spacing="12" styleClass="admin-card-header">
+                            <StackPane styleClass="icon-tile">
+                                <Label styleClass="icon-tile-text" text="📋"/>
+                            </StackPane>
+                            <Label styleClass="admin-card-title" text="Phiên đấu giá của bạn"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Button styleClass="button-ghost button-row" mnemonicParsing="false"
+                                    onAction="#handleViewDetail" text="👁 Chi tiết"/>
+                            <Button styleClass="button-success button-row" mnemonicParsing="false"
+                                    onAction="#handleStartAuction" text="▶ Bắt đầu"/>
+                            <Button styleClass="button-danger button-row" mnemonicParsing="false"
+                                    onAction="#handleFinishAuction" text="⏹ Kết thúc"/>
+                        </HBox>
+                        <VBox style="-fx-padding: 0;">
+                            <TableView fx:id="sellerAuctionTable" VBox.vgrow="ALWAYS" prefHeight="380" styleClass="admin-table">
+                                <columns>
+                                    <TableColumn fx:id="auctionIdColumn"    prefWidth="220.0" text="Mã phiên"/>
+                                    <TableColumn fx:id="itemNameColumn"     prefWidth="220.0" text="Vật phẩm"/>
+                                    <TableColumn fx:id="statusColumn"       prefWidth="160.0" text="Trạng thái"/>
+                                    <TableColumn fx:id="currentPriceColumn" prefWidth="160.0" text="Giá hiện tại"/>
+                                </columns>
+                            </TableView>
+                        </VBox>
+                    </VBox>
+                </VBox>
+            </ScrollPane>
+
+            <HBox alignment="CENTER_LEFT" spacing="12" styleClass="admin-footer">
+                <Label styleClass="admin-footer-text" text="© 2026 Auctra"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label styleClass="admin-footer-text" text="Điều khoản · Trợ giúp · Liên hệ"/>
+            </HBox>
+        </VBox>
+    </center>
+</BorderPane>
+</StackPane>
