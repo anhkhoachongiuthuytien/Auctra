@@ -15,7 +15,6 @@ public final class DbMappers {
     }
 
     public static String detectRole(User user) {
-        // Database chỉ lưu chuỗi role, nên trước khi save phải chuyển subtype Java về text tương ứng.
         if (user instanceof Seller) {
             return "SELLER";
         }
@@ -29,7 +28,6 @@ public final class DbMappers {
     }
 
     public static User createUser(String role, String id, String username, String email) {
-        // Khi load từ DB lên, chuỗi role quyết định object Java nào cần được dựng lại.
         return switch (role.toUpperCase()) {
             case "SELLER" -> new Seller(id, username, email);
             case "BIDDER" -> new Bidder(id, username, email);
@@ -39,7 +37,6 @@ public final class DbMappers {
     }
 
     public static String detectItemType(Item item) {
-        // Tương tự role, loại item cũng phải được chuyển về text để lưu trong một cột đơn giản.
         if (item instanceof Art) {
             return ItemType.ART.name();
         }
@@ -53,11 +50,17 @@ public final class DbMappers {
     }
 
     public static Item createItem(String type, String id, String name, String description, double startingPrice) {
-        // Dùng type từ DB để dựng đúng subclass của Item thay vì luôn trả về Item cơ bản.
-        return switch (ItemType.fromString(type)) {
+        return createItem(type, id, name, description, startingPrice, null);
+    }
+
+    public static Item createItem(String type, String id, String name, String description,
+                                  double startingPrice, String imagePath) {
+        Item item = switch (ItemType.fromString(type)) {
             case ART -> new Art(id, name, description, startingPrice);
             case ELECTRONICS -> new Electronics(id, name, description, startingPrice);
             case VEHICLE -> new Vehicle(id, name, description, startingPrice);
         };
+        item.setImagePath(imagePath);
+        return item;
     }
 }

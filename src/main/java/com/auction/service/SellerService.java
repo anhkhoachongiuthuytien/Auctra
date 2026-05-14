@@ -21,34 +21,39 @@ public class SellerService {
     }
 
     public Item createItem(String type, String name, String description, double startingPrice) {
-        return createItem(ItemType.fromString(type), name, description, startingPrice);
+        return createItem(ItemType.fromString(type), name, description, startingPrice, null);
     }
 
     public Item createItem(ItemType type, String name, String description, double startingPrice) {
+        return createItem(type, name, description, startingPrice, null);
+    }
+
+    public Item createItem(ItemType type, String name, String description, double startingPrice, String imagePath) {
         if (type == null) {
-            throw new ValidationException("Item type must not be null");
+            throw new ValidationException("Loại vật phẩm không được để trống");
         }
         if (name == null || name.trim().isEmpty()) {
-            throw new ValidationException("Item name must not be empty");
+            throw new ValidationException("Tên vật phẩm không được để trống");
         }
         if (description == null || description.trim().isEmpty()) {
-            throw new ValidationException("Item description must not be empty");
+            throw new ValidationException("Mô tả vật phẩm không được để trống");
         }
         if (Double.isNaN(startingPrice) || Double.isInfinite(startingPrice) || startingPrice <= 0) {
-            throw new ValidationException("Starting price must be greater than 0");
+            throw new ValidationException("Giá khởi điểm phải lớn hơn 0");
         }
         String id = IdGenerator.generateId();
         Item item = ItemFactory.createItem(type, id, name, description, startingPrice);
+        item.setImagePath(imagePath);
         itemDao.save(item);
         return item;
     }
 
     public Auction createAuction(Item item, Seller seller) {
         if (item == null) {
-            throw new AuctionException("Item not found");
+            throw new AuctionException("Không tìm thấy vật phẩm");
         }
         if (seller == null) {
-            throw new AuctionException("Seller not found");
+            throw new AuctionException("Không tìm thấy người bán");
         }
 
         Auction auction = new Auction(IdGenerator.generateId(), item, seller);
@@ -59,7 +64,7 @@ public class SellerService {
     public Item getItemById(String itemId) {
         Item item = itemDao.findById(itemId);
         if (item == null) {
-            throw new AuctionException("Item not found");
+            throw new AuctionException("Không tìm thấy vật phẩm");
         }
         return item;
     }

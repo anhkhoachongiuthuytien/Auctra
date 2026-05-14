@@ -2,21 +2,23 @@ package com.auction.controller;
 
 import com.auction.app.AppContext;
 import com.auction.app.SceneNavigator;
-import com.auction.model.user.User;
 import com.auction.presentation.LoginViewModel;
 import com.auction.util.UiEffects;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.StackPane;
 
 import java.io.IOException;
 
-public class AuthController {
+public class ForgotPasswordController {
     @FXML private StackPane rootPane;
     @FXML private TextField emailField;
-    @FXML private PasswordField passwordField;
+    @FXML private TextField usernameField;
+    @FXML private PasswordField newPasswordField;
+    @FXML private PasswordField confirmPasswordField;
     @FXML private Label messageLabel;
 
     private AppContext appContext;
@@ -30,33 +32,39 @@ public class AuthController {
         if (messageLabel != null) {
             messageLabel.setText("");
         }
+        // Enter ở ô cuối → submit
+        confirmPasswordField.setOnKeyPressed(e -> {
+            if (e.getCode() == KeyCode.ENTER) {
+                handleReset();
+            }
+        });
     }
 
     @FXML
-    private void handleLogin() {
-        LoginViewModel.LoginResult result = viewModel.login(emailField.getText(), passwordField.getText());
+    private void handleReset() {
+        LoginViewModel.LoginResult result = viewModel.resetPassword(
+                emailField.getText(),
+                usernameField.getText(),
+                newPasswordField.getText(),
+                confirmPasswordField.getText()
+        );
         showMessage(result);
         if (!result.success()) {
             UiEffects.showToast(rootPane, result.message(), UiEffects.ToastType.ERROR, 2400);
             return;
         }
         try {
-            User user = result.user();
-            UiEffects.showToast(rootPane, "Đăng nhập thành công", UiEffects.ToastType.SUCCESS, 1200);
-            navigator.showHome(user);
+            UiEffects.showToast(rootPane, "Đặt lại mật khẩu thành công",
+                    UiEffects.ToastType.SUCCESS, 1800);
+            navigator.showLogin();
         } catch (IOException ex) {
             messageLabel.setText(ex.getMessage());
         }
     }
 
     @FXML
-    private void goToRegister() throws IOException {
-        navigator.showRegister();
-    }
-
-    @FXML
-    private void goToForgotPassword() throws IOException {
-        navigator.showForgotPassword();
+    private void goToLogin() throws IOException {
+        navigator.showLogin();
     }
 
     private void showMessage(LoginViewModel.LoginResult result) {

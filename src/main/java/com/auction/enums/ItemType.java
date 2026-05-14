@@ -17,7 +17,7 @@ public enum ItemType {
 
     public static ItemType fromString(String value) {
         if (value == null || value.trim().isEmpty()) {
-            throw new IllegalArgumentException("Item type must not be empty");
+            throw new IllegalArgumentException("Loại vật phẩm không được để trống");
         }
 
         for (ItemType type : values()) {
@@ -26,6 +26,6 @@ public enum ItemType {
             }
         }
 
-        throw new IllegalArgumentException("Unsupported item type: " + value);
+        throw new IllegalArgumentException("Loại vật phẩm không được hỗ trợ: " + value);
     }
 }

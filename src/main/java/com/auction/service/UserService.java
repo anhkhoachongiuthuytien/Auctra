@@ -16,7 +16,7 @@ public class UserService {
     public User getUserById(String id) {
         User user = userDao.findById(id);
         if (user == null) {
-            throw new AuthenticationException("User not found");
+            throw new AuthenticationException("Không tìm thấy người dùng");
         }
         return user;
     }
@@ -24,7 +24,7 @@ public class UserService {
     public User getUserByEmail(String email) {
         User user = userDao.findByEmail(email);
         if (user == null) {
-            throw new AuthenticationException("User not found");
+            throw new AuthenticationException("Không tìm thấy người dùng");
         }
         return user;
     }

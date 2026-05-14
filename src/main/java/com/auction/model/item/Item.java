@@ -5,6 +5,7 @@ public class Item extends Entity {
     private String name;
     private String description;
     private double startingPrice;
+    private String imagePath; // Đường dẫn tới file ảnh (tuyệt đối trên máy local)
 
     public Item() {}
 
@@ -34,5 +35,12 @@ public class Item extends Entity {
     }
     public void setStartingPrice(double startingPrice) {
         this.startingPrice = startingPrice;
+    }
+
+    public String getImagePath() {
+        return imagePath;
+    }
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
     }
 }

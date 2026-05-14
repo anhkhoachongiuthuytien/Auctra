@@ -21,7 +21,7 @@ public class SqliteUserDao implements UserDao {
 
     @Override
     public void save(User user) {
-        // Upsert user: nếu id đã tồn tại thì cập nhật thông tin thay vì thêm dòng trùng.
+        // Upsert user without changing the stored password hash.
         String sql = """
                 INSERT INTO users(id, username, email, role)
                 VALUES (?, ?, ?, ?)
@@ -44,20 +44,75 @@ public class SqliteUserDao implements UserDao {
     }
 
     @Override
+    public void save(User user, String passwordHash) {
+        // Upsert user together with a password hash for register and password bootstrap flows.
+        String sql = """
+                INSERT INTO users(id, username, email, role, password_hash)
+                VALUES (?, ?, ?, ?, ?)
+                ON CONFLICT(id) DO UPDATE SET
+                    username = excluded.username,
+                    email = excluded.email,
+                    role = excluded.role,
+                    password_hash = excluded.password_hash
+                """;
+
+        try (Connection connection = databaseManager.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, user.getId());
+            statement.setString(2, user.getUsername());
+            statement.setString(3, user.getEmail());
+            statement.setString(4, DbMappers.detectRole(user));
+            statement.setString(5, passwordHash);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new IllegalStateException("Failed to save user", e);
+        }
+    }
+
+    @Override
     public User findById(String id) {
-        // Truy vấn một user theo khóa chính id.
         return findSingle("SELECT id, username, email, role FROM users WHERE id = ?", id);
     }
 
     @Override
     public User findByEmail(String email) {
-        // Truy vấn một user theo email để phục vụ login và kiểm tra email trùng.
         return findSingle("SELECT id, username, email, role FROM users WHERE email = ?", email);
     }
 
     @Override
+    public String findPasswordHashByEmail(String email) {
+        String sql = "SELECT password_hash FROM users WHERE email = ?";
+
+        try (Connection connection = databaseManager.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, email);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getString("password_hash");
+                }
+                return null;
+            }
+        } catch (SQLException e) {
+            throw new IllegalStateException("Failed to query password hash", e);
+        }
+    }
+
+    @Override
+    public void updatePasswordHash(String email, String passwordHash) {
+        String sql = "UPDATE users SET password_hash = ? WHERE email = ?";
+
+        try (Connection connection = databaseManager.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, passwordHash);
+            statement.setString(2, email);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new IllegalStateException("Failed to update password hash", e);
+        }
+    }
+
+    @Override
     public List<User> findAll() {
-        // Lấy toàn bộ user và sắp xếp theo username để kết quả ổn định khi hiển thị.
         String sql = "SELECT id, username, email, role FROM users ORDER BY username";
         List<User> users = new ArrayList<>();
 
@@ -80,7 +135,6 @@ public class SqliteUserDao implements UserDao {
     }
 
     private User findSingle(String sql, String value) {
-        // Hàm dùng chung cho các truy vấn chỉ mong đợi tối đa một kết quả.
         try (Connection connection = databaseManager.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, value);

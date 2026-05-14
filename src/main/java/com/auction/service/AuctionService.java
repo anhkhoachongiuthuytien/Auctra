@@ -57,7 +57,7 @@ public class AuctionService {
     public Auction getAuctionById(String auctionId) {
         Auction auction = auctionDao.findById(auctionId);
         if (auction == null) {
-            throw new AuctionException("Auction not found");
+            throw new AuctionException("Không tìm thấy cuộc đấu giá");
         }
         return auction;
     }

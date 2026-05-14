@@ -6,7 +6,8 @@ CREATE TABLE IF NOT EXISTS users (
     id TEXT PRIMARY KEY,
     username TEXT NOT NULL,
     email TEXT NOT NULL UNIQUE,
-    role TEXT NOT NULL
+    role TEXT NOT NULL,
+    password_hash TEXT NOT NULL DEFAULT ''
 );
 
 -- Bảng items lưu thông tin vật phẩm được đem ra đấu giá.
@@ -15,7 +16,8 @@ CREATE TABLE IF NOT EXISTS items (
     name TEXT NOT NULL,
     description TEXT NOT NULL,
     starting_price REAL NOT NULL,
-    type TEXT NOT NULL
+    type TEXT NOT NULL,
+    image_path TEXT
 );
 
 -- Bảng auctions lưu phiên đấu giá, người bán, người thắng và trạng thái hiện tại.

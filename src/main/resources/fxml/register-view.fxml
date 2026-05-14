@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<StackPane fx:id="rootPane" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.auction.controller.RegisterController">
+    <VBox alignment="CENTER" spacing="24.0">
+        <padding>
+            <Insets top="48.0" right="36.0" bottom="48.0" left="36.0"/>
+        </padding>
+
+        <!-- Brand -->
+        <HBox alignment="CENTER" spacing="12.0">
+            <StackPane styleClass="app-logo">
+                <Label styleClass="app-logo-text" text="AX"/>
+            </StackPane>
+            <VBox alignment="CENTER" spacing="2.0">
+                <HBox alignment="CENTER" spacing="0">
+                    <Label style="-fx-text-fill: #4285F4; -fx-font-size: 20; -fx-font-weight: bold;" text="A"/>
+                    <Label style="-fx-text-fill: #EA4335; -fx-font-size: 20; -fx-font-weight: bold;" text="u"/>
+                    <Label style="-fx-text-fill: #FBBC05; -fx-font-size: 20; -fx-font-weight: bold;" text="c"/>
+                    <Label style="-fx-text-fill: #4285F4; -fx-font-size: 20; -fx-font-weight: bold;" text="t"/>
+                    <Label style="-fx-text-fill: #34A853; -fx-font-size: 20; -fx-font-weight: bold;" text="r"/>
+                    <Label style="-fx-text-fill: #EA4335; -fx-font-size: 20; -fx-font-weight: bold;" text="a"/>
+                </HBox>
+                <Label styleClass="app-subtitle" text="Tạo tài khoản mới"/>
+            </VBox>
+        </HBox>
+
+        <!-- Register card -->
+        <VBox alignment="TOP_CENTER" spacing="16.0" styleClass="card" maxWidth="440.0">
+            <Label styleClass="screen-title" text="Đăng ký"/>
+            <Label styleClass="muted-label" wrapText="true" maxWidth="380.0"
+                   style="-fx-text-alignment: center;"
+                   text="Tạo tài khoản Bidder hoặc Seller với mật khẩu của riêng bạn."/>
+
+            <VBox spacing="12.0" maxWidth="380.0">
+                <Label styleClass="muted-label" text="Username"/>
+                <TextField fx:id="registerUsernameField" promptText="Tên hiển thị"/>
+
+                <Label styleClass="muted-label" text="Email"/>
+                <TextField fx:id="registerEmailField" promptText="you@example.com"/>
+
+                <Label styleClass="muted-label" text="Mật khẩu"/>
+                <PasswordField fx:id="registerPasswordField" promptText="Ít nhất 8 ký tự"/>
+
+                <Label styleClass="muted-label" text="Xác nhận mật khẩu"/>
+                <PasswordField fx:id="confirmPasswordField" promptText="Nhập lại mật khẩu"/>
+
+                <Label styleClass="muted-label" text="Loại tài khoản"/>
+                <ComboBox fx:id="roleComboBox" maxWidth="Infinity" promptText="Chọn loại"/>
+
+                <Region prefHeight="4"/>
+
+                <Button maxWidth="Infinity" styleClass="button-primary" mnemonicParsing="false"
+                        onAction="#handleRegister" text="Tạo tài khoản"/>
+            </VBox>
+
+            <Label fx:id="messageLabel" maxWidth="380.0" styleClass="info-label" wrapText="true"
+                   style="-fx-text-alignment: center;"/>
+
+            <Region prefHeight="4"/>
+
+            <HBox alignment="CENTER" spacing="4.0">
+                <Label styleClass="muted-label" text="Đã có tài khoản?"/>
+                <Hyperlink text="Đăng nhập" onAction="#goToLogin"/>
+            </HBox>
+        </VBox>
+    </VBox>
+</StackPane>

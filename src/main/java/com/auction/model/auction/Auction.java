@@ -53,7 +53,7 @@ public class Auction extends Entity {
                 status = AuctionStatus.RUNNING;
                 return;
             }
-            throw new AuctionException("Cannot start auction from status: " + status);
+            throw new AuctionException("Không thể bắt đầu phiên đấu giá khi đang ở trạng thái: " + status);
         } finally {
             stateLock.unlock();
         }
@@ -66,7 +66,7 @@ public class Auction extends Entity {
                 status = AuctionStatus.FINISHED;
                 return;
             }
-            throw new AuctionException("Cannot finish auction from status: " + status);
+            throw new AuctionException("Không thể kết thúc phiên đấu giá khi đang ở trạng thái: " + status);
         } finally {
             stateLock.unlock();
         }
@@ -79,7 +79,7 @@ public class Auction extends Entity {
                 status = AuctionStatus.CANCELED;
                 return;
             }
-            throw new AuctionException("Cannot cancel auction from status: " + status);
+            throw new AuctionException("Không thể huỷ phiên đấu giá khi đang ở trạng thái: " + status);
         } finally {
             stateLock.unlock();
         }
@@ -92,7 +92,7 @@ public class Auction extends Entity {
                 status = AuctionStatus.PAID;
                 return;
             }
-            throw new AuctionException("Cannot mark auction as paid from status: " + status);
+            throw new AuctionException("Không thể đánh dấu đã thanh toán khi đang ở trạng thái: " + status);
         } finally {
             stateLock.unlock();
         }
@@ -118,13 +118,13 @@ public class Auction extends Entity {
         stateLock.lock();
         try {
             if (status != AuctionStatus.RUNNING) {
-                throw new AuctionClosedException("Auction is not open for bidding");
+                throw new AuctionClosedException("Phiên đấu giá chưa mở để đặt giá");
             }
             if (bid == null) {
-                throw new InvalidBidException("Bid cannot be null");
+                throw new InvalidBidException("Lượt đặt giá không được để trống");
             }
             if (bid.getAmount() <= currentPrice) {
-                throw new InvalidBidException("Bid amount must be higher than current price");
+                throw new InvalidBidException("Số tiền đặt giá phải cao hơn giá hiện tại");
             }
 
             bids.add(bid);

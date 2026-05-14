@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.stream.Collectors;
@@ -36,8 +37,40 @@ public class DatabaseManager {
                     statement.execute(trimmed);
                 }
             }
+            ensureUsersPasswordHashColumn(connection);
+            ensureItemsImagePathColumn(connection);
         } catch (SQLException e) {
             throw new IllegalStateException("Failed to initialize database schema", e);
+        }
+    }
+
+    private void ensureUsersPasswordHashColumn(Connection connection) throws SQLException {
+        try (Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery("PRAGMA table_info(users)")) {
+            while (resultSet.next()) {
+                if ("password_hash".equalsIgnoreCase(resultSet.getString("name"))) {
+                    return;
+                }
+            }
+        }
+
+        try (Statement statement = connection.createStatement()) {
+            statement.execute("ALTER TABLE users ADD COLUMN password_hash TEXT NOT NULL DEFAULT ''");
+        }
+    }
+
+    private void ensureItemsImagePathColumn(Connection connection) throws SQLException {
+        try (Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery("PRAGMA table_info(items)")) {
+            while (resultSet.next()) {
+                if ("image_path".equalsIgnoreCase(resultSet.getString("name"))) {
+                    return;
+                }
+            }
+        }
+
+        try (Statement statement = connection.createStatement()) {
+            statement.execute("ALTER TABLE items ADD COLUMN image_path TEXT");
         }
     }
 

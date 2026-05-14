@@ -18,30 +18,29 @@ public class BidService {
 
     public void placeBid(String auctionId, Bidder bidder, double amount) {
         if (auctionId == null || auctionId.trim().isEmpty()) {
-            throw new ValidationException("Auction id must not be empty");
+            throw new ValidationException("Mã phiên đấu giá không được để trống");
         }
         if (bidder == null) {
-            throw new ValidationException("Bidder must not be null");
+            throw new ValidationException("Bidder không được để trống");
         }
         if (Double.isNaN(amount) || Double.isInfinite(amount) || amount <= 0) {
-            throw new ValidationException("Bid amount must be greater than 0");
+            throw new ValidationException("Số tiền đặt giá phải lớn hơn 0");
         }
         Auction auction = auctionDao.findById(auctionId);
         if (auction == null) {
-            throw new AuctionException("Auction not found");
+            throw new AuctionException("Không tìm thấy cuộc đấu giá");
         }
         // Khóa theo từng object auction để hai thread không cùng kiểm tra và cập nhật
         // currentPrice trên cùng một phiên đấu giá tại cùng thời điểm.
         synchronized (auction) {
             if (!auction.isOpen()) {
-                throw new AuctionClosedException("Auction is closed");
+                throw new AuctionClosedException("Cuộc đấu giá đã đóng");
             }
             if (amount <= auction.getCurrentPrice()) {
-                throw new InvalidBidException("Bid must be higher");
+                throw new InvalidBidException("Giá đặt phải cao hơn giá hiện tại");
             }
             BidTransaction bid = new BidTransaction(bidder, amount);
             auction.addBid(bid);
-            // Sau khi domain model cập nhật xong, lưu ngay snapshot mới xuống persistence.
             auctionDao.save(auction);
         }
     }

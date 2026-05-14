@@ -1,8 +1,185 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.Priority?>
 
-<StackPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
-    <Label text="Auction detail view is reserved for the next iteration."/>
+<StackPane fx:id="rootPane" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.auction.controller.AuctionDetailController">
+<BorderPane styleClass="admin-root">
+
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="20.0" styleClass="admin-top-nav">
+            <padding><Insets top="12" right="24" bottom="12" left="24"/></padding>
+            <HBox alignment="CENTER_LEFT" spacing="8" prefWidth="200">
+                <HBox alignment="CENTER_LEFT" spacing="0">
+                    <Label style="-fx-text-fill: #4285F4; -fx-font-size: 20; -fx-font-weight: bold;" text="A"/>
+                    <Label style="-fx-text-fill: #EA4335; -fx-font-size: 20; -fx-font-weight: bold;" text="u"/>
+                    <Label style="-fx-text-fill: #FBBC05; -fx-font-size: 20; -fx-font-weight: bold;" text="c"/>
+                    <Label style="-fx-text-fill: #4285F4; -fx-font-size: 20; -fx-font-weight: bold;" text="t"/>
+                    <Label style="-fx-text-fill: #34A853; -fx-font-size: 20; -fx-font-weight: bold;" text="r"/>
+                    <Label style="-fx-text-fill: #EA4335; -fx-font-size: 20; -fx-font-weight: bold;" text="a"/>
+                </HBox>
+            </HBox>
+
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <HBox alignment="CENTER" spacing="20">
+                <HBox alignment="CENTER" spacing="8">
+                    <StackPane styleClass="admin-user-avatar">
+                        <Label styleClass="admin-user-avatar-text" text="U"/>
+                    </StackPane>
+                    <Label styleClass="admin-user-name" text="User"/>
+                </HBox>
+            </HBox>
+        </HBox>
+    </top>
+
+    <left>
+        <VBox spacing="4" styleClass="admin-sidebar" prefWidth="240">
+            <padding><Insets top="24" right="16" bottom="24" left="16"/></padding>
+            <Button styleClass="nav-link" mnemonicParsing="false"
+                    onAction="#handleBack" text="←  Quay lại" alignment="BASELINE_LEFT" maxWidth="Infinity"/>
+            <Region VBox.vgrow="ALWAYS"/>
+        </VBox>
+    </left>
+
+    <center>
+        <VBox spacing="0" styleClass="admin-main-bg">
+            <HBox alignment="CENTER_LEFT" spacing="8" styleClass="admin-content-header">
+                <padding><Insets top="16" right="32" bottom="16" left="32"/></padding>
+                <Label styleClass="admin-breadcrumb-text" text="Trang chủ"/>
+                <Label styleClass="admin-breadcrumb-sep" text="›"/>
+                <Label styleClass="admin-breadcrumb-text" text="Phiên đấu giá"/>
+                <Label styleClass="admin-breadcrumb-sep" text="›"/>
+                <Label styleClass="admin-breadcrumb-active" text="Chi tiết"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button styleClass="button-ghost" mnemonicParsing="false"
+                        onAction="#handleRefresh" text="Làm mới"/>
+            </HBox>
+
+            <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="admin-scroll">
+                <VBox spacing="24">
+                    <padding><Insets top="8" right="32" bottom="32" left="32"/></padding>
+
+                    <HBox spacing="28.0">
+                        <VBox spacing="12.0" prefWidth="520.0">
+                            <StackPane styleClass="detail-image-wrapper" prefHeight="460" minHeight="460" style="-fx-background-color: white; -fx-border-color: #E5E5E5; -fx-border-radius: 8;">
+                                <ImageView fx:id="itemImageView" fitWidth="500" fitHeight="440"
+                                           preserveRatio="true" smooth="true"/>
+                                <Label fx:id="imagePlaceholderLabel" styleClass="muted-label"
+                                       style="-fx-font-size: 64;" text="IM"/>
+                            </StackPane>
+                        </VBox>
+
+                        <VBox spacing="14.0" HBox.hgrow="ALWAYS">
+                            <Label fx:id="itemNameLabel" styleClass="admin-page-title" wrapText="true"/>
+                            <HBox alignment="CENTER_LEFT" spacing="8">
+                                <Label fx:id="itemTypeChip" styleClass="chip-info" text="Category"/>
+                                <Label fx:id="statusLabel" styleClass="badge" text="OPEN"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Label fx:id="bidCountChip" styleClass="chip" text="0 luot"/>
+                            </HBox>
+
+                            <Separator/>
+
+                            <VBox spacing="4">
+                                <Label styleClass="muted-label" text="Giá hiện tại"/>
+                                <Label fx:id="currentPriceLabel" styleClass="price-big"/>
+                                <Label fx:id="startingPriceLabel" styleClass="muted-label"/>
+                            </VBox>
+
+                            <HBox spacing="12" alignment="CENTER_LEFT">
+                                <Label styleClass="muted-label" text="Người thắng hiện tại:"/>
+                                <Label fx:id="winnerLabel" styleClass="admin-card-title" text="Chưa có"/>
+                            </HBox>
+
+                            <VBox fx:id="bidFormPanel" styleClass="admin-card" spacing="10.0" style="-fx-padding: 20;">
+                                <Label styleClass="admin-card-title" text="Đặt giá của bạn"/>
+                                <Label fx:id="bidHintLabel" styleClass="muted-label" wrapText="true"/>
+                                <TextField fx:id="bidAmountField" promptText="Nhập số tiền" styleClass="admin-inner-search-field" style="-fx-border-color: #DADCE0; -fx-border-radius: 4; -fx-padding: 8;"/>
+                                <HBox spacing="8">
+                                    <Button styleClass="button-ghost button-row" maxWidth="Infinity"
+                                            HBox.hgrow="ALWAYS" mnemonicParsing="false"
+                                            onAction="#bidPlusSmall" text="+10"/>
+                                    <Button styleClass="button-ghost button-row" maxWidth="Infinity"
+                                            HBox.hgrow="ALWAYS" mnemonicParsing="false"
+                                            onAction="#bidPlusMedium" text="+100"/>
+                                    <Button styleClass="button-ghost button-row" maxWidth="Infinity"
+                                            HBox.hgrow="ALWAYS" mnemonicParsing="false"
+                                            onAction="#bidPlusLarge" text="+1,000"/>
+                                </HBox>
+                                <HBox spacing="10">
+                                    <Button fx:id="placeBidButton" styleClass="button-primary"
+                                            HBox.hgrow="ALWAYS" maxWidth="Infinity" prefHeight="44"
+                                            mnemonicParsing="false" onAction="#handlePlaceBid"
+                                            text="Đặt giá ngay"/>
+                                </HBox>
+                            </VBox>
+
+                            <Separator/>
+
+                            <VBox spacing="2">
+                                <HBox styleClass="meta-row" alignment="CENTER_LEFT">
+                                    <Label styleClass="meta-key" text="Người bán"/>
+                                    <Region HBox.hgrow="ALWAYS"/>
+                                    <Label fx:id="sellerLabel" styleClass="meta-value"/>
+                                </HBox>
+                                <HBox styleClass="meta-row" alignment="CENTER_LEFT">
+                                    <Label styleClass="meta-key" text="Đánh giá"/>
+                                    <Region HBox.hgrow="ALWAYS"/>
+                                    <Label styleClass="muted-label" text="4.0/5"/>
+                                </HBox>
+                            </VBox>
+                        </VBox>
+                    </HBox>
+
+                    <HBox spacing="20">
+                        <VBox styleClass="admin-card" spacing="8" prefWidth="520">
+                            <HBox alignment="CENTER_LEFT" spacing="12" styleClass="admin-card-header">
+                                <Label styleClass="admin-card-title" text="Mô tả sản phẩm"/>
+                            </HBox>
+                            <VBox style="-fx-padding: 16;">
+                                <Label fx:id="itemDescriptionLabel" styleClass="muted-label" wrapText="true"/>
+                            </VBox>
+                        </VBox>
+
+                        <VBox styleClass="admin-card" spacing="0" HBox.hgrow="ALWAYS">
+                            <HBox alignment="CENTER_LEFT" spacing="12" styleClass="admin-card-header">
+                                <Label styleClass="admin-card-title" text="Lịch sử đặt giá"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Label fx:id="bidCountLabel" styleClass="muted-label" text="0 luot"/>
+                            </HBox>
+
+                            <TableView fx:id="bidTable" prefHeight="280" styleClass="admin-table">
+                                <columns>
+                                    <TableColumn fx:id="bidIndexColumn"  prefWidth="60.0"  text="#"/>
+                                    <TableColumn fx:id="bidderColumn"    prefWidth="180.0" text="Người đặt"/>
+                                    <TableColumn fx:id="bidAmountColumn" prefWidth="140.0" text="Số tiền"/>
+                                    <TableColumn fx:id="bidTimeColumn"   prefWidth="180.0" text="Thời điểm"/>
+                                </columns>
+                            </TableView>
+                        </VBox>
+                    </HBox>
+                </VBox>
+            </ScrollPane>
+
+            <HBox alignment="CENTER_LEFT" spacing="12" styleClass="admin-footer">
+                <Label styleClass="admin-footer-text" text="(C) 2026 Auctra"/>
+            </HBox>
+        </VBox>
+    </center>
+</BorderPane>
 </StackPane>

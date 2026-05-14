@@ -21,15 +21,15 @@ public class SqliteItemDao implements ItemDao {
 
     @Override
     public void save(Item item) {
-        // Upsert item để cùng một câu SQL xử lý cả thêm mới lẫn cập nhật vật phẩm.
         String sql = """
-                INSERT INTO items(id, name, description, starting_price, type)
-                VALUES (?, ?, ?, ?, ?)
+                INSERT INTO items(id, name, description, starting_price, type, image_path)
+                VALUES (?, ?, ?, ?, ?, ?)
                 ON CONFLICT(id) DO UPDATE SET
                     name = excluded.name,
                     description = excluded.description,
                     starting_price = excluded.starting_price,
-                    type = excluded.type
+                    type = excluded.type,
+                    image_path = excluded.image_path
                 """;
 
         try (Connection connection = databaseManager.getConnection();
@@ -39,6 +39,11 @@ public class SqliteItemDao implements ItemDao {
             statement.setString(3, item.getDescription());
             statement.setDouble(4, item.getStartingPrice());
             statement.setString(5, DbMappers.detectItemType(item));
+            if (item.getImagePath() == null) {
+                statement.setNull(6, java.sql.Types.VARCHAR);
+            } else {
+                statement.setString(6, item.getImagePath());
+            }
             statement.executeUpdate();
         } catch (SQLException e) {
             throw new IllegalStateException("Failed to save item", e);
@@ -47,8 +52,7 @@ public class SqliteItemDao implements ItemDao {
 
     @Override
     public Item findById(String id) {
-        // Tìm một item theo id để dựng lại auction hoặc mở chi tiết vật phẩm.
-        String sql = "SELECT id, name, description, starting_price, type FROM items WHERE id = ?";
+        String sql = "SELECT id, name, description, starting_price, type, image_path FROM items WHERE id = ?";
 
         try (Connection connection = databaseManager.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -60,7 +64,8 @@ public class SqliteItemDao implements ItemDao {
                             resultSet.getString("id"),
                             resultSet.getString("name"),
                             resultSet.getString("description"),
-                            resultSet.getDouble("starting_price")
+                            resultSet.getDouble("starting_price"),
+                            resultSet.getString("image_path")
                     );
                 }
                 return null;
@@ -72,8 +77,7 @@ public class SqliteItemDao implements ItemDao {
 
     @Override
     public List<Item> findAll() {
-        // Lấy toàn bộ item, sắp xếp theo tên để danh sách hiển thị dễ đọc hơn.
-        String sql = "SELECT id, name, description, starting_price, type FROM items ORDER BY name";
+        String sql = "SELECT id, name, description, starting_price, type, image_path FROM items ORDER BY name";
         List<Item> items = new ArrayList<>();
 
         try (Connection connection = databaseManager.getConnection();
@@ -85,7 +89,8 @@ public class SqliteItemDao implements ItemDao {
                         resultSet.getString("id"),
                         resultSet.getString("name"),
                         resultSet.getString("description"),
-                        resultSet.getDouble("starting_price")
+                        resultSet.getDouble("starting_price"),
+                        resultSet.getString("image_path")
                 ));
             }
         } catch (SQLException e) {
@@ -97,7 +102,6 @@ public class SqliteItemDao implements ItemDao {
 
     @Override
     public void delete(String id) {
-        // Xóa item theo id khi vật phẩm không còn cần lưu trong hệ thống.
         String sql = "DELETE FROM items WHERE id = ?";
 
         try (Connection connection = databaseManager.getConnection();
