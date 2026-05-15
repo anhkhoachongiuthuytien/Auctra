@@ -164,6 +164,7 @@
                             </HBox>
 
                             <TableView fx:id="bidTable" prefHeight="280" styleClass="admin-table">
+                                <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/></columnResizePolicy>
                                 <columns>
                                     <TableColumn fx:id="bidIndexColumn"  prefWidth="60.0"  text="#"/>
                                     <TableColumn fx:id="bidderColumn"    prefWidth="180.0" text="Người đặt"/>

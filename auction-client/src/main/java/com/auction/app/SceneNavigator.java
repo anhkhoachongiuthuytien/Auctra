@@ -121,31 +121,37 @@ public class SceneNavigator {
     }
 
     private void setScene(Parent root, String title) {
-        double width = 1180;
-        double height = 760;
+        boolean isAuthScreen = title.contains("Đăng nhập") || title.contains("Đăng ký") || title.contains("Đặt lại mật khẩu");
 
-        // Tự động thu nhỏ cửa sổ nếu là màn hình Auth (Login/Register/Forgot)
-        if (title.contains("Đăng nhập") || title.contains("Đăng ký") || title.contains("Đặt lại mật khẩu")) {
-            width = 460;
-            height = 680;
+        if (stage.getScene() == null) {
+            // Lần đầu khởi tạo: Đặt kích thước đủ rộng (1180x760) để thấy hết cả 2 panel
+            double width = 1180;
+            double height = 760;
+            Scene scene = new Scene(root, width, height);
+            scene.getStylesheets().add(getClass().getResource("/css/app.css").toExternalForm());
+            stage.setScene(scene);
+            stage.centerOnScreen();
+        } else {
+            // Tái sử dụng scene hiện tại để tránh giật / nhảy cửa sổ
+            Scene scene = stage.getScene();
+            boolean wasAuthScreen = stage.getTitle() != null && (
+                    stage.getTitle().contains("Đăng nhập") || 
+                    stage.getTitle().contains("Đăng ký") || 
+                    stage.getTitle().contains("Đặt lại mật khẩu"));
+
+            // Chuyển qua lại giữa các màn hình giữ nguyên kích thước cửa sổ hiện tại của người dùng
+            // (Đã loại bỏ đoạn code ép kích thước về 460 để không bị lỗi co hẹp)
+            
+            scene.setRoot(root);
         }
-
-        Scene scene = new Scene(root, width, height);
-        scene.getStylesheets().add(getClass().getResource("/css/app.css").toExternalForm());
         
         stage.setTitle(title);
-        stage.setScene(scene);
         
-        // Cấu hình linh hoạt
-        if (width < 600) {
-            stage.setResizable(false); // Không cho resize khi đang ở Login
-        } else {
-            stage.setResizable(true);
-            stage.setMinWidth(1000);
-            stage.setMinHeight(700);
-        }
+        // Cho phép phóng to thu nhỏ tùy ý
+        stage.setResizable(true);
+        stage.setMinWidth(900); // Kích thước tối thiểu đủ để hiện 2 panel
+        stage.setMinHeight(600);
         
-        stage.centerOnScreen();
         stage.show();
 
         FadeTransition fade = new FadeTransition(Duration.millis(220), root);

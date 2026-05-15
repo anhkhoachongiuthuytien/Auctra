@@ -66,7 +66,7 @@
                         </VBox>
                     </HBox>
                     <VBox fx:id="dashboardSection" spacing="16">
-                        <VBox spacing="16.0">
+                        <FlowPane hgap="16.0" vgap="16.0">
                             <VBox styleClass="admin-stat-card" spacing="10">
                                 <HBox alignment="CENTER_LEFT" spacing="14">
                                     <StackPane styleClass="icon-tile" style="-fx-background-color: #E8F0FE;">
@@ -111,7 +111,7 @@
                                     </VBox>
                                 </HBox>
                             </VBox>
-                        </VBox>
+                        </FlowPane>
                     </VBox>
                     <VBox fx:id="usersSection" styleClass="admin-card" spacing="0" visible="false" managed="false">
                         <HBox alignment="CENTER_LEFT" spacing="12" styleClass="admin-card-header">
@@ -122,6 +122,7 @@
                             </HBox>
                         </HBox>
                         <TableView fx:id="userTable" prefHeight="440.0" styleClass="admin-table">
+                            <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/></columnResizePolicy>
                             <columns>
                                 <TableColumn fx:id="userIdColumn"   prefWidth="200.0" text="Mã"/>
                                 <TableColumn fx:id="usernameColumn" prefWidth="180.0" text="Tên"/>
@@ -141,6 +142,7 @@
                             <Button styleClass="button-success button-row" mnemonicParsing="false" onAction="#handleMarkPaid" text="Đã TT"/>
                         </HBox>
                         <TableView fx:id="auctionTable" prefHeight="440.0" styleClass="admin-table">
+                            <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/></columnResizePolicy>
                             <columns>
                                 <TableColumn fx:id="auctionIdColumn"    prefWidth="180.0" text="Mã phiên"/>
                                 <TableColumn fx:id="itemColumn"         prefWidth="220.0" text="Vật phẩm"/>

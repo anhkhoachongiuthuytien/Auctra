@@ -153,6 +153,7 @@
                         </HBox>
                         <VBox style="-fx-padding: 0;">
                             <TableView fx:id="sellerAuctionTable" VBox.vgrow="ALWAYS" prefHeight="380" styleClass="admin-table">
+                                <columnResizePolicy><TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/></columnResizePolicy>
                                 <columns>
                                     <TableColumn fx:id="auctionIdColumn"    prefWidth="220.0" text="Mã phiên"/>
                                     <TableColumn fx:id="itemNameColumn"     prefWidth="220.0" text="Vật phẩm"/>
