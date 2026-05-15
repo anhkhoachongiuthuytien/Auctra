@@ -121,12 +121,31 @@ public class SceneNavigator {
     }
 
     private void setScene(Parent root, String title) {
-        Scene scene = new Scene(root, 1180, 760);
+        double width = 1180;
+        double height = 760;
+
+        // Tự động thu nhỏ cửa sổ nếu là màn hình Auth (Login/Register/Forgot)
+        if (title.contains("Đăng nhập") || title.contains("Đăng ký") || title.contains("Đặt lại mật khẩu")) {
+            width = 460;
+            height = 680;
+        }
+
+        Scene scene = new Scene(root, width, height);
         scene.getStylesheets().add(getClass().getResource("/css/app.css").toExternalForm());
-        stage.setMinWidth(960);
-        stage.setMinHeight(620);
+        
         stage.setTitle(title);
         stage.setScene(scene);
+        
+        // Cấu hình linh hoạt
+        if (width < 600) {
+            stage.setResizable(false); // Không cho resize khi đang ở Login
+        } else {
+            stage.setResizable(true);
+            stage.setMinWidth(1000);
+            stage.setMinHeight(700);
+        }
+        
+        stage.centerOnScreen();
         stage.show();
 
         FadeTransition fade = new FadeTransition(Duration.millis(220), root);

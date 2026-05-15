@@ -141,6 +141,8 @@ public class AuctionSocketServer {
                             request.get("password"),
                             request.get("role")
                     );
+                    // Bắn thông báo cho các Client khác biết có người mới đăng ký (dành cho Admin update)
+                    BroadcastManager.broadcast(new AuctionEvent("USER_REGISTERED"));
                     return AuctionResponse.ok(DtoMapper.toDto(user));
                 }
                 case GET_REGISTRATION_ROLES: {
