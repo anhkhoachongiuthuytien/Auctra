@@ -4,6 +4,7 @@ import com.auction.model.base.Entity;
 public abstract class User extends Entity {
     private String username;
     private String email;
+    private String avatarPath;
 
     public User() {}
 
@@ -26,5 +27,13 @@ public abstract class User extends Entity {
     }
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getAvatarPath() {
+        return avatarPath;
+    }
+
+    public void setAvatarPath(String avatarPath) {
+        this.avatarPath = avatarPath;
     }
 }

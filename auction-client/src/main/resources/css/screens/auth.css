@@ -1,0 +1,168 @@
+/* ================================================
+   AUTH SCREEN — Premium split-panel login & register
+   ================================================ */
+
+/* Root */
+.auth-root {
+    -fx-background-color: #f8fafc;
+}
+
+/* ── BRAND PANEL (left side) ── */
+.google-brand-panel,
+.auth-brand-panel {
+    -fx-background-color: linear-gradient(to bottom right, #0a0e1a, #0f172a, #1e1b4b, #312e81, #4f46e5);
+    -fx-padding: 72 60;
+    -fx-border-color: transparent;
+}
+
+.auth-brand-kicker {
+    -fx-text-fill: -brand-gold;
+    -fx-font-size: 10.5px;
+    -fx-font-weight: 700;
+    -fx-font-family: -font-heading;
+    -fx-padding: 0 0 4 0;
+}
+
+.auth-brand-title {
+    -fx-font-family: -font-heading;
+    -fx-font-size: 56px;
+    -fx-font-weight: 700;
+    -fx-text-fill: white;
+}
+
+.auth-brand-copy {
+    -fx-font-family: -font-body;
+    -fx-text-fill: rgba(226, 232, 240, 0.85);
+    -fx-font-size: 14.5px;
+    -fx-wrap-text: true;
+}
+
+/* Metric cards on brand panel */
+.auth-metric-card {
+    -fx-background-color: rgba(255, 255, 255, 0.05);
+    -fx-background-radius: 14;
+    -fx-padding: 16 20;
+    -fx-border-color: rgba(255, 255, 255, 0.09);
+    -fx-border-radius: 14;
+    -fx-border-width: 1;
+}
+
+.auth-metric-value {
+    -fx-text-fill: white;
+    -fx-font-family: -font-heading;
+    -fx-font-size: 26px;
+    -fx-font-weight: 700;
+}
+
+.auth-metric-label {
+    -fx-text-fill: rgba(148, 163, 184, 0.90);
+    -fx-font-size: 11.5px;
+}
+
+/* Demo credentials card */
+.auth-demo-password {
+    -fx-text-fill: -brand-gold-light;
+    -fx-font-size: 12px;
+    -fx-font-weight: 700;
+    -fx-font-family: -font-heading;
+}
+
+.auth-demo-card {
+    -fx-background-color: rgba(255, 255, 255, 0.04);
+    -fx-background-radius: 12;
+    -fx-padding: 12 16;
+    -fx-border-color: rgba(255, 255, 255, 0.07);
+    -fx-border-radius: 12;
+    -fx-border-width: 1;
+    -fx-cursor: hand;
+}
+
+.auth-demo-card:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.08);
+    -fx-border-color: rgba(255, 255, 255, 0.14);
+}
+
+.auth-demo-role {
+    -fx-text-fill: white;
+    -fx-font-size: 13.5px;
+    -fx-font-weight: 700;
+    -fx-font-family: -font-heading;
+}
+
+.auth-demo-email {
+    -fx-text-fill: rgba(203, 213, 225, 0.85);
+    -fx-font-family: -font-mono;
+    -fx-font-size: 11.5px;
+}
+
+/* Step pills on brand panel (dark background context) */
+.auth-brand-panel .step-pill {
+    -fx-background-color: rgba(255, 255, 255, 0.08);
+    -fx-text-fill: #cbd5e1;
+    -fx-padding: 7 14;
+    -fx-font-size: 11.5px;
+}
+
+.auth-brand-panel .step-pill-active {
+    -fx-background-color: -brand-gold;
+    -fx-text-fill: -color-text-on-gold;
+    -fx-padding: 7 14;
+    -fx-font-size: 11.5px;
+    -fx-effect: none;
+}
+
+/* ── FORM PANEL (right side) ── */
+.auth-form-panel {
+    -fx-background-color: #f8fafc;
+    -fx-background-radius: 0;
+    -fx-padding: 64 60;
+}
+
+/* ── AUTH CARD ── */
+.google-auth-card {
+    -fx-background-color: white;
+    -fx-background-radius: 24;
+    -fx-padding: 40 44;
+    -fx-border-color: -border;
+    -fx-border-radius: 24;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(gaussian, rgba(15, 23, 42, 0.06), 32, 0, 0, 10);
+}
+
+.auth-title {
+    -fx-font-family: -font-heading;
+    -fx-font-size: 28px;
+    -fx-font-weight: 700;
+    -fx-text-fill: -text-primary;
+}
+
+.auth-subtitle {
+    -fx-font-family: -font-body;
+    -fx-text-fill: -text-muted;
+    -fx-font-size: 13.5px;
+}
+
+.auth-footer-link {
+    -fx-text-fill: -text-muted;
+    -fx-font-size: 12px;
+    -fx-cursor: hand;
+    -fx-font-weight: 600;
+}
+
+.auth-footer-link:hover {
+    -fx-text-fill: -brand-deep;
+}
+
+/* Feature chips at bottom of brand panel */
+.auth-feature-chip {
+    -fx-background-color: rgba(255, 255, 255, 0.09);
+    -fx-background-radius: 999;
+    -fx-padding: 6 14;
+    -fx-text-fill: rgba(226, 232, 240, 0.90);
+    -fx-font-size: 12px;
+    -fx-font-weight: 700;
+    -fx-font-family: -font-heading;
+    -fx-border-color: rgba(255, 255, 255, 0.10);
+    -fx-border-radius: 999;
+    -fx-border-width: 1;
+}

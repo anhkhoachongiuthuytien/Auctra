@@ -1,0 +1,18 @@
+.skeleton-pane,
+.skeleton-row,
+.skeleton-block {
+    -fx-background-color: linear-gradient(to right, #ECE7DE, #F7F3EA);
+    -fx-background-radius: 12;
+}
+
+.skeleton-row {
+    -fx-pref-height: 44;
+    -fx-min-height: 44;
+}
+
+.skeleton-circle {
+    -fx-background-color: #ECE7DE;
+    -fx-background-radius: 999;
+    -fx-pref-width: 42;
+    -fx-pref-height: 42;
+}

@@ -10,12 +10,13 @@ import com.auction.controller.SellerController;
 import com.auction.model.user.Admin;
 import com.auction.model.user.Seller;
 import com.auction.model.user.User;
-import javafx.animation.FadeTransition;
+import com.auction.ui.ResponsiveManager;
+import com.auction.ui.ThemeManager;
+import com.auction.ui.UIAnimations;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 
 import java.io.IOException;
 
@@ -28,8 +29,14 @@ public class SceneNavigator {
         this.appContext = appContext;
     }
 
+    private FXMLLoader createLoader(String fxmlPath) {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+        loader.setCharset(java.nio.charset.StandardCharsets.UTF_8);
+        return loader;
+    }
+
     public void showLogin() throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/login-view.fxml"));
+        FXMLLoader loader = createLoader("/fxml/login-view.fxml");
         Parent root = loader.load();
         AuthController controller = loader.getController();
         controller.init(appContext, this);
@@ -37,7 +44,7 @@ public class SceneNavigator {
     }
 
     public void showRegister() throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/register-view.fxml"));
+        FXMLLoader loader = createLoader("/fxml/register-view.fxml");
         Parent root = loader.load();
         RegisterController controller = loader.getController();
         controller.init(appContext, this);
@@ -45,7 +52,7 @@ public class SceneNavigator {
     }
 
     public void showForgotPassword() throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/forgot-password-view.fxml"));
+        FXMLLoader loader = createLoader("/fxml/forgot-password-view.fxml");
         Parent root = loader.load();
         ForgotPasswordController controller = loader.getController();
         controller.init(appContext, this);
@@ -53,7 +60,7 @@ public class SceneNavigator {
     }
 
     public void showAuctionList(User user) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/auction-list-view.fxml"));
+        FXMLLoader loader = createLoader("/fxml/auction-list-view.fxml");
         Parent root = loader.load();
         AuctionController controller = loader.getController();
         controller.init(appContext, this, user);
@@ -61,7 +68,7 @@ public class SceneNavigator {
     }
 
     public void showAuctionDetail(com.auction.model.auction.Auction auction, User user) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/auction-detail-view.fxml"));
+        FXMLLoader loader = createLoader("/fxml/auction-detail-view.fxml");
         Parent root = loader.load();
         com.auction.controller.AuctionDetailController controller = loader.getController();
         controller.init(appContext, this, user, auction);
@@ -81,7 +88,7 @@ public class SceneNavigator {
     }
 
     public void showSellerDashboard(Seller seller) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/seller-view.fxml"));
+        FXMLLoader loader = createLoader("/fxml/seller-view.fxml");
         Parent root = loader.load();
         SellerController controller = loader.getController();
         controller.init(appContext, this, seller);
@@ -89,7 +96,7 @@ public class SceneNavigator {
     }
 
     public void showAdminDashboard(Admin admin) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/admin-view.fxml"));
+        FXMLLoader loader = createLoader("/fxml/admin-view.fxml");
         Parent root = loader.load();
         AdminController controller = loader.getController();
         controller.init(appContext, this, admin);
@@ -97,7 +104,7 @@ public class SceneNavigator {
     }
 
     public void showProfile(User user) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/profile-view.fxml"));
+        FXMLLoader loader = createLoader("/fxml/profile-view.fxml");
         Parent root = loader.load();
         ProfileController controller = loader.getController();
         controller.init(appContext, this, user);
@@ -130,6 +137,8 @@ public class SceneNavigator {
             Scene scene = new Scene(root, width, height);
             scene.getStylesheets().add(getClass().getResource("/css/app.css").toExternalForm());
             stage.setScene(scene);
+            ThemeManager.applySavedTheme(scene);
+            ResponsiveManager.attach(scene);
             stage.centerOnScreen();
         } else {
             // Tái sử dụng scene hiện tại để tránh giật / nhảy cửa sổ
@@ -143,20 +152,19 @@ public class SceneNavigator {
             // (Đã loại bỏ đoạn code ép kích thước về 460 để không bị lỗi co hẹp)
             
             scene.setRoot(root);
+            ThemeManager.applySavedTheme(scene);
+            ResponsiveManager.attach(scene);
         }
         
         stage.setTitle(title);
         
         // Cho phép phóng to thu nhỏ tùy ý
         stage.setResizable(true);
-        stage.setMinWidth(900); // Kích thước tối thiểu đủ để hiện 2 panel
+        stage.setMinWidth(800);
         stage.setMinHeight(600);
         
         stage.show();
 
-        FadeTransition fade = new FadeTransition(Duration.millis(220), root);
-        fade.setFromValue(0.6);
-        fade.setToValue(1.0);
-        fade.play();
+        UIAnimations.slideUpFadeIn(root);
     }
 }

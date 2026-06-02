@@ -26,6 +26,11 @@ public class AppContext {
         ServerContext serverContext = new ServerContext("jdbc:sqlite:auction-system.db");
         AuctionServerFacade serverFacade = new AuctionServerFacade(serverContext);
         this.gateway = new LocalAuctionClientGateway(serverFacade);
+
+        // Khởi động scheduler kiểm tra auction hết hạn (daemon thread, tự dọn khi app tắt)
+        com.auction.server.AuctionExpiryScheduler expiryScheduler =
+                new com.auction.server.AuctionExpiryScheduler(serverContext.getAuctionService());
+        expiryScheduler.start();
     }
 
     /**
@@ -38,6 +43,10 @@ public class AppContext {
         SocketAuctionClientGateway socketGateway = new SocketAuctionClientGateway(host, port);
         socketGateway.connect();
         this.gateway = socketGateway;
+    }
+
+    public AppContext(AuctionClientGateway gateway) {
+        this.gateway = gateway;
     }
 
     public AuctionClientGateway getGateway() {

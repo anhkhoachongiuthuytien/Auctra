@@ -1,0 +1,17 @@
+.chip-gold {
+    -fx-background-color: -color-brand-gold-bg;
+    -fx-text-fill: -color-text-gold;
+    -fx-background-radius: 999;
+    -fx-padding: 6 14;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.chip-muted {
+    -fx-background-color: -surface-2;
+    -fx-text-fill: -text-secondary;
+    -fx-background-radius: 999;
+    -fx-padding: 6 14;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}

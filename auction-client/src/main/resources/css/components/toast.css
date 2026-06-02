@@ -1,0 +1,14 @@
+.toast-container {
+    -fx-padding: 20;
+    -fx-spacing: 10;
+}
+
+.toast-title {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.toast-message {
+    -fx-text-fill: rgba(255,255,255,0.82);
+    -fx-font-size: 12px;
+}

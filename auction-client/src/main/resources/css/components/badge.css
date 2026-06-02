@@ -1,0 +1,160 @@
+/* ================================================
+   BADGE & CHIP — Status indicators & filter tabs
+   ================================================ */
+
+/* ── SHARED BASE ── */
+.badge,
+.chip,
+.chip-info,
+.chip-success,
+.chip-warning,
+.chip-danger {
+    -fx-background-radius: 999;
+    -fx-padding: 5 13;
+    -fx-font-weight: 700;
+    -fx-font-size: 11.5px;
+    -fx-font-family: -font-heading;
+}
+
+/* ── CHIP VARIANTS ── */
+.chip {
+    -fx-background-color: -surface-2;
+    -fx-text-fill: -text-secondary;
+}
+
+.chip-info {
+    -fx-background-color: -color-info-bg;
+    -fx-text-fill: -info;
+}
+
+.chip-success {
+    -fx-background-color: -color-success-bg;
+    -fx-text-fill: -active;
+}
+
+.chip-warning {
+    -fx-background-color: -color-warning-bg;
+    -fx-text-fill: -warning;
+}
+
+.chip-danger {
+    -fx-background-color: -color-danger-bg;
+    -fx-text-fill: -danger;
+}
+
+/* ── AUCTION STATUS BADGES ── */
+.badge-open {
+    -fx-background-color: -color-warning-bg;
+    -fx-text-fill: -warning;
+    -fx-background-radius: 999;
+    -fx-padding: 5 13;
+    -fx-font-weight: 700;
+    -fx-font-size: 11.5px;
+    -fx-font-family: -font-heading;
+}
+
+.badge-running {
+    -fx-background-color: -color-success-bg;
+    -fx-text-fill: -active;
+    -fx-background-radius: 999;
+    -fx-padding: 5 13;
+    -fx-font-weight: 700;
+    -fx-font-size: 11.5px;
+    -fx-font-family: -font-heading;
+}
+
+.badge-finished {
+    -fx-background-color: -surface-2;
+    -fx-text-fill: -text-muted;
+    -fx-background-radius: 999;
+    -fx-padding: 5 13;
+    -fx-font-weight: 700;
+    -fx-font-size: 11.5px;
+    -fx-font-family: -font-heading;
+}
+
+.badge-paid {
+    -fx-background-color: -color-gold-50;
+    -fx-text-fill: -color-text-gold;
+    -fx-background-radius: 999;
+    -fx-padding: 5 13;
+    -fx-font-weight: 700;
+    -fx-font-size: 11.5px;
+    -fx-font-family: -font-heading;
+}
+
+.badge-canceled {
+    -fx-background-color: -color-danger-bg;
+    -fx-text-fill: -danger;
+    -fx-background-radius: 999;
+    -fx-padding: 5 13;
+    -fx-font-weight: 700;
+    -fx-font-size: 11.5px;
+    -fx-font-family: -font-heading;
+}
+
+/* ── FILTER TABS ── */
+.filter-tab,
+.filter-tab-active {
+    -fx-padding: 8 18;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-cursor: hand;
+    -fx-font-weight: 700;
+    -fx-font-size: 13px;
+    -fx-font-family: -font-heading;
+    -fx-effect: none;
+    -fx-border-width: 1;
+}
+
+.filter-tab {
+    -fx-background-color: -surface;
+    -fx-text-fill: -text-secondary;
+    -fx-border-color: -border;
+}
+
+.filter-tab:hover {
+    -fx-background-color: -surface-2;
+    -fx-text-fill: -text-primary;
+    -fx-border-color: -color-border-strong;
+}
+
+.filter-tab:pressed {
+    -fx-scale-x: 0.96;
+    -fx-scale-y: 0.96;
+}
+
+.filter-tab-active {
+    -fx-background-color: linear-gradient(to bottom, #5b52ed, #4338ca);
+    -fx-text-fill: white;
+    -fx-border-color: transparent;
+    -fx-effect: dropshadow(gaussian, rgba(79, 70, 229, 0.22), 10, 0, 0, 3);
+}
+
+/* ── ROLE BADGE (user management) ── */
+.role-admin {
+    -fx-background-color: -color-brand-100;
+    -fx-text-fill: -brand-deep-2;
+    -fx-background-radius: 6;
+    -fx-padding: 4 10;
+    -fx-font-size: 11px;
+    -fx-font-weight: 700;
+}
+
+.role-seller {
+    -fx-background-color: -color-warning-bg;
+    -fx-text-fill: -color-gold-700;
+    -fx-background-radius: 6;
+    -fx-padding: 4 10;
+    -fx-font-size: 11px;
+    -fx-font-weight: 700;
+}
+
+.role-bidder {
+    -fx-background-color: -color-success-bg;
+    -fx-text-fill: -active;
+    -fx-background-radius: 6;
+    -fx-padding: 4 10;
+    -fx-font-size: 11px;
+    -fx-font-weight: 700;
+}

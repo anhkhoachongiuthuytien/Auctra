@@ -281,4 +281,63 @@ public class SocketAuctionClientGateway implements AuctionClientGateway {
         }
         return users;
     }
+
+    @Override
+    public void registerAutoBid(String auctionId, String bidderId, double maxPrice, double increment) {
+        AuctionRequest req = new AuctionRequest(RequestType.REGISTER_AUTO_BID)
+                .put("auctionId", auctionId)
+                .put("bidderId", bidderId)
+                .put("maxPrice", String.valueOf(maxPrice))
+                .put("increment", String.valueOf(increment));
+        send(req);
+    }
+
+    @Override
+    public void cancelAutoBid(String auctionId, String bidderId) {
+        AuctionRequest req = new AuctionRequest(RequestType.CANCEL_AUTO_BID)
+                .put("auctionId", auctionId)
+                .put("bidderId", bidderId);
+        send(req);
+    }
+
+    @Override
+    public com.auction.model.auction.AutoBidConfig getAutoBid(String auctionId, String bidderId) {
+        AuctionRequest req = new AuctionRequest(RequestType.GET_AUTO_BID_STATUS)
+                .put("auctionId", auctionId)
+                .put("bidderId", bidderId);
+        AuctionResponse resp = send(req);
+        return (com.auction.model.auction.AutoBidConfig) resp.getData();
+    }
+
+    @Override
+    public User updateUser(String userId, String username, String email) {
+        return updateUser(userId, username, email, null, null, null, null, null, null);
+    }
+
+    @Override
+    public User updateUser(String userId, String username, String email,
+                           String shippingAddress, String phoneNumber,
+                           String storeName, String storeDescription,
+                           String department) {
+        return updateUser(userId, username, email, shippingAddress, phoneNumber, storeName, storeDescription, department, null);
+    }
+
+    @Override
+    public User updateUser(String userId, String username, String email,
+                           String shippingAddress, String phoneNumber,
+                           String storeName, String storeDescription,
+                           String department, String avatarPath) {
+        AuctionRequest req = new AuctionRequest(RequestType.UPDATE_USER)
+                .put("userId", userId)
+                .put("username", username)
+                .put("email", email)
+                .put("shippingAddress", shippingAddress)
+                .put("phoneNumber", phoneNumber)
+                .put("storeName", storeName)
+                .put("storeDescription", storeDescription)
+                .put("department", department)
+                .put("avatarPath", avatarPath);
+        AuctionResponse resp = send(req);
+        return DtoMapper.toUser((UserDto) resp.getData());
+    }
 }

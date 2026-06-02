@@ -38,9 +38,31 @@ public class DatabaseManager {
                 }
             }
             ensureUsersPasswordHashColumn(connection);
+            ensureUsersColumn(connection, "shipping_address", "TEXT");
+            ensureUsersColumn(connection, "phone_number", "TEXT");
+            ensureUsersColumn(connection, "store_name", "TEXT");
+            ensureUsersColumn(connection, "store_description", "TEXT");
+            ensureUsersColumn(connection, "department", "TEXT");
+            ensureUsersColumn(connection, "avatar_path", "TEXT");
             ensureItemsImagePathColumn(connection);
+            ensureAuctionsEndTimeColumn(connection);
         } catch (SQLException e) {
             throw new IllegalStateException("Failed to initialize database schema", e);
+        }
+    }
+
+    private void ensureUsersColumn(Connection connection, String columnName, String columnDefinition) throws SQLException {
+        try (Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery("PRAGMA table_info(users)")) {
+            while (resultSet.next()) {
+                if (columnName.equalsIgnoreCase(resultSet.getString("name"))) {
+                    return;
+                }
+            }
+        }
+
+        try (Statement statement = connection.createStatement()) {
+            statement.execute("ALTER TABLE users ADD COLUMN " + columnName + " " + columnDefinition);
         }
     }
 
@@ -71,6 +93,21 @@ public class DatabaseManager {
 
         try (Statement statement = connection.createStatement()) {
             statement.execute("ALTER TABLE items ADD COLUMN image_path TEXT");
+        }
+    }
+
+    private void ensureAuctionsEndTimeColumn(Connection connection) throws SQLException {
+        try (Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery("PRAGMA table_info(auctions)")) {
+            while (resultSet.next()) {
+                if ("end_time".equalsIgnoreCase(resultSet.getString("name"))) {
+                    return;
+                }
+            }
+        }
+
+        try (Statement statement = connection.createStatement()) {
+            statement.execute("ALTER TABLE auctions ADD COLUMN end_time TEXT");
         }
     }
 

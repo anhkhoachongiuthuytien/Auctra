@@ -1,0 +1,115 @@
+/* ================================================
+   ADMIN SCREEN — Dashboard, stats, activity
+   ================================================ */
+
+/* ── CHART PLACEHOLDER & ACTIVITY FEED ── */
+.admin-chart-placeholder,
+.activity-feed {
+    -fx-background-color: -surface-2;
+    -fx-background-radius: 16;
+    -fx-border-color: -border;
+    -fx-border-radius: 16;
+    -fx-border-width: 1;
+    -fx-padding: 18;
+}
+
+/* ── SPARKLINE MINI BAR ── */
+.sparkline {
+    -fx-background-color: linear-gradient(to right, rgba(79, 70, 229, 0.15), rgba(79, 70, 229, 0.55));
+    -fx-background-radius: 999;
+    -fx-pref-height: 5;
+    -fx-min-height: 5;
+    -fx-max-height: 5;
+}
+
+.sparkline-success {
+    -fx-background-color: linear-gradient(to right, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.55));
+    -fx-background-radius: 999;
+    -fx-pref-height: 5;
+}
+
+.sparkline-warning {
+    -fx-background-color: linear-gradient(to right, rgba(245, 158, 11, 0.15), rgba(245, 158, 11, 0.55));
+    -fx-background-radius: 999;
+    -fx-pref-height: 5;
+}
+
+/* ── ACTIVITY FEED ITEMS ── */
+.activity-item {
+    -fx-padding: 13 4;
+    -fx-border-color: transparent transparent -border transparent;
+    -fx-border-width: 0 0 1 0;
+    -fx-text-fill: -text-secondary;
+    -fx-font-size: 13px;
+}
+
+.activity-item:last-child {
+    -fx-border-color: transparent;
+}
+
+/* ── ADMIN PANEL INFO LINE ── */
+.admin-panel-line {
+    -fx-background-color: -surface;
+    -fx-background-radius: 12;
+    -fx-padding: 14 16;
+    -fx-text-fill: -text-secondary;
+    -fx-font-size: 13px;
+    -fx-border-color: -border;
+    -fx-border-radius: 12;
+    -fx-border-width: 1;
+    -fx-wrap-text: true;
+}
+
+/* ── DASHBOARD GRID ── */
+.admin-dashboard-grid {
+    -fx-alignment: top-left;
+    -fx-row-valignment: top;
+}
+
+/* ── QUICK ACTION ROW ── */
+.admin-quick-action-row {
+    -fx-background-color: -color-brand-50;
+    -fx-background-radius: 12;
+    -fx-padding: 14 18;
+    -fx-border-color: -color-brand-200;
+    -fx-border-radius: 12;
+    -fx-border-width: 1;
+    -fx-cursor: hand;
+}
+
+.admin-quick-action-row:hover {
+    -fx-background-color: -color-brand-100;
+    -fx-border-color: -color-brand-400;
+    -fx-effect: dropshadow(gaussian, rgba(79, 70, 229, 0.08), 10, 0, 0, 3);
+}
+
+/* ── BAR CHART STYLING ── */
+.admin-ops-chart {
+    -fx-min-height: 180;
+    -fx-pref-height: 200;
+}
+
+.admin-ops-chart .chart-plot-background {
+    -fx-background-color: transparent;
+}
+
+.admin-ops-chart .chart-vertical-grid-lines,
+.admin-ops-chart .chart-horizontal-grid-lines {
+    -fx-stroke: -border;
+    -fx-stroke-dash-array: 4 10;
+    -fx-stroke-width: 1;
+}
+
+.admin-ops-chart .axis,
+.admin-ops-chart .axis-label {
+    -fx-tick-label-fill: -text-muted;
+    -fx-text-fill: -text-muted;
+    -fx-font-family: -font-body;
+    -fx-font-size: 11px;
+}
+
+.admin-ops-chart .default-color0.chart-bar {
+    -fx-bar-fill: -brand-deep;
+    -fx-background-radius: 6 6 0 0;
+}
+

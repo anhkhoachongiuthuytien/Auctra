@@ -2,118 +2,104 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.shape.Circle?>
 
 <StackPane fx:id="rootPane" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="com.auction.controller.AuthController"
-           style="-fx-background-color: #FFFFFF;">
+           styleClass="auth-root">
     <HBox>
+        <VBox styleClass="auth-brand-panel" alignment="CENTER_LEFT" spacing="28"
+              HBox.hgrow="ALWAYS" prefWidth="620" minWidth="420">
+            <Label styleClass="auth-brand-kicker" text="DEMO AUCTION APP"/>
+            <VBox spacing="8">
+                <Label styleClass="auth-brand-title" text="Auctra"/>
+                <Label styleClass="auth-brand-copy" maxWidth="520" wrapText="true"
+                       text="Ứng dụng đấu giá JavaFX cho ba vai trò: admin quản trị hệ thống, seller tạo phiên và bidder đặt giá realtime."/>
+            </VBox>
 
-        <!-- LEFT — Google colorful branding panel -->
-        <VBox styleClass="google-brand-panel" alignment="CENTER" spacing="24"
-              HBox.hgrow="SOMETIMES" prefWidth="480.0" minWidth="0">
-            <padding><Insets top="60" right="48" bottom="60" left="48"/></padding>
-
-            <!-- Decorative circles -->
-            <HBox alignment="CENTER" spacing="16">
-                <Circle radius="12" style="-fx-fill: #4285F4;"/>
-                <Circle radius="8" style="-fx-fill: #EA4335;"/>
-                <Circle radius="10" style="-fx-fill: #FBBC05;"/>
-                <Circle radius="14" style="-fx-fill: #34A853;"/>
-            </HBox>
-
-            <!-- Big brand -->
-            <HBox alignment="CENTER" spacing="0">
-                <Label style="-fx-text-fill: #4285F4; -fx-font-size: 64; -fx-font-weight: bold;" text="A"/>
-                <Label style="-fx-text-fill: #EA4335; -fx-font-size: 64; -fx-font-weight: bold;" text="u"/>
-                <Label style="-fx-text-fill: #FBBC05; -fx-font-size: 64; -fx-font-weight: bold;" text="c"/>
-                <Label style="-fx-text-fill: #4285F4; -fx-font-size: 64; -fx-font-weight: bold;" text="t"/>
-                <Label style="-fx-text-fill: #34A853; -fx-font-size: 64; -fx-font-weight: bold;" text="r"/>
-                <Label style="-fx-text-fill: #EA4335; -fx-font-size: 64; -fx-font-weight: bold;" text="a"/>
-            </HBox>
-
-            <Label style="-fx-text-fill: #5F6368; -fx-font-size: 15;" text="Nền tảng đấu giá trực tuyến"/>
-
-            <Region prefHeight="20"/>
-
-            <!-- Feature chips -->
-            <HBox spacing="10" alignment="CENTER">
-                <Label styleClass="chip-info" text="Real-time" style="-fx-padding: 8 16; -fx-font-size: 12;"/>
-                <Label styleClass="chip-success" text="An toàn" style="-fx-padding: 8 16; -fx-font-size: 12;"/>
-                <Label styleClass="chip-warning" text="Nhiều người" style="-fx-padding: 8 16; -fx-font-size: 12;"/>
-            </HBox>
-
-            <!-- Stats -->
-            <HBox spacing="32" alignment="CENTER" style="-fx-padding: 20 0 0 0;">
-                <VBox spacing="2" alignment="CENTER">
-                    <Label style="-fx-text-fill: #4285F4; -fx-font-size: 28; -fx-font-weight: bold;" text="1K+"/>
-                    <Label style="-fx-text-fill: #5F6368; -fx-font-size: 11;" text="Người dùng"/>
-                </VBox>
-                <VBox spacing="2" alignment="CENTER">
-                    <Label style="-fx-text-fill: #34A853; -fx-font-size: 28; -fx-font-weight: bold;" text="500+"/>
-                    <Label style="-fx-text-fill: #5F6368; -fx-font-size: 11;" text="Phiên đấu giá"/>
-                </VBox>
-                <VBox spacing="2" alignment="CENTER">
-                    <Label style="-fx-text-fill: #EA4335; -fx-font-size: 28; -fx-font-weight: bold;" text="99%"/>
-                    <Label style="-fx-text-fill: #5F6368; -fx-font-size: 11;" text="Hài lòng"/>
-                </VBox>
-            </HBox>
-
-            <!-- Bottom decorative -->
-            <Region VBox.vgrow="ALWAYS"/>
-            <HBox alignment="CENTER" spacing="12">
-                <Circle radius="6" style="-fx-fill: #34A853; -fx-opacity: 0.4;"/>
-                <Circle radius="4" style="-fx-fill: #FBBC05; -fx-opacity: 0.4;"/>
-                <Circle radius="8" style="-fx-fill: #4285F4; -fx-opacity: 0.4;"/>
-                <Circle radius="5" style="-fx-fill: #EA4335; -fx-opacity: 0.4;"/>
-            </HBox>
-        </VBox>
-
-        <!-- RIGHT — Login form -->
-        <VBox alignment="CENTER" style="-fx-background-color: #FFFFFF;"
-              HBox.hgrow="ALWAYS" minWidth="380">
-
-            <VBox styleClass="google-auth-card" alignment="TOP_CENTER" spacing="4" maxWidth="380">
-                <HBox alignment="CENTER" spacing="0" style="-fx-padding: 0 0 6 0;">
-                    <Label style="-fx-text-fill: #4285F4; -fx-font-size: 32; -fx-font-weight: bold;" text="A"/>
-                    <Label style="-fx-text-fill: #EA4335; -fx-font-size: 32; -fx-font-weight: bold;" text="u"/>
-                    <Label style="-fx-text-fill: #FBBC05; -fx-font-size: 32; -fx-font-weight: bold;" text="c"/>
-                    <Label style="-fx-text-fill: #4285F4; -fx-font-size: 32; -fx-font-weight: bold;" text="t"/>
-                    <Label style="-fx-text-fill: #34A853; -fx-font-size: 32; -fx-font-weight: bold;" text="r"/>
-                    <Label style="-fx-text-fill: #EA4335; -fx-font-size: 32; -fx-font-weight: bold;" text="a"/>
-                </HBox>
-                <Label style="-fx-font-size: 20; -fx-font-weight: normal; -fx-text-fill: #202124;" text="Đăng nhập"/>
-                <Label styleClass="muted-label" text="Sử dụng tài khoản Auctra của bạn"/>
-
-                <Region prefHeight="20"/>
-
-                <TextField fx:id="emailField" promptText="Email" styleClass="google-input" maxWidth="Infinity"/>
-                <Region prefHeight="8"/>
-                <PasswordField fx:id="passwordField" promptText="Mật khẩu" styleClass="google-input" maxWidth="Infinity"/>
-
-                <Region prefHeight="4"/>
-                <HBox alignment="CENTER_LEFT">
-                    <Hyperlink text="Quên mật khẩu?" onAction="#goToForgotPassword" style="-fx-font-size: 13; -fx-font-weight: bold;"/>
-                </HBox>
-                <HBox alignment="CENTER_LEFT">
-                    <CheckBox text="Ghi nhớ đăng nhập" style="-fx-text-fill: #5F6368; -fx-font-size: 13;"/>
-                </HBox>
-
-                <Region prefHeight="16"/>
-
-                <Label fx:id="messageLabel" maxWidth="Infinity" styleClass="info-label" alignment="CENTER" wrapText="true" style="-fx-text-alignment: center;"/>
-
-                <HBox alignment="CENTER_LEFT" spacing="0">
-                    <Hyperlink text="Tạo tài khoản" onAction="#goToRegister" style="-fx-font-size: 14; -fx-font-weight: bold;"/>
+            <VBox spacing="10" maxWidth="520">
+                <Label styleClass="auth-demo-password" text="Tài khoản mẫu - mật khẩu: demo12345"/>
+                <HBox styleClass="auth-demo-card" spacing="12" alignment="CENTER_LEFT">
+                    <Label styleClass="auth-demo-role" text="Admin"/>
                     <Region HBox.hgrow="ALWAYS"/>
-                    <Button styleClass="google-btn-primary" mnemonicParsing="false" onAction="#handleLogin" text="Tiếp theo"/>
+                    <Label styleClass="auth-demo-email" text="admin@auction.local"/>
+                </HBox>
+                <HBox styleClass="auth-demo-card" spacing="12" alignment="CENTER_LEFT">
+                    <Label styleClass="auth-demo-role" text="Seller"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label styleClass="auth-demo-email" text="seller@auction.local"/>
+                </HBox>
+                <HBox styleClass="auth-demo-card" spacing="12" alignment="CENTER_LEFT">
+                    <Label styleClass="auth-demo-role" text="Bidder"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label styleClass="auth-demo-email" text="bidder@auction.local"/>
                 </HBox>
             </VBox>
 
-            <HBox alignment="CENTER" spacing="20" style="-fx-padding: 30 0 0 0;">
-                <Label styleClass="muted-label" style="-fx-font-size: 11;" text="Tiếng Việt"/>
-                <Label styleClass="muted-label" style="-fx-font-size: 11;" text="Trợ giúp"/>
-                <Label styleClass="muted-label" style="-fx-font-size: 11;" text="Điều khoản"/>
+            <Region VBox.vgrow="ALWAYS"/>
+
+            <!-- Extra vertical margin above chips via padding -->
+            <VBox>
+                <padding><Insets top="16"/></padding>
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Label styleClass="chip-warning" text="Realtime"/>
+                    <Label styleClass="chip-success" text="An toàn"/>
+                    <Label styleClass="chip-info" text="Minh bạch"/>
+                </HBox>
+            </VBox>
+        </VBox>
+
+        <VBox styleClass="auth-form-panel" alignment="CENTER" HBox.hgrow="ALWAYS" minWidth="420">
+            <VBox styleClass="google-auth-card" alignment="TOP_LEFT" spacing="16" maxWidth="400">
+                <HBox alignment="CENTER_LEFT" spacing="12">
+                    <StackPane styleClass="brand-mark-large">
+                        <Label styleClass="brand-mark-large-text" text="A"/>
+                    </StackPane>
+                    <VBox spacing="2">
+                        <Label styleClass="brand-word-large" text="Auctra"/>
+                        <Label styleClass="brand-tag" text="Đăng nhập tài khoản"/>
+                    </VBox>
+                </HBox>
+
+                <VBox spacing="4">
+                    <Label styleClass="auth-title" text="Chào mừng trở lại"/>
+                    <Label styleClass="auth-subtitle" text="Dùng tài khoản demo hoặc tài khoản đã đăng ký."/>
+                </VBox>
+
+                <VBox styleClass="field-shell">
+                    <Label styleClass="field-label" text="Email"/>
+                    <TextField fx:id="emailField" promptText="admin@auction.local" styleClass="google-input" maxWidth="Infinity"/>
+                </VBox>
+
+                <VBox styleClass="field-shell">
+                    <Label styleClass="field-label" text="Mật khẩu"/>
+                    <PasswordField fx:id="passwordField" promptText="demo12345" styleClass="google-input" maxWidth="Infinity"/>
+                </VBox>
+
+                <HBox alignment="CENTER_LEFT">
+                    <CheckBox text="Ghi nhớ đăng nhập"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Hyperlink text="Quên mật khẩu?" onAction="#goToForgotPassword"/>
+                </HBox>
+
+                <!-- Subtle divider between remember-me and submit -->
+                <Separator styleClass="auth-divider"/>
+
+                <Label fx:id="messageLabel" maxWidth="Infinity" styleClass="info-label" wrapText="true"/>
+
+                <Button styleClass="google-btn-primary button-full" mnemonicParsing="false"
+                        onAction="#handleLogin" text="Tiếp theo" maxWidth="Infinity"/>
+
+                <HBox alignment="CENTER" spacing="4">
+                    <Label styleClass="muted-label" text="Chưa có tài khoản?"/>
+                    <Hyperlink text="Tạo tài khoản" onAction="#goToRegister"/>
+                </HBox>
+            </VBox>
+
+            <HBox alignment="CENTER" spacing="20">
+                <padding><Insets top="28"/></padding>
+                <Label styleClass="auth-footer-link" text="JavaFX"/>
+                <Label styleClass="auth-footer-link" text="SQLite"/>
+                <Label styleClass="auth-footer-link" text="Realtime"/>
             </HBox>
         </VBox>
     </HBox>

@@ -1,16 +1,18 @@
 package com.auction.client;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Quản lý các callback để cập nhật giao diện (JavaFX) khi có sự kiện Real-time từ Server.
  */
 public class ClientEventManager {
-    private static final List<Runnable> listeners = new ArrayList<>();
+    private static final List<Runnable> listeners = new CopyOnWriteArrayList<>();
 
     public static void addListener(Runnable listener) {
-        listeners.add(listener);
+        if (listener != null) {
+            listeners.add(listener);
+        }
     }
 
     public static void clearListeners() {
@@ -19,8 +21,10 @@ public class ClientEventManager {
 
     public static void fireUpdate() {
         for (Runnable r : listeners) {
-            if (r != null) {
+            try {
                 r.run();
+            } catch (RuntimeException ignored) {
+                // One stale screen listener should not block realtime refreshes.
             }
         }
     }

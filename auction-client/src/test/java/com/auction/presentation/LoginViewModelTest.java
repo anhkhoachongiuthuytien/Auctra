@@ -149,5 +149,41 @@ class LoginViewModelTest {
         public List<User> listUsers() {
             throw new UnsupportedOperationException();
         }
+
+        @Override
+        public void registerAutoBid(String auctionId, String bidderId, double maxPrice, double increment) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void cancelAutoBid(String auctionId, String bidderId) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public com.auction.model.auction.AutoBidConfig getAutoBid(String auctionId, String bidderId) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public User updateUser(String userId, String username, String email) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public User updateUser(String userId, String username, String email,
+                               String shippingAddress, String phoneNumber,
+                               String storeName, String storeDescription,
+                               String department) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public User updateUser(String userId, String username, String email,
+                               String shippingAddress, String phoneNumber,
+                               String storeName, String storeDescription,
+                               String department, String avatarPath) {
+            throw new UnsupportedOperationException();
+        }
     }
 }

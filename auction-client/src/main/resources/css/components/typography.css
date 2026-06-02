@@ -1,0 +1,117 @@
+/* ================================================
+   TYPOGRAPHY — Complete type scale system
+   ================================================ */
+
+/* ── DISPLAY / HEADINGS ── */
+.heading-display {
+    -fx-font-family: -font-heading;
+    -fx-font-size: 48px;
+    -fx-font-weight: 700;
+    -fx-text-fill: -text-primary;
+}
+
+.heading-1 {
+    -fx-font-family: -font-heading;
+    -fx-font-size: 36px;
+    -fx-font-weight: 700;
+    -fx-text-fill: -text-primary;
+}
+
+.heading-2 {
+    -fx-font-family: -font-heading;
+    -fx-font-size: 28px;
+    -fx-font-weight: 700;
+    -fx-text-fill: -text-primary;
+}
+
+.heading-3 {
+    -fx-font-family: -font-heading;
+    -fx-font-size: 22px;
+    -fx-font-weight: 700;
+    -fx-text-fill: -text-primary;
+}
+
+.heading-4 {
+    -fx-font-family: -font-heading;
+    -fx-font-size: 18px;
+    -fx-font-weight: 700;
+    -fx-text-fill: -text-primary;
+}
+
+/* ── BODY TEXT ── */
+.body-lg {
+    -fx-font-family: -font-body;
+    -fx-font-size: 16px;
+    -fx-text-fill: -text-primary;
+}
+
+.body-base {
+    -fx-font-family: -font-body;
+    -fx-font-size: 14px;
+    -fx-text-fill: -text-primary;
+}
+
+.body-sm {
+    -fx-font-family: -font-body;
+    -fx-font-size: 12.5px;
+    -fx-text-fill: -text-secondary;
+}
+
+/* ── UI LABELS ── */
+.ui-label {
+    -fx-font-family: -font-heading;
+    -fx-font-size: 12px;
+    -fx-font-weight: 700;
+    -fx-text-fill: -text-muted;
+}
+
+.caption-label {
+    -fx-font-family: -font-mono;
+    -fx-font-size: 11px;
+    -fx-font-weight: 600;
+    -fx-text-fill: -text-muted;
+}
+
+/* ── MONOSPACE ── */
+.mono-price {
+    -fx-font-family: -font-mono;
+    -fx-font-size: 28px;
+    -fx-font-weight: 700;
+    -fx-text-fill: -brand-deep;
+}
+
+.mono-sm {
+    -fx-font-family: -font-mono;
+    -fx-font-size: 13px;
+    -fx-text-fill: -text-muted;
+}
+
+/* ── UTILITY COLORS ── */
+.text-muted    { -fx-text-fill: -text-muted; }
+.text-secondary { -fx-text-fill: -text-secondary; }
+.text-primary  { -fx-text-fill: -text-primary; }
+.text-danger   { -fx-text-fill: -danger; }
+.text-success  { -fx-text-fill: -active; }
+.text-warning  { -fx-text-fill: -warning; }
+.text-gold     { -fx-text-fill: -color-text-gold; }
+.text-brand    { -fx-text-fill: -brand-deep; }
+.text-white    { -fx-text-fill: white; }
+
+/* ── WEIGHT UTILITIES ── */
+.font-bold   { -fx-font-weight: 700; }
+.font-normal { -fx-font-weight: 400; }
+
+/* ── KICKER / LABEL ABOVE HEADING ── */
+.kicker {
+    -fx-font-family: -font-heading;
+    -fx-font-size: 10.5px;
+    -fx-font-weight: 700;
+    -fx-text-fill: -brand-deep;
+}
+
+.kicker-gold {
+    -fx-font-family: -font-heading;
+    -fx-font-size: 10.5px;
+    -fx-font-weight: 700;
+    -fx-text-fill: -brand-gold;
+}

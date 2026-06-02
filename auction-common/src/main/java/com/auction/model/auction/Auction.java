@@ -29,6 +29,7 @@ public class Auction extends Entity {
     private final List<BidObserver> bidObservers;
     // stateLock bảo vệ các thay đổi trạng thái và currentPrice bên trong cùng một auction.
     private final ReentrantLock stateLock;
+    private java.time.LocalDateTime endTime;
 
     public Auction() {
         this(null, null, null);
@@ -44,6 +45,7 @@ public class Auction extends Entity {
         this.winner = null;
         this.bidObservers = new CopyOnWriteArrayList<>();
         this.stateLock = new ReentrantLock();
+        this.endTime = java.time.LocalDateTime.now().plusMinutes(5);
     }
 
     public void start() {
@@ -130,6 +132,7 @@ public class Auction extends Entity {
             bids.add(bid);
             currentPrice = bid.getAmount();
             winner = bid.getBidder();
+            checkAndApplyAntiSniping();
         } finally {
             stateLock.unlock();
         }
@@ -170,13 +173,42 @@ public class Auction extends Entity {
         this.winner = winner;
     }
 
+    public java.time.LocalDateTime getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(java.time.LocalDateTime endTime) {
+        this.endTime = endTime;
+    }
+
+    /**
+     * Tài liệu học tập: Giải thuật Chống Bắn Tỉa Giá (Anti-Sniping)
+     * Nếu thời gian kết thúc của phiên còn dưới 60 giây và có lượt đặt giá mới hợp lệ,
+     * hệ thống tự động gia hạn thêm 60 giây để đảm bảo những người tham gia khác
+     * đều có đủ thời gian phản hồi, bảo đảm tính công bằng.
+     */
+    public void checkAndApplyAntiSniping() {
+        if (endTime != null && status == AuctionStatus.RUNNING) {
+            java.time.LocalDateTime now = java.time.LocalDateTime.now();
+            if (now.isAfter(endTime.minusSeconds(60)) && now.isBefore(endTime)) {
+                this.endTime = this.endTime.plusSeconds(60);
+                System.out.println("[Anti-Sniping] Phiên " + getId() + " được gia hạn 60 giây. Thời gian kết thúc mới: " + this.endTime);
+            }
+        }
+    }
+
     public void restoreState(AuctionStatus status, double currentPrice, Bidder winner, List<BidTransaction> restoredBids) {
+        restoreState(status, currentPrice, winner, restoredBids, java.time.LocalDateTime.now().plusMinutes(5));
+    }
+
+    public void restoreState(AuctionStatus status, double currentPrice, Bidder winner, List<BidTransaction> restoredBids, java.time.LocalDateTime endTime) {
         // Hàm này chỉ dùng khi dựng lại aggregate từ database, không dùng trong luồng bid thông thường.
         this.status = status;
         this.currentPrice = currentPrice;
         this.winner = winner;
         this.bids.clear();
         this.bids.addAll(restoredBids);
+        this.endTime = endTime;
     }
 
     private void notifyBidPlaced(BidTransaction bid) {

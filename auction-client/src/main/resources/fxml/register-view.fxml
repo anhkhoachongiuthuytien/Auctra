@@ -2,85 +2,99 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.shape.Circle?>
 
 <StackPane fx:id="rootPane" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="com.auction.controller.RegisterController"
-           style="-fx-background-color: #FFFFFF;">
+           styleClass="auth-root">
     <HBox>
+        <VBox styleClass="auth-brand-panel" alignment="CENTER_LEFT" spacing="28"
+              HBox.hgrow="ALWAYS" prefWidth="620" minWidth="420">
+            <Label styleClass="auth-brand-kicker" text="START BIDDING"/>
+            <VBox spacing="8">
+                <Label styleClass="auth-brand-title" text="Auctra"/>
+                <Label styleClass="auth-brand-copy" maxWidth="520" wrapText="true"
+                       text="Tạo tài khoản để bán vật phẩm, tham gia phiên đấu giá và theo dõi mọi thay đổi giá theo thời gian thực."/>
+            </VBox>
 
-        <!-- LEFT — Google branding -->
-        <VBox styleClass="google-brand-panel" alignment="CENTER" spacing="24"
-              HBox.hgrow="SOMETIMES" prefWidth="480.0" minWidth="0">
-            <padding><Insets top="60" right="48" bottom="60" left="48"/></padding>
-            <HBox alignment="CENTER" spacing="16">
-                <Circle radius="12" style="-fx-fill: #4285F4;"/>
-                <Circle radius="8" style="-fx-fill: #EA4335;"/>
-                <Circle radius="10" style="-fx-fill: #FBBC05;"/>
-                <Circle radius="14" style="-fx-fill: #34A853;"/>
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label styleClass="chip-warning" text="Miễn phí"/>
+                <Label styleClass="chip-success" text="Bảo mật"/>
+                <Label styleClass="chip-info" text="Nhanh chóng"/>
             </HBox>
-            <HBox alignment="CENTER" spacing="0">
-                <Label style="-fx-text-fill: #4285F4; -fx-font-size: 64; -fx-font-weight: bold;" text="A"/>
-                <Label style="-fx-text-fill: #EA4335; -fx-font-size: 64; -fx-font-weight: bold;" text="u"/>
-                <Label style="-fx-text-fill: #FBBC05; -fx-font-size: 64; -fx-font-weight: bold;" text="c"/>
-                <Label style="-fx-text-fill: #4285F4; -fx-font-size: 64; -fx-font-weight: bold;" text="t"/>
-                <Label style="-fx-text-fill: #34A853; -fx-font-size: 64; -fx-font-weight: bold;" text="r"/>
-                <Label style="-fx-text-fill: #EA4335; -fx-font-size: 64; -fx-font-weight: bold;" text="a"/>
-            </HBox>
-            <Label style="-fx-text-fill: #5F6368; -fx-font-size: 15;" text="Tạo tài khoản mới"/>
-            <Region prefHeight="20"/>
-            <HBox spacing="10" alignment="CENTER">
-                <Label styleClass="chip-info" text="Miễn phí" style="-fx-padding: 8 16; -fx-font-size: 12;"/>
-                <Label styleClass="chip-success" text="Bảo mật" style="-fx-padding: 8 16; -fx-font-size: 12;"/>
-                <Label styleClass="chip-warning" text="Nhanh chóng" style="-fx-padding: 8 16; -fx-font-size: 12;"/>
-            </HBox>
+
             <Region VBox.vgrow="ALWAYS"/>
-            <HBox alignment="CENTER" spacing="12">
-                <Circle radius="6" style="-fx-fill: #34A853; -fx-opacity: 0.4;"/>
-                <Circle radius="4" style="-fx-fill: #FBBC05; -fx-opacity: 0.4;"/>
-                <Circle radius="8" style="-fx-fill: #4285F4; -fx-opacity: 0.4;"/>
-                <Circle radius="5" style="-fx-fill: #EA4335; -fx-opacity: 0.4;"/>
-            </HBox>
+
+            <VBox spacing="10">
+                <Label styleClass="auth-brand-copy" text="Quy trình đăng ký"/>
+                <Label styleClass="auth-subtitle" text="3 bước đơn giản"/>
+                <HBox spacing="8">
+                    <Label styleClass="step-pill-active" text="1. Hồ sơ"/>
+                    <Label styleClass="step-pill" text="2. Vai trò"/>
+                    <Label styleClass="step-pill" text="3. Sẵn sàng"/>
+                </HBox>
+            </VBox>
         </VBox>
 
-        <!-- RIGHT — Register form -->
-        <VBox alignment="CENTER" style="-fx-background-color: #FFFFFF;"
-              HBox.hgrow="ALWAYS" minWidth="380">
-
-            <VBox styleClass="google-auth-card" alignment="TOP_CENTER" spacing="4" maxWidth="400">
-                <HBox alignment="CENTER" spacing="0" style="-fx-padding: 0 0 6 0;">
-                    <Label style="-fx-text-fill: #4285F4; -fx-font-size: 32; -fx-font-weight: bold;" text="A"/>
-                    <Label style="-fx-text-fill: #EA4335; -fx-font-size: 32; -fx-font-weight: bold;" text="u"/>
-                    <Label style="-fx-text-fill: #FBBC05; -fx-font-size: 32; -fx-font-weight: bold;" text="c"/>
-                    <Label style="-fx-text-fill: #4285F4; -fx-font-size: 32; -fx-font-weight: bold;" text="t"/>
-                    <Label style="-fx-text-fill: #34A853; -fx-font-size: 32; -fx-font-weight: bold;" text="r"/>
-                    <Label style="-fx-text-fill: #EA4335; -fx-font-size: 32; -fx-font-weight: bold;" text="a"/>
+        <VBox styleClass="auth-form-panel" alignment="CENTER" HBox.hgrow="ALWAYS" minWidth="420">
+            <VBox styleClass="google-auth-card" alignment="TOP_LEFT" spacing="16" maxWidth="440">
+                <HBox alignment="CENTER_LEFT" spacing="12">
+                    <StackPane styleClass="brand-mark-large">
+                        <Label styleClass="brand-mark-large-text" text="A"/>
+                    </StackPane>
+                    <VBox spacing="2">
+                        <Label styleClass="brand-word-large" text="Auctra"/>
+                        <Label styleClass="brand-tag" text="Tạo tài khoản mới"/>
+                    </VBox>
                 </HBox>
-                <Label style="-fx-font-size: 20; -fx-text-fill: #202124;" text="Tạo tài khoản"/>
-                <Label styleClass="muted-label" text="Nhập thông tin để bắt đầu"/>
 
-                <Region prefHeight="14"/>
+                <VBox spacing="4">
+                    <Label styleClass="auth-title" text="Bắt đầu với Auctra"/>
+                    <Label styleClass="auth-subtitle" text="Nhập thông tin để mở quyền truy cập."/>
+                </VBox>
 
-                <TextField fx:id="registerUsernameField" promptText="Tên hiển thị" styleClass="google-input" maxWidth="Infinity"/>
-                <Region prefHeight="6"/>
-                <TextField fx:id="registerEmailField" promptText="Email" styleClass="google-input" maxWidth="Infinity"/>
-                <Region prefHeight="6"/>
+                <VBox styleClass="field-shell">
+                    <Label styleClass="field-label" text="Tên hiển thị"/>
+                    <TextField fx:id="registerUsernameField" promptText="Ví dụ: Nguyen An" styleClass="google-input" maxWidth="Infinity"/>
+                </VBox>
+
+                <VBox styleClass="field-shell">
+                    <Label styleClass="field-label" text="Email"/>
+                    <TextField fx:id="registerEmailField" promptText="name@example.com" styleClass="google-input" maxWidth="Infinity"/>
+                </VBox>
+
                 <HBox spacing="10">
-                    <PasswordField fx:id="registerPasswordField" promptText="Mật khẩu" styleClass="google-input" HBox.hgrow="ALWAYS"/>
-                    <PasswordField fx:id="confirmPasswordField" promptText="Xác nhận" styleClass="google-input" HBox.hgrow="ALWAYS"/>
+                    <VBox styleClass="field-shell" HBox.hgrow="ALWAYS">
+                        <Label styleClass="field-label" text="Mật khẩu"/>
+                        <PasswordField fx:id="registerPasswordField" promptText="Tối thiểu 8 ký tự" styleClass="google-input" maxWidth="Infinity"/>
+                    </VBox>
+                    <VBox styleClass="field-shell" HBox.hgrow="ALWAYS">
+                        <Label styleClass="field-label" text="Xác nhận"/>
+                        <PasswordField fx:id="confirmPasswordField" promptText="Nhập lại" styleClass="google-input" maxWidth="Infinity"/>
+                    </VBox>
                 </HBox>
-                <Label styleClass="muted-label" style="-fx-font-size: 11; -fx-padding: 2 0 0 2;" text="Sử dụng 8 ký tự trở lên"/>
-                <Region prefHeight="4"/>
-                <ComboBox fx:id="roleComboBox" maxWidth="Infinity" promptText="Chọn loại tài khoản" styleClass="google-input" style="-fx-padding: 8 12;"/>
 
-                <Region prefHeight="12"/>
+                <!-- Password strength with label wrapper for better alignment -->
+                <VBox styleClass="field-shell" spacing="5">
+                    <Label styleClass="field-label" text="Độ mạnh mật khẩu"/>
+                    <HBox alignment="CENTER_LEFT" spacing="8">
+                        <ProgressBar fx:id="passwordStrengthBar" progress="0.0" HBox.hgrow="ALWAYS" maxWidth="Infinity"/>
+                        <Label fx:id="passwordStrengthLabel" styleClass="muted-label" text="Chưa nhập" minWidth="70"/>
+                    </HBox>
+                </VBox>
 
-                <Label fx:id="messageLabel" maxWidth="Infinity" styleClass="info-label" alignment="CENTER" wrapText="true" style="-fx-text-alignment: center;"/>
+                <VBox styleClass="field-shell">
+                    <Label styleClass="field-label" text="Loại tài khoản"/>
+                    <ComboBox fx:id="roleComboBox" maxWidth="Infinity" promptText="Chọn loại tài khoản" styleClass="google-input"/>
+                </VBox>
 
-                <HBox alignment="CENTER_LEFT">
-                    <Hyperlink text="Đăng nhập" onAction="#goToLogin" style="-fx-font-size: 14; -fx-font-weight: bold;"/>
-                    <Region HBox.hgrow="ALWAYS"/>
-                    <Button styleClass="google-btn-primary" mnemonicParsing="false" onAction="#handleRegister" text="Tiếp theo"/>
+                <Label fx:id="messageLabel" maxWidth="Infinity" styleClass="info-label" wrapText="true"/>
+
+                <Button styleClass="google-btn-primary button-full" mnemonicParsing="false"
+                        onAction="#handleRegister" text="Tạo tài khoản" maxWidth="Infinity"/>
+
+                <HBox alignment="CENTER" spacing="4">
+                    <Label styleClass="muted-label" text="Đã có tài khoản?"/>
+                    <Hyperlink text="Đăng nhập" onAction="#goToLogin"/>
                 </HBox>
             </VBox>
         </VBox>

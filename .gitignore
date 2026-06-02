@@ -4,7 +4,13 @@ target/
 !**/src/test/**/target/
 .kotlin
 
+*.db
+*.docx
+skills-lock.json
+.agents/
+
 ### IntelliJ IDEA ###
+.idea/
 .idea/modules.xml
 .idea/jarRepositories.xml
 .idea/compiler.xml

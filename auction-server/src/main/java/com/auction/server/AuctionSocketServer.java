@@ -217,7 +217,7 @@ public class AuctionSocketServer {
                             request.get("bidderEmail")
                     );
                     facade.placeBid(request.get("auctionId"), bidder, request.getDouble("amount"));
-                    BroadcastManager.broadcast(new AuctionEvent("NEW_BID"));
+                    BroadcastManager.broadcast(new AuctionEvent("NEW_BID", request.get("auctionId")));
                     return AuctionResponse.ok();
                 }
                 case LIST_USERS: {
@@ -227,6 +227,46 @@ public class AuctionSocketServer {
                         dtos.add(DtoMapper.toDto(u));
                     }
                     return AuctionResponse.ok(dtos);
+                }
+                case REGISTER_AUTO_BID: {
+                    facade.registerAutoBid(
+                            request.get("auctionId"),
+                            request.get("bidderId"),
+                            request.getDouble("maxPrice"),
+                            request.getDouble("increment")
+                    );
+                    BroadcastManager.broadcast(new AuctionEvent("NEW_BID", request.get("auctionId")));
+                    return AuctionResponse.ok();
+                }
+                case CANCEL_AUTO_BID: {
+                    facade.cancelAutoBid(
+                            request.get("auctionId"),
+                            request.get("bidderId")
+                    );
+                    BroadcastManager.broadcast(new AuctionEvent("NEW_BID", request.get("auctionId")));
+                    return AuctionResponse.ok();
+                }
+                case GET_AUTO_BID_STATUS: {
+                    com.auction.model.auction.AutoBidConfig config = facade.getAutoBid(
+                            request.get("auctionId"),
+                            request.get("bidderId")
+                    );
+                    return AuctionResponse.ok(config);
+                }
+                case UPDATE_USER: {
+                    User user = facade.updateUser(
+                            request.get("userId"),
+                            request.get("username"),
+                            request.get("email"),
+                            request.get("shippingAddress"),
+                            request.get("phoneNumber"),
+                            request.get("storeName"),
+                            request.get("storeDescription"),
+                            request.get("department"),
+                            request.get("avatarPath")
+                    );
+                    BroadcastManager.broadcast(new com.auction.protocol.AuctionEvent("USER_UPDATED"));
+                    return AuctionResponse.ok(DtoMapper.toDto(user));
                 }
                 default:
                     return AuctionResponse.error("Loại request không được hỗ trợ: " + request.getType());

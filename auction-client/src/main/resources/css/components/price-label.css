@@ -1,0 +1,19 @@
+.price-label {
+    -fx-font-family: -font-mono;
+    -fx-text-fill: -brand-deep;
+    -fx-font-weight: bold;
+}
+
+.price-label-lg {
+    -fx-font-family: -font-mono;
+    -fx-text-fill: -brand-deep;
+    -fx-font-size: 34px;
+    -fx-font-weight: bold;
+}
+
+.price-label-sm {
+    -fx-font-family: -font-mono;
+    -fx-text-fill: -brand-deep;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}

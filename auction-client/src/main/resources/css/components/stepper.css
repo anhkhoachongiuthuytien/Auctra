@@ -1,0 +1,50 @@
+.stepper {
+    -fx-background-color: -surface-2;
+    -fx-background-radius: 18;
+    -fx-padding: 14;
+    -fx-spacing: 8;
+}
+
+.stepper-line {
+    -fx-background-color: -border;
+    -fx-pref-height: 2;
+}
+
+.stepper-dot,
+.stepper-dot-active {
+    -fx-background-radius: 999;
+    -fx-pref-width: 24;
+    -fx-pref-height: 24;
+    -fx-alignment: center;
+}
+
+.stepper-dot {
+    -fx-background-color: -surface-2;
+}
+
+.stepper-dot-active {
+    -fx-background-color: -brand-deep;
+}
+
+/* Stepper inside white/light cards */
+.seller-stepper {
+    -fx-spacing: 12;
+}
+
+.seller-stepper .step-pill-active {
+    -fx-background-color: -color-info-bg;
+    -fx-text-fill: -brand-deep;
+    -fx-background-radius: 999;
+    -fx-padding: 6 14;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+}
+
+.seller-stepper .step-pill {
+    -fx-background-color: -surface-2;
+    -fx-text-fill: -text-secondary;
+    -fx-background-radius: 999;
+    -fx-padding: 6 14;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+}

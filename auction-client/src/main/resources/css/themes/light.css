@@ -1,0 +1,63 @@
+.root.light, .light {
+    /* Brand Accent Colors - mature blue with restrained gold */
+    -color-brand-deep: #2563eb;
+    -color-brand-navy: #1d4ed8;
+    -color-brand-gold: #c5a059;      /* Champagne Gold */
+    -color-brand-gold-lt: #e3d1ac;
+    -color-brand-gold-bg: #fcf8f0;
+    
+    /* Semantic Status Colors */
+    -color-success: #10b981;         /* Emerald 500 */
+    -color-success-bg: #ecfdf5;
+    -color-success-border: #a7f3d0;
+    
+    -color-danger: #f43f5e;          /* Rose 500 */
+    -color-danger-bg: #fff1f2;
+    -color-danger-border: #fecdd3;
+    
+    -color-warning: #f59e0b;         /* Amber 500 */
+    -color-warning-bg: #fef3c7;
+    -color-warning-border: #fde68a;
+    
+    -color-info: #0284c7;
+    -color-info-bg: #e0f2fe;
+    -color-info-border: #bae6fd;
+
+    /* Base Layout Colors - Slate Light Theme */
+    -color-bg: #f7f8fb;
+    -color-surface: #ffffff;
+    -color-surface-2: #f3f6fb;
+    -color-surface-3: #e5ebf4;
+    -color-border: #dfe6ef;
+    -color-border-strong: #c7d2e1;
+    
+    /* Typography Colors - Dark Slate */
+    -color-text-primary: #0f172a;    /* Slate 900 */
+    -color-text-secondary: #475569;  /* Slate 600 */
+    -color-text-muted: #64748b;      /* Slate 500 */
+    -color-text-disabled: #cbd5e1;
+    -color-text-on-dark: #ffffff;
+    -color-text-on-gold: #0f172a;
+    -color-text-gold: #b45309;
+    
+    /* Short aliases mapped directly to tokens */
+    -brand-deep: #2563eb;
+    -brand-deep-2: #1d4ed8;
+    -brand-gold: #c5a059;
+    -brand-gold-light: #e3d1ac;
+    -active: #10b981;
+    -danger: #f43f5e;
+    -info: #0284c7;
+    -warning: #f59e0b;
+    
+    -bg: #f7f8fb;
+    -surface: #ffffff;
+    -surface-2: #f3f6fb;
+    -border: #dfe6ef;
+    -text-primary: #0f172a;
+    -text-secondary: #475569;
+    -text-muted: #64748b;
+    
+    /* Overlay for modal / loading */
+    -color-overlay: rgba(247, 248, 251, 0.74);
+}

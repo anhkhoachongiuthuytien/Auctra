@@ -1,0 +1,331 @@
+/* ================================================
+   CARD — Premium card & container system
+   ================================================ */
+
+/* ── BASE CARD ── */
+.card,
+.admin-card,
+.auth-card,
+.google-auth-card {
+    -fx-background-color: -surface;
+    -fx-background-radius: 18;
+    -fx-padding: 24;
+    -fx-border-color: -border;
+    -fx-border-radius: 18;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(gaussian, rgba(15, 23, 42, 0.04), 18, 0, 0, 4);
+}
+
+.card:hover,
+.admin-card:hover {
+    -fx-border-color: -color-brand-200;
+    -fx-effect: dropshadow(gaussian, rgba(79, 70, 229, 0.08), 24, 0, 0, 7);
+}
+
+/* ── CARD HEADER ── */
+.admin-card-header {
+    -fx-padding: 18 22;
+    -fx-border-color: transparent transparent -border transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.admin-card-title {
+    -fx-font-family: -font-heading;
+    -fx-font-size: 17px;
+    -fx-font-weight: 700;
+    -fx-text-fill: -text-primary;
+}
+
+/* ── STAT CARD ── */
+.stat-card,
+.admin-stat-card {
+    -fx-background-color: -surface;
+    -fx-background-radius: 18;
+    -fx-padding: 16 20;
+    -fx-border-color: -border;
+    -fx-border-radius: 18;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(gaussian, rgba(15, 23, 42, 0.04), 14, 0, 0, 3);
+    -fx-min-width: 140;
+}
+
+.stat-card:hover,
+.admin-stat-card:hover {
+    -fx-border-color: -color-brand-200;
+    -fx-effect: dropshadow(gaussian, rgba(79, 70, 229, 0.10), 20, 0, 0, 6);
+}
+
+.stat-card-label {
+    -fx-text-fill: -text-muted;
+    -fx-font-size: 12.5px;
+    -fx-font-weight: 700;
+    -fx-font-family: -font-heading;
+}
+
+.stat-card-value,
+.stat-card-value-accent,
+.stat-card-value-success,
+.stat-card-value-warning {
+    -fx-font-size: 34px;
+    -fx-font-weight: 700;
+}
+
+.stat-card-value,
+.stat-card-value-accent {
+    -fx-text-fill: -brand-deep;
+}
+
+.stat-card-value-success {
+    -fx-text-fill: -active;
+}
+
+.stat-card-value-warning {
+    -fx-text-fill: -warning;
+}
+
+/* ── TREND LABELS ── */
+.trend-up {
+    -fx-text-fill: -active;
+    -fx-font-size: 11.5px;
+    -fx-font-weight: 700;
+    -fx-font-family: -font-heading;
+}
+
+.trend-flat {
+    -fx-text-fill: -text-muted;
+    -fx-font-size: 11.5px;
+    -fx-font-weight: 700;
+    -fx-font-family: -font-heading;
+}
+
+.trend-down {
+    -fx-text-fill: -danger;
+    -fx-font-size: 11.5px;
+    -fx-font-weight: 700;
+    -fx-font-family: -font-heading;
+}
+
+/* ── WELCOME / HERO GRADIENT PANEL ── */
+.welcome-gradient {
+    -fx-background-color: linear-gradient(to bottom right, #0f172a, #1e1b4b, #312e81, #4f46e5);
+    -fx-background-radius: 22;
+    -fx-padding: 28 36;
+    -fx-border-color: transparent;
+    -fx-border-radius: 22;
+    -fx-effect: dropshadow(gaussian, rgba(79, 70, 229, 0.22), 32, 0, 0, 10);
+}
+
+/* ── WELCOME HEADER (FLAT NO BANNER) ── */
+.welcome-header {
+    -fx-background-color: transparent;
+    -fx-padding: 8 0 12 0;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-effect: null;
+}
+
+.welcome-title {
+    -fx-text-fill: -text-primary;
+    -fx-font-family: -font-heading;
+    -fx-font-size: 24px;
+    -fx-font-weight: 800;
+}
+
+.welcome-subtitle {
+    -fx-text-fill: -text-secondary;
+    -fx-font-size: 13.5px;
+}
+
+.welcome-meta-box {
+    -fx-background-color: -surface;
+    -fx-background-radius: 12;
+    -fx-padding: 8 16;
+    -fx-border-color: -border;
+    -fx-border-radius: 12;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(gaussian, rgba(15, 23, 42, 0.02), 8, 0, 0, 2);
+}
+
+/* ── ICON TILE ── */
+.icon-tile {
+    -fx-background-color: rgba(255, 255, 255, 0.12);
+    -fx-background-radius: 14;
+    -fx-pref-width: 52;
+    -fx-pref-height: 52;
+    -fx-min-width: 52;
+    -fx-min-height: 52;
+    -fx-alignment: center;
+}
+
+.icon-tile-colored {
+    -fx-background-color: -color-brand-100;
+}
+
+.icon-tile-text {
+    -fx-text-fill: white;
+    -fx-font-size: 17px;
+    -fx-font-weight: 700;
+    -fx-font-family: -font-heading;
+}
+
+.icon-tile-colored .icon-tile-text {
+    -fx-text-fill: -brand-deep;
+}
+
+/* ── META ROWS (detail view) ── */
+.meta-row {
+    -fx-padding: 14 4;
+    -fx-border-color: transparent transparent -surface-2 transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.meta-key {
+    -fx-text-fill: -text-muted;
+    -fx-font-size: 13.5px;
+}
+
+.meta-value {
+    -fx-text-fill: -text-primary;
+    -fx-font-size: 13.5px;
+    -fx-font-weight: 700;
+}
+
+/* ── IMAGE BOXES ── */
+.image-preview-box,
+.detail-image-wrapper,
+.upload-zone {
+    -fx-background-color: -surface-2;
+    -fx-background-radius: 16;
+    -fx-border-color: -border;
+    -fx-border-radius: 16;
+    -fx-border-width: 1.2;
+    -fx-alignment: center;
+}
+
+.image-preview-box:hover {
+    -fx-border-color: -brand-deep;
+    -fx-effect: dropshadow(gaussian, rgba(79, 70, 229, 0.12), 14, 0, 0, 4);
+}
+
+.upload-zone {
+    -fx-border-style: segments(10, 8);
+    -fx-border-color: -brand-deep;
+}
+
+.drop-zone-active {
+    -fx-background-color: -color-brand-50;
+    -fx-border-color: -brand-deep;
+    -fx-effect: dropshadow(gaussian, rgba(79, 70, 229, 0.18), 20, 0, 0, 6);
+}
+
+/* ── SECTION HEADER ACCENT BAR ── */
+.section-header-bar {
+    -fx-background-color: linear-gradient(to bottom, -brand-light, -brand-deep);
+    -fx-pref-width: 5;
+    -fx-min-width: 5;
+    -fx-max-width: 5;
+    -fx-background-radius: 999;
+}
+
+/* ── AUCTION CARD GRID ── */
+.auction-grid {
+    -fx-padding: 10;
+}
+
+.auction-card-container {
+    -fx-alignment: center;
+}
+
+/* ── AUCTION CARD ITEM ── */
+.auction-card-item {
+    -fx-background-color: -surface;
+    -fx-background-radius: 20;
+    -fx-border-color: -border;
+    -fx-border-radius: 20;
+    -fx-border-width: 1;
+    -fx-padding: 16;
+    -fx-pref-width: 236;
+    -fx-min-width: 236;
+    -fx-max-width: 236;
+    -fx-spacing: 12;
+    -fx-effect: dropshadow(gaussian, rgba(15, 23, 42, 0.05), 14, 0, 0, 4);
+    -fx-cursor: hand;
+}
+
+.auction-card-item:hover {
+    -fx-border-color: -color-brand-400;
+    -fx-effect: dropshadow(gaussian, rgba(79, 70, 229, 0.14), 24, 0, 0, 8);
+    -fx-translate-y: -5;
+}
+
+.auction-card-selected {
+    -fx-border-color: -brand-gold;
+    -fx-border-width: 2;
+    -fx-effect: dropshadow(gaussian, rgba(234, 179, 8, 0.28), 22, 0, 0, 7);
+}
+
+/* ── CARD IMAGE BOX ── */
+.auction-card-image-box {
+    -fx-background-color: linear-gradient(to bottom, -surface-2, #e8edf5);
+    -fx-background-radius: 14;
+    -fx-pref-height: 128;
+    -fx-min-height: 128;
+    -fx-max-height: 128;
+    -fx-alignment: center;
+}
+
+.auction-card-placeholder {
+    -fx-text-fill: -color-brand-400;
+    -fx-font-size: 34px;
+    -fx-font-weight: 700;
+    -fx-font-family: -font-heading;
+}
+
+.auction-card-title {
+    -fx-font-family: -font-heading;
+    -fx-font-size: 15px;
+    -fx-font-weight: 700;
+    -fx-text-fill: -text-primary;
+    -fx-wrap-text: true;
+}
+
+.auction-card-price {
+    -fx-font-family: -font-mono;
+    -fx-font-size: 16.5px;
+    -fx-font-weight: 700;
+    -fx-text-fill: -brand-deep;
+}
+
+.auction-card-seller {
+    -fx-font-size: 11.5px;
+    -fx-text-fill: -text-muted;
+}
+
+/* ── AUCTION OVERLAY ── */
+.auction-action-overlay {
+    -fx-background-color: rgba(255, 255, 255, 0.97);
+    -fx-background-radius: 18;
+    -fx-border-radius: 18;
+    -fx-border-color: -color-brand-200;
+    -fx-border-width: 1.5;
+    -fx-padding: 14;
+    -fx-effect: dropshadow(gaussian, rgba(15, 23, 42, 0.14), 26, 0, 0, 9);
+}
+
+.auction-overlay-title {
+    -fx-font-family: -font-heading;
+    -fx-font-weight: 700;
+    -fx-text-fill: -text-primary;
+    -fx-font-size: 13.5px;
+}
+
+/* ── SCROLL TRANSPARENT WRAPPER ── */
+.admin-scroll-transparent {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.admin-scroll-transparent .viewport {
+    -fx-background-color: transparent;
+}

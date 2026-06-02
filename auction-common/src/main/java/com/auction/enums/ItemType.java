@@ -3,7 +3,8 @@ package com.auction.enums;
 public enum ItemType {
     ART("Art"),
     ELECTRONICS("Electronics"),
-    VEHICLE("Vehicle");
+    VEHICLE("Vehicle"),
+    OTHER("Other");
 
     private final String displayName;
 

@@ -1,0 +1,194 @@
+/* ================================================
+   TOPBAR — Premium navigation bar
+   ================================================ */
+.app-bar,
+.admin-top-nav {
+    -fx-background-color: rgba(255, 255, 255, 0.96);
+    -fx-padding: 10 28;
+    -fx-min-height: 64;
+    -fx-pref-height: 64;
+    -fx-border-color: transparent transparent -border transparent;
+    -fx-border-width: 0 0 1 0;
+    -fx-effect: dropshadow(gaussian, rgba(15, 23, 42, 0.05), 14, 0, 0, 4);
+}
+
+/* ── BRAND MARK ── */
+.app-logo,
+.brand-mark {
+    -fx-background-image: url("/images/logo.jpg");
+    -fx-background-size: cover;
+    -fx-background-position: center;
+    -fx-background-radius: 999;
+    -fx-pref-width: 40;
+    -fx-pref-height: 40;
+    -fx-min-width: 40;
+    -fx-min-height: 40;
+    -fx-max-width: 40;
+    -fx-max-height: 40;
+    -fx-alignment: center;
+}
+
+.brand-mark-large {
+    -fx-background-image: url("/images/logo.jpg");
+    -fx-background-size: cover;
+    -fx-background-position: center;
+    -fx-background-radius: 999;
+    -fx-pref-width: 56;
+    -fx-pref-height: 56;
+    -fx-min-width: 56;
+    -fx-min-height: 56;
+    -fx-max-width: 56;
+    -fx-max-height: 56;
+    -fx-alignment: center;
+}
+
+.app-logo-text,
+.brand-mark-text,
+.brand-mark-large-text {
+    -fx-text-fill: transparent;
+    -fx-font-size: 0;
+}
+
+.brand-word {
+    -fx-font-family: -font-heading;
+    -fx-font-size: 19px;
+    -fx-font-weight: 700;
+    -fx-text-fill: -brand-deep;
+}
+
+.brand-word-large {
+    -fx-font-family: -font-heading;
+    -fx-font-size: 56px;
+    -fx-font-weight: 700;
+    -fx-text-fill: -brand-deep;
+}
+
+.brand-tag {
+    -fx-text-fill: -text-muted;
+    -fx-font-size: 11px;
+    -fx-font-weight: 600;
+}
+
+/* ── USER AVATAR ── */
+.admin-user-avatar,
+.user-avatar {
+    -fx-background-color: linear-gradient(to bottom right, -brand-light, -brand-deep);
+    -fx-background-radius: 999;
+    -fx-pref-width: 40;
+    -fx-pref-height: 40;
+    -fx-min-width: 40;
+    -fx-min-height: 40;
+    -fx-alignment: center;
+    -fx-effect: dropshadow(gaussian, rgba(79, 70, 229, 0.18), 12, 0, 0, 3);
+}
+
+.admin-user-avatar-text,
+.user-avatar-text {
+    -fx-text-fill: white;
+    -fx-font-weight: 700;
+    -fx-font-size: 15px;
+    -fx-font-family: -font-heading;
+}
+
+.admin-user-name {
+    -fx-text-fill: -text-primary;
+    -fx-font-size: 14px;
+    -fx-font-weight: 700;
+}
+
+/* ── SEARCH BOX ── */
+.admin-search-box,
+.topbar-search {
+    -fx-background-color: -surface-2;
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-border-color: transparent;
+    -fx-border-width: 1.5;
+    -fx-padding: 0 14;
+    -fx-pref-height: 40;
+    -fx-min-height: 40;
+}
+
+.admin-search-box:hover,
+.topbar-search:hover {
+    -fx-background-color: -surface-3;
+    -fx-border-color: -border;
+}
+
+.admin-search-box:focused-within,
+.topbar-search:focused-within {
+    -fx-background-color: -surface;
+    -fx-border-color: -brand-deep;
+    -fx-effect: dropshadow(gaussian, rgba(79, 70, 229, 0.10), 12, 0, 0, 3);
+}
+
+.admin-search-icon,
+.search-icon {
+    -fx-text-fill: -text-muted;
+    -fx-font-size: 13px;
+}
+
+.admin-search-field,
+.search-field-topbar {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-text-fill: -text-primary;
+    -fx-prompt-text-fill: -text-muted;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-padding: 0 4;
+    -fx-font-size: 13.5px;
+    -fx-effect: none;
+}
+
+.admin-search-field:focused,
+.search-field-topbar:focused {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-effect: none;
+}
+
+/* ── BREADCRUMB ── */
+.admin-content-header {
+    -fx-background-color: transparent;
+}
+
+.admin-breadcrumb-text,
+.admin-breadcrumb-sep {
+    -fx-text-fill: -text-muted;
+    -fx-font-size: 13px;
+}
+
+.admin-breadcrumb-active {
+    -fx-text-fill: -brand-deep;
+    -fx-font-size: 13px;
+    -fx-font-weight: 700;
+}
+
+/* ── NOTIFICATION PILL ── */
+.notification-pill {
+    -fx-background-color: -surface-2;
+    -fx-background-radius: 999;
+    -fx-border-color: -border;
+    -fx-border-radius: 999;
+    -fx-border-width: 1.2;
+    -fx-padding: 7 14;
+    -fx-text-fill: -brand-deep;
+    -fx-font-weight: 600;
+    -fx-font-size: 12.5px;
+    -fx-cursor: hand;
+}
+
+.notification-pill:hover {
+    -fx-background-color: -color-brand-50;
+    -fx-border-color: -brand-deep;
+}
+
+.notification-badge {
+    -fx-background-color: -danger;
+    -fx-background-radius: 999;
+    -fx-padding: 2 7;
+    -fx-text-fill: white;
+    -fx-font-size: 10px;
+    -fx-font-weight: 700;
+}

@@ -1,0 +1,60 @@
+.root.dark, .dark {
+    /* Brand Accent Colors - bright blue and champagne gold */
+    -color-brand-deep: #60a5fa;
+    -color-brand-navy: #3b82f6;
+    -color-brand-gold: #fbbf24;      /* Champagne Gold */
+    -color-brand-gold-bg: #78350f;
+    -color-text-gold: #fbbf24;
+    
+    /* Semantic Status Colors for Dark Mode */
+    -color-success: #34d399;         /* Emerald 400 */
+    -color-success-bg: #064e3b;
+    -color-success-border: #0f766e;
+    
+    -color-danger: #fb7185;          /* Rose 400 */
+    -color-danger-bg: #4c0519;
+    -color-danger-border: #9f1239;
+    
+    -color-warning: #fbbf24;         /* Amber 400 */
+    -color-warning-bg: #78350f;
+    -color-warning-border: #92400e;
+    
+    -color-info: #38bdf8;            /* Sky 400 */
+    -color-info-bg: #0c4a6e;
+    -color-info-border: #0369a1;
+
+    /* Base Layout Colors - Deep Space Dark Theme */
+    -color-bg: #090d16;              /* Deep Space Dark */
+    -color-surface: #111827;         /* Gray 900 */
+    -color-surface-2: #1f2937;       /* Gray 800 */
+    -color-surface-3: #374151;       /* Gray 700 */
+    -color-border: #1f2937;          /* Gray 800 */
+    -color-border-strong: #374151;   /* Gray 700 */
+    
+    /* Typography Colors - Light Space */
+    -color-text-primary: #f9fafb;    /* Gray 50 */
+    -color-text-secondary: #d1d5db;  /* Gray 300 */
+    -color-text-muted: #9ca3af;      /* Gray 400 */
+    -color-text-disabled: #374151;
+    
+    /* Short aliases mapped directly to tokens */
+    -brand-deep: #60a5fa;
+    -brand-deep-2: #3b82f6;
+    -brand-gold: #fbbf24;
+    -brand-gold-light: #fef08a;
+    -active: #34d399;
+    -danger: #fb7185;
+    -info: #38bdf8;
+    -warning: #fbbf24;
+    
+    -bg: #090d16;
+    -surface: #111827;
+    -surface-2: #1f2937;
+    -border: #1f2937;
+    -text-primary: #f9fafb;
+    -text-secondary: #d1d5db;
+    -text-muted: #9ca3af;
+    
+    /* Overlay for modal / loading in dark mode */
+    -color-overlay: rgba(9, 13, 22, 0.75);
+}
