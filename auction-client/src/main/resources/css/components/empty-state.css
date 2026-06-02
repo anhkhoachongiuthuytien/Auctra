@@ -1,0 +1,37 @@
+.empty-state {
+    -fx-background-color: -surface;
+    -fx-background-radius: 18;
+    -fx-border-color: -border;
+    -fx-border-radius: 18;
+    -fx-padding: 28;
+    -fx-alignment: center;
+    -fx-spacing: 8;
+    -fx-effect: dropshadow(gaussian, rgba(15, 23, 42, 0.04), 18, 0, 0, 6);
+}
+
+.empty-state-compact {
+    -fx-pref-width: 360;
+    -fx-min-width: 300;
+}
+
+.empty-state-icon {
+    -fx-background-color: -color-info-bg;
+    -fx-background-radius: 999;
+    -fx-padding: 10 14;
+    -fx-text-fill: -brand-deep;
+    -fx-font-weight: bold;
+    -fx-font-size: 15px;
+}
+
+.empty-state-title {
+    -fx-font-family: "Segoe UI Variable Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -fx-font-size: 22px;
+    -fx-font-weight: 700;
+    -fx-text-fill: -text-primary;
+}
+
+.empty-state-message {
+    -fx-text-fill: -text-secondary;
+    -fx-font-size: 13px;
+    -fx-wrap-text: true;
+}

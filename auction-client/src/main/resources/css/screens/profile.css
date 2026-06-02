@@ -1,0 +1,150 @@
+/* ================================================
+   PROFILE SCREEN — User profile & edit modal
+   ================================================ */
+
+/* ── HERO CARD ── */
+.profile-hero-card {
+    -fx-background-color: linear-gradient(to bottom right, #0a0e1a, #0f172a, #1e1b4b, #4f46e5);
+    -fx-background-radius: 22;
+    -fx-padding: 32 36;
+    -fx-border-color: transparent;
+    -fx-border-radius: 22;
+    -fx-effect: dropshadow(gaussian, rgba(15, 23, 42, 0.14), 32, 0, 0, 12);
+}
+
+.profile-hero-card .admin-page-title,
+.profile-hero-card .muted-label,
+.profile-hero-card .info-label {
+    -fx-text-fill: white;
+}
+
+/* ── LARGE AVATAR ── */
+.profile-avatar-large {
+    -fx-background-color: linear-gradient(to bottom right, #818cf8, #4f46e5, #3730a3);
+    -fx-background-radius: 999;
+    -fx-pref-width: 100;
+    -fx-pref-height: 100;
+    -fx-min-width: 100;
+    -fx-min-height: 100;
+    -fx-alignment: center;
+    -fx-border-color: rgba(255, 255, 255, 0.90);
+    -fx-border-width: 3.5;
+    -fx-border-radius: 999;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.20), 18, 0, 0, 5);
+}
+
+.profile-avatar-large:hover {
+    -fx-effect: dropshadow(gaussian, rgba(255, 255, 255, 0.30), 24, 0, 0, 0),
+                dropshadow(gaussian, rgba(0, 0, 0, 0.22), 18, 0, 0, 5);
+}
+
+.profile-avatar-text {
+    -fx-text-fill: white;
+    -fx-font-size: 40px;
+    -fx-font-weight: 700;
+    -fx-font-family: -font-heading;
+}
+
+/* ── PROFILE STATS (on hero) ── */
+.profile-hero-stat-value {
+    -fx-text-fill: white;
+    -fx-font-family: -font-mono;
+    -fx-font-size: 26px;
+    -fx-font-weight: 700;
+}
+
+.profile-hero-stat-label {
+    -fx-text-fill: rgba(203, 213, 225, 0.85);
+    -fx-font-size: 11.5px;
+    -fx-font-weight: 600;
+}
+
+/* ── TABS ── */
+.profile-tabs {
+    -fx-background-color: transparent;
+    -fx-tab-min-height: 48;
+}
+
+.profile-tabs .tab-header-area {
+    -fx-padding: 0 36 0 36;
+}
+
+.profile-tabs .tab-header-background {
+    -fx-background-color: -bg;
+    -fx-border-color: transparent transparent -border transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.profile-tabs .tab {
+    -fx-background-color: transparent;
+    -fx-padding: 12 22;
+    -fx-border-color: transparent;
+    -fx-border-width: 0 0 2.5 0;
+}
+
+.profile-tabs .tab:selected {
+    -fx-border-color: transparent transparent -brand-deep transparent;
+}
+
+.profile-tabs .tab .tab-label {
+    -fx-text-fill: -text-muted;
+    -fx-font-size: 13.5px;
+    -fx-font-weight: 700;
+    -fx-font-family: -font-heading;
+}
+
+.profile-tabs .tab:selected .tab-label {
+    -fx-text-fill: -brand-deep;
+}
+
+.profile-tabs .tab:hover .tab-label {
+    -fx-text-fill: -text-primary;
+}
+
+.profile-tabs .tab-content-area {
+    -fx-background-color: -bg;
+    -fx-padding: 0;
+}
+
+/* ── EDIT MODAL ── */
+.profile-edit-modal {
+    -fx-min-width: 740;
+    -fx-max-width: 860;
+}
+
+.profile-edit-avatar-panel {
+    -fx-background-color: -surface-2;
+    -fx-background-radius: 18;
+    -fx-border-color: -border;
+    -fx-border-radius: 18;
+    -fx-border-width: 1;
+    -fx-padding: 24;
+}
+
+.profile-edit-fields {
+    -fx-padding: 6 0 6 0;
+}
+
+.profile-edit-fields .google-field-container {
+    -fx-background-color: transparent;
+}
+
+/* ── PROFILE INFO ROWS ── */
+.profile-info-row {
+    -fx-padding: 14 0;
+    -fx-border-color: transparent transparent -border transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.profile-info-key {
+    -fx-text-fill: -text-muted;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+}
+
+.profile-info-value {
+    -fx-text-fill: -text-primary;
+    -fx-font-size: 13.5px;
+    -fx-font-weight: 700;
+}

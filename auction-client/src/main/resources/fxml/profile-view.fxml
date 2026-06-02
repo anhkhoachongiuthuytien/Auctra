@@ -1,16 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.Separator?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Region?>
-<?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
 <StackPane fx:id="rootPane" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="com.auction.controller.ProfileController">
@@ -19,25 +10,22 @@
     <top>
         <HBox alignment="CENTER_LEFT" spacing="20.0" styleClass="admin-top-nav">
             <padding><Insets top="12" right="24" bottom="12" left="24"/></padding>
-            <HBox alignment="CENTER_LEFT" spacing="8" prefWidth="200">
-                <HBox alignment="CENTER_LEFT" spacing="0">
-                    <Label style="-fx-text-fill: #4285F4; -fx-font-size: 20; -fx-font-weight: bold;" text="A"/>
-                    <Label style="-fx-text-fill: #EA4335; -fx-font-size: 20; -fx-font-weight: bold;" text="u"/>
-                    <Label style="-fx-text-fill: #FBBC05; -fx-font-size: 20; -fx-font-weight: bold;" text="c"/>
-                    <Label style="-fx-text-fill: #4285F4; -fx-font-size: 20; -fx-font-weight: bold;" text="t"/>
-                    <Label style="-fx-text-fill: #34A853; -fx-font-size: 20; -fx-font-weight: bold;" text="r"/>
-                    <Label style="-fx-text-fill: #EA4335; -fx-font-size: 20; -fx-font-weight: bold;" text="a"/>
-                </HBox>
+            <HBox alignment="CENTER_LEFT" spacing="10" prefWidth="220">
+                <StackPane styleClass="brand-mark">
+                    <Label styleClass="brand-mark-text" text="A"/>
+                </StackPane>
+                <VBox spacing="0">
+                    <Label styleClass="brand-word" text="Auctra"/>
+                    <Label styleClass="brand-tag" text="Hồ sơ"/>
+                </VBox>
             </HBox>
 
             <Region HBox.hgrow="ALWAYS"/>
 
-            <HBox alignment="CENTER" spacing="20">
-                <HBox alignment="CENTER" spacing="8">
-                    <StackPane styleClass="admin-user-avatar">
-                        <Label fx:id="userInitialsLabel" styleClass="admin-user-avatar-text" text="U"/>
-                    </StackPane>
-                </HBox>
+            <HBox alignment="CENTER" spacing="16">
+                <StackPane styleClass="admin-user-avatar">
+                    <Label fx:id="userInitialsLabel" styleClass="admin-user-avatar-text" text="U"/>
+                </StackPane>
             </HBox>
         </HBox>
     </top>
@@ -45,13 +33,18 @@
     <left>
         <VBox spacing="4" styleClass="admin-sidebar" prefWidth="240">
             <padding><Insets top="24" right="16" bottom="24" left="16"/></padding>
+            <Label styleClass="sidebar-section-label" text="MENU"/>
             <Button fx:id="navAuctions" styleClass="nav-link" mnemonicParsing="false"
-                    onAction="#goToAuctions" text="🔨  Phiên đấu giá" alignment="BASELINE_LEFT" maxWidth="Infinity"/>
+                    onAction="#goToAuctions" text="Phiên đấu giá" alignment="BASELINE_LEFT" maxWidth="Infinity"/>
             <Button fx:id="navProfile" styleClass="nav-link-active" mnemonicParsing="false"
-                    onAction="#goToProfile" text="👤  Tài khoản" alignment="BASELINE_LEFT" maxWidth="Infinity"/>
+                    onAction="#goToProfile" text="Tài khoản" alignment="BASELINE_LEFT" maxWidth="Infinity"/>
             <Region VBox.vgrow="ALWAYS"/>
+            <VBox styleClass="sidebar-user-card" spacing="3">
+                <Label styleClass="sidebar-user-name" text="Hồ sơ cá nhân"/>
+                <Label styleClass="sidebar-user-meta" text="Thông tin tài khoản"/>
+            </VBox>
             <Button styleClass="nav-link" mnemonicParsing="false"
-                    onAction="#handleLogout" text="🚪  Đăng xuất" alignment="BASELINE_LEFT" maxWidth="Infinity"/>
+                    onAction="#handleLogout" text="Đăng xuất" alignment="BASELINE_LEFT" maxWidth="Infinity"/>
         </VBox>
     </left>
 
@@ -60,22 +53,19 @@
             <HBox alignment="CENTER_LEFT" spacing="8" styleClass="admin-content-header">
                 <padding><Insets top="16" right="32" bottom="16" left="32"/></padding>
                 <Label styleClass="admin-breadcrumb-text" text="Trang chủ"/>
-                <Label styleClass="admin-breadcrumb-sep" text="›"/>
+                <Label styleClass="admin-breadcrumb-sep" text="/"/>
                 <Label styleClass="admin-breadcrumb-active" text="Tài khoản"/>
             </HBox>
 
             <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="admin-scroll">
                 <VBox spacing="24">
-                    <padding><Insets top="8" right="32" bottom="32" left="32"/></padding>
+                    <padding><Insets top="16" right="32" bottom="32" left="32"/></padding>
 
-                    <HBox styleClass="admin-card" spacing="24" alignment="CENTER_LEFT" style="-fx-padding: 24;">
-                        <StackPane style="-fx-background-color: #4285F4; -fx-background-radius: 50%;
-                                          -fx-pref-width: 96; -fx-pref-height: 96; -fx-alignment: center;">
-                            <Label fx:id="userAvatarBigLabel"
-                                   style="-fx-text-fill: white; -fx-font-size: 40; -fx-font-weight: bold;"
-                                   text="U"/>
+                    <HBox styleClass="profile-hero-card" spacing="24" alignment="CENTER_LEFT">
+                        <StackPane styleClass="profile-avatar-large" onMouseClicked="#handleChangeAvatar">
+                            <Label fx:id="userAvatarBigLabel" styleClass="profile-avatar-text" text="U"/>
                         </StackPane>
-                        <VBox spacing="6">
+                        <VBox spacing="8">
                             <Label fx:id="userNameLabel" styleClass="admin-page-title" text="User"/>
                             <HBox spacing="8" alignment="CENTER_LEFT">
                                 <Label fx:id="userRoleLabel" styleClass="chip-info" text="BIDDER"/>
@@ -84,15 +74,38 @@
                             <Label fx:id="userEmailLabel" styleClass="muted-label"/>
                         </VBox>
                         <Region HBox.hgrow="ALWAYS"/>
-                        <Button styleClass="button-ghost button-row" mnemonicParsing="false"
-                                onAction="#handleEditProfile" text="Chỉnh sửa hồ sơ"/>
+                        <VBox spacing="8" alignment="CENTER_RIGHT">
+                            <Button styleClass="button-ghost button-row" mnemonicParsing="false"
+                                    onAction="#handleChangeAvatar" text="Đổi ảnh đại diện"/>
+                            <Button styleClass="button-primary button-row" mnemonicParsing="false"
+                                    onAction="#handleEditProfileV2" text="Chỉnh sửa hồ sơ"/>
+                        </VBox>
+                    </HBox>
+
+                    <HBox spacing="16" maxWidth="Infinity">
+                        <VBox styleClass="admin-stat-card" spacing="6" HBox.hgrow="ALWAYS" maxWidth="Infinity">
+                            <Label styleClass="stat-card-label" text="Vai trò"/>
+                            <Label fx:id="profileRoleValue" styleClass="stat-card-value" text="--"/>
+                            <Label styleClass="trend-flat" text="Điều hướng đúng dashboard"/>
+                        </VBox>
+                        <VBox styleClass="admin-stat-card" spacing="6" HBox.hgrow="ALWAYS" maxWidth="Infinity">
+                            <Label styleClass="stat-card-label" text="Email"/>
+                            <Label fx:id="profileEmailStatusValue" styleClass="stat-card-value-accent" text="Đã liên kết"/>
+                            <Label styleClass="trend-flat" text="Dùng để đăng nhập"/>
+                        </VBox>
+                        <VBox styleClass="admin-stat-card" spacing="6" HBox.hgrow="ALWAYS" maxWidth="Infinity">
+                            <Label styleClass="stat-card-label" text="Ảnh đại diện"/>
+                            <Label fx:id="profileAvatarStatusValue" styleClass="stat-card-value-success" text="Chưa có ảnh"/>
+                            <Label styleClass="trend-flat" text="Hiển thị trên hồ sơ"/>
+                        </VBox>
                     </HBox>
 
                     <VBox styleClass="admin-card" spacing="0">
                         <HBox alignment="CENTER_LEFT" spacing="12" styleClass="admin-card-header">
                             <Label styleClass="admin-card-title" text="Thông tin tài khoản"/>
                         </HBox>
-                        <VBox spacing="0" style="-fx-padding: 16 20;">
+                        <VBox fx:id="metaRowsContainer" spacing="0">
+                            <padding><Insets top="16" right="20" bottom="16" left="20"/></padding>
                             <HBox styleClass="meta-row" alignment="CENTER_LEFT">
                                 <Label styleClass="meta-key" text="Mã người dùng"/>
                                 <Region HBox.hgrow="ALWAYS"/>
@@ -101,7 +114,7 @@
                             <HBox styleClass="meta-row" alignment="CENTER_LEFT">
                                 <Label styleClass="meta-key" text="Email đăng nhập"/>
                                 <Region HBox.hgrow="ALWAYS"/>
-                                <Label styleClass="meta-value" text=""/>
+                                <Label fx:id="emailValueLabel" styleClass="meta-value"/>
                             </HBox>
                         </VBox>
                     </VBox>

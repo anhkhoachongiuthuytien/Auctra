@@ -36,4 +36,22 @@ public interface AuctionClientGateway {
     void placeBid(String auctionId, Bidder bidder, double amount);
 
     List<User> listUsers();
+
+    void registerAutoBid(String auctionId, String bidderId, double maxPrice, double increment);
+
+    void cancelAutoBid(String auctionId, String bidderId);
+
+    com.auction.model.auction.AutoBidConfig getAutoBid(String auctionId, String bidderId);
+
+    User updateUser(String userId, String username, String email);
+
+    User updateUser(String userId, String username, String email,
+                    String shippingAddress, String phoneNumber,
+                    String storeName, String storeDescription,
+                    String department);
+
+    User updateUser(String userId, String username, String email,
+                    String shippingAddress, String phoneNumber,
+                    String storeName, String storeDescription,
+                    String department, String avatarPath);
 }

@@ -1,0 +1,151 @@
+/* ================================================
+   AUCTION SCREEN — Detail, bid, live chart
+   ================================================ */
+
+/* ── AUCTION HERO BANNER (REMOVED: USING GLOBAL WELCOME-HEADER FOR FLAT DESIGN) ── */
+
+/* ── DETAIL LAYOUT ── */
+.detail-grid {
+    -fx-spacing: 24;
+    -fx-alignment: top-left;
+    -fx-row-valignment: top;
+}
+
+.detail-main-column {
+    -fx-min-width: 360;
+}
+
+.detail-history-column {
+    -fx-min-width: 290;
+}
+
+/* ── DETAIL IMAGE WRAPPER ── */
+.detail-image-wrapper {
+    -fx-background-color: linear-gradient(to bottom, -surface-2, #dde4ef);
+    -fx-border-color: -border;
+    -fx-border-radius: 22;
+    -fx-background-radius: 22;
+    -fx-effect: dropshadow(gaussian, rgba(15, 23, 42, 0.06), 24, 0, 0, 8);
+}
+
+.image-placeholder-large {
+    -fx-text-fill: -color-brand-400;
+    -fx-font-size: 64px;
+    -fx-font-weight: 700;
+    -fx-font-family: -font-heading;
+}
+
+/* ── BID CARD ── */
+.bid-card {
+    -fx-background-color: -surface;
+    -fx-border-color: -color-brand-400;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 20;
+    -fx-background-radius: 20;
+    -fx-effect: dropshadow(gaussian, rgba(79, 70, 229, 0.12), 24, 0, 0, 7);
+}
+
+/* ── BID CHIPS (quick increment buttons) ── */
+.bid-chip {
+    -fx-background-color: -surface-2;
+    -fx-border-color: -border;
+    -fx-border-width: 1.2;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-text-fill: -text-secondary;
+    -fx-font-weight: 700;
+    -fx-font-family: -font-mono;
+    -fx-font-size: 12.5px;
+    -fx-effect: none;
+    -fx-padding: 8 14;
+    -fx-cursor: hand;
+}
+
+.bid-chip:hover {
+    -fx-background-color: -color-brand-50;
+    -fx-border-color: -brand-deep;
+    -fx-text-fill: -brand-deep;
+}
+
+.bid-chip:pressed {
+    -fx-scale-x: 0.94;
+    -fx-scale-y: 0.94;
+    -fx-background-color: -color-brand-100;
+}
+
+/* ── HISTORY CARD ── */
+.history-card {
+    -fx-background-color: -surface;
+    -fx-background-radius: 20;
+    -fx-border-color: -border;
+    -fx-border-radius: 20;
+    -fx-border-width: 1;
+    -fx-padding: 0;
+    -fx-effect: dropshadow(gaussian, rgba(15, 23, 42, 0.04), 16, 0, 0, 4);
+}
+
+/* ── THUMBNAIL STRIP ── */
+.detail-thumbnail-selected {
+    -fx-border-color: -brand-deep;
+    -fx-border-width: 2.5;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-effect: dropshadow(gaussian, rgba(79, 70, 229, 0.24), 16, 0, 0, 5);
+}
+
+.detail-thumbnail-strip {
+    -fx-padding: 6 0 0 0;
+}
+
+/* ── LIVE CHART ── */
+.chart-card {
+    -fx-min-height: 240;
+}
+
+.live-chart-card {
+    -fx-padding: 22 24 18 24;
+}
+
+.live-chart-card .chart {
+    -fx-min-height: 280;
+    -fx-pref-height: 300;
+}
+
+.live-chart-card .chart-plot-background {
+    -fx-background-color: linear-gradient(to bottom, #f8faff, -surface-2);
+    -fx-background-radius: 14;
+}
+
+.live-chart-card .chart-vertical-grid-lines,
+.live-chart-card .chart-horizontal-grid-lines {
+    -fx-stroke: -border;
+    -fx-stroke-dash-array: 4 10;
+    -fx-stroke-width: 1;
+}
+
+.live-chart-card .axis,
+.live-chart-card .axis-label {
+    -fx-tick-label-fill: -text-muted;
+    -fx-text-fill: -text-muted;
+    -fx-font-family: -font-body;
+    -fx-font-size: 11px;
+}
+
+.live-chart-card .default-color0.chart-series-line {
+    -fx-stroke: -brand-deep;
+    -fx-stroke-width: 3px;
+}
+
+.live-chart-card .default-color0.chart-line-symbol {
+    -fx-background-color: -brand-deep, white;
+    -fx-background-insets: 0, 2.5;
+    -fx-background-radius: 999;
+    -fx-padding: 6px;
+}
+
+/* Winner highlight */
+.winner-highlight {
+    -fx-text-fill: -brand-gold;
+    -fx-font-weight: 700;
+    -fx-font-size: 15px;
+}

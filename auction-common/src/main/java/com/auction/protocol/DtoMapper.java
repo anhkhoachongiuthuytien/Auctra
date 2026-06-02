@@ -8,6 +8,7 @@ import com.auction.model.item.Art;
 import com.auction.model.item.Electronics;
 import com.auction.model.item.Item;
 import com.auction.model.item.Vehicle;
+import com.auction.model.item.Other;
 import com.auction.model.user.Admin;
 import com.auction.model.user.Bidder;
 import com.auction.model.user.Seller;
@@ -34,13 +35,19 @@ public final class DtoMapper {
         dto.setId(user.getId());
         dto.setUsername(user.getUsername());
         dto.setEmail(user.getEmail());
+        dto.setAvatarPath(user.getAvatarPath());
 
         if (user instanceof Admin) {
             dto.setRole("Admin");
+            dto.setDepartment(((Admin) user).getDepartment());
         } else if (user instanceof Seller) {
             dto.setRole("Seller");
+            dto.setStoreName(((Seller) user).getStoreName());
+            dto.setStoreDescription(((Seller) user).getStoreDescription());
         } else if (user instanceof Bidder) {
             dto.setRole("Bidder");
+            dto.setShippingAddress(((Bidder) user).getShippingAddress());
+            dto.setPhoneNumber(((Bidder) user).getPhoneNumber());
         } else {
             dto.setRole("Unknown");
         }
@@ -51,16 +58,30 @@ public final class DtoMapper {
         if (dto == null) {
             return null;
         }
+        User user;
         switch (dto.getRole()) {
             case "Admin":
-                return new Admin(dto.getId(), dto.getUsername(), dto.getEmail());
+                Admin admin = new Admin(dto.getId(), dto.getUsername(), dto.getEmail());
+                admin.setDepartment(dto.getDepartment());
+                user = admin;
+                break;
             case "Seller":
-                return new Seller(dto.getId(), dto.getUsername(), dto.getEmail());
+                Seller seller = new Seller(dto.getId(), dto.getUsername(), dto.getEmail());
+                seller.setStoreName(dto.getStoreName());
+                seller.setStoreDescription(dto.getStoreDescription());
+                user = seller;
+                break;
             case "Bidder":
-                return new Bidder(dto.getId(), dto.getUsername(), dto.getEmail());
+                Bidder bidder = new Bidder(dto.getId(), dto.getUsername(), dto.getEmail());
+                bidder.setShippingAddress(dto.getShippingAddress());
+                bidder.setPhoneNumber(dto.getPhoneNumber());
+                user = bidder;
+                break;
             default:
                 throw new IllegalArgumentException("Vai trò không xác định: " + dto.getRole());
         }
+        user.setAvatarPath(dto.getAvatarPath());
+        return user;
     }
 
     // ===== Auction ===== //
@@ -104,6 +125,10 @@ public final class DtoMapper {
         }
         dto.setBids(bidDtos);
 
+        if (auction.getEndTime() != null) {
+            dto.setEndTime(auction.getEndTime().toString());
+        }
+
         return dto;
     }
 
@@ -131,11 +156,16 @@ public final class DtoMapper {
             }
         }
 
+        java.time.LocalDateTime endTime = dto.getEndTime() != null 
+                ? java.time.LocalDateTime.parse(dto.getEndTime()) 
+                : java.time.LocalDateTime.now().plusMinutes(5);
+
         auction.restoreState(
                 AuctionStatus.valueOf(dto.getStatus()),
                 dto.getCurrentPrice(),
                 winner,
-                restoredBids
+                restoredBids,
+                endTime
         );
 
         return auction;
@@ -169,6 +199,9 @@ public final class DtoMapper {
         if (item instanceof Vehicle) {
             return "Vehicle";
         }
+        if (item instanceof Other) {
+            return "Other";
+        }
         return "Electronics";
     }
 
@@ -179,6 +212,8 @@ public final class DtoMapper {
             item = new Art(id, name, desc, startingPrice);
         } else if ("Vehicle".equalsIgnoreCase(typeName)) {
             item = new Vehicle(id, name, desc, startingPrice);
+        } else if ("Other".equalsIgnoreCase(typeName)) {
+            item = new Other(id, name, desc, startingPrice);
         } else {
             item = new Electronics(id, name, desc, startingPrice);
         }

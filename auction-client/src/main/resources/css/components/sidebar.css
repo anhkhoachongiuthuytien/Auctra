@@ -1,0 +1,86 @@
+/* ================================================
+   SIDEBAR — Premium left navigation
+   ================================================ */
+.admin-sidebar {
+    -fx-background-color: -surface;
+    -fx-border-color: transparent -border transparent transparent;
+    -fx-border-width: 0 1 0 0;
+    -fx-effect: dropshadow(gaussian, rgba(15, 23, 42, 0.04), 8, 0, 0, 0);
+}
+
+.sidebar-section-label {
+    -fx-text-fill: -text-muted;
+    -fx-font-size: 10.5px;
+    -fx-font-weight: 700;
+    -fx-font-family: -font-heading;
+    -fx-padding: 0 0 10 14;
+    -fx-letter-spacing: 0.08em;
+}
+
+/* ── NAV LINKS ── */
+.admin-sidebar .nav-link,
+.nav-link {
+    -fx-background-color: transparent;
+    -fx-text-fill: -text-secondary;
+    -fx-font-size: 13.5px;
+    -fx-font-weight: 600;
+    -fx-font-family: -font-body;
+    -fx-padding: 10 14;
+    -fx-background-radius: 10;
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+    -fx-alignment: center-left;
+    -fx-effect: none;
+}
+
+.admin-sidebar .nav-link:hover,
+.nav-link:hover {
+    -fx-background-color: -surface-2;
+    -fx-text-fill: -text-primary;
+}
+
+.admin-sidebar .nav-link:pressed,
+.nav-link:pressed {
+    -fx-background-color: -surface-3;
+    -fx-scale-x: 0.97;
+    -fx-scale-y: 0.97;
+}
+
+/* ── ACTIVE STATE ── */
+.admin-sidebar .nav-link-active,
+.nav-link-active {
+    -fx-background-color: -color-brand-50;
+    -fx-text-fill: -brand-deep;
+    -fx-font-size: 13.5px;
+    -fx-font-weight: 700;
+    -fx-font-family: -font-body;
+    -fx-padding: 10 14 10 11;
+    -fx-background-radius: 10;
+    -fx-cursor: hand;
+    -fx-border-color: transparent transparent transparent -brand-deep;
+    -fx-border-width: 0 0 0 3;
+    -fx-alignment: center-left;
+    -fx-effect: none;
+}
+
+/* ── SIDEBAR USER CARD ── */
+.sidebar-user-card {
+    -fx-background-color: -surface-2;
+    -fx-background-radius: 14;
+    -fx-border-color: -border;
+    -fx-border-radius: 14;
+    -fx-border-width: 1;
+    -fx-padding: 14;
+    -fx-spacing: 3;
+}
+
+.sidebar-user-name {
+    -fx-text-fill: -text-primary;
+    -fx-font-weight: 700;
+    -fx-font-size: 13.5px;
+}
+
+.sidebar-user-meta {
+    -fx-text-fill: -text-muted;
+    -fx-font-size: 11px;
+}

@@ -29,13 +29,13 @@ Tài liệu này hướng dẫn chi tiết từng click chuột để bạn trì
 ## 🎭 GIAI ĐOẠN 2: QUY TRÌNH NGƯỜI BÁN (Seller Workflow)
 1.  **Tại máy Seller:**
     *   Vào tab **Trang người bán** (Sidebar trái).
-    *   Nhấn nút **Tạo phiên đấu giá** (Nút xanh dương có icon +).
-    *   Điền: Tên = `iPhone 15 Pro`, Loại = `Electronics`, Giá = `1000`, Mô tả = `Máy mới 100%`.
-    *   Nhấn **Tạo**. Quan sát bảng phía dưới: Item hiện lên với trạng thái `OPEN` (Màu xanh dương).
+    *   Điền thông tin sản phẩm: Tên = `iPhone 15 Pro`, Loại = `Electronics`, Giá khởi điểm = `1000`, Mô tả = `Máy mới 100%`.
+    *   Chọn ảnh sản phẩm (hoặc kéo thả ảnh vào vùng chứa) để hiển thị chuyên nghiệp.
+    *   Nhấn nút **Tạo phiên đấu giá** ở góc dưới cùng bên phải. Quan sát lưới sản phẩm phía dưới: thẻ sản phẩm mới hiện lên với trạng thái `OPEN` (màu vàng cam).
 2.  **Kích hoạt phiên:**
-    *   Chọn dòng `iPhone 15 Pro` trong bảng.
-    *   Nhấn nút **▶ Bắt đầu** ở phía trên bảng.
-    *   Trạng thái chuyển sang `RUNNING` (Màu xanh lá).
+    *   Nhấp chuột trực tiếp vào thẻ sản phẩm `iPhone 15 Pro` vừa tạo. Một menu thao tác (Action Overlay) sẽ xuất hiện trên thẻ.
+    *   Nhấn nút **Bắt đầu** trên menu thao tác.
+    *   Huy hiệu trạng thái của phiên chuyển sang `RUNNING` (màu xanh lá), sẵn sàng cho người mua đặt giá.
 
 ---
 
@@ -53,19 +53,19 @@ Tài liệu này hướng dẫn chi tiết từng click chuột để bạn trì
 ---
 
 ## 🎭 GIAI ĐOẠN 4: KẾT THÚC & QUẢN TRỊ (Admin & Closing)
-1.  **Tại máy Seller:** Chọn sản phẩm -> Nhấn **⏹ Kết thúc**. Trạng thái thành `FINISHED` (Màu vàng).
+1.  **Tại máy Seller:** Nhấp vào thẻ sản phẩm `iPhone 15 Pro` -> Nhấn **Kết thúc** trên menu thao tác. Trạng thái chuyển thành `FINISHED` (màu xám).
 2.  **Tại máy Admin:**
-    *   Vào tab **Tổng quan** (Dashboard): Show các thẻ thống kê dọc (Tổng người dùng tăng, Phiên đang diễn ra giảm).
-    *   Vào tab **Phiên đấu giá**: Chọn iPhone 15 Pro -> Nhấn **Đã TT** (Đã thanh toán).
-    *   Trạng thái thành `PAID` (Màu tím).
-3.  **Kiểm tra doanh thu:** Quay lại tab **Tổng quan**, thẻ **Tổng doanh thu** đã tự động cộng thêm 1200$.
+    *   Vào tab **Tổng quan** (Dashboard): Quan sát các số liệu thống kê tự động cập nhật thời gian thực.
+    *   Vào tab **Phiên đấu giá**: Nhấp vào thẻ sản phẩm `iPhone 15 Pro` -> Nhấn **Thanh toán** trên menu thao tác.
+    *   Trạng thái chuyển thành `PAID` (màu vàng gold).
+3.  **Kiểm tra doanh thu:** Quay lại tab **Tổng quan**, thẻ **Tổng doanh thu** đã tự động cộng thêm giá chốt của phiên (ví dụ: $1,200).
 
 ---
 
 ## 🎭 GIAI ĐOẠN 5: SHOW CHI TIẾT KỸ THUẬT (Dành cho câu hỏi khó)
 1.  **Xem Database:** Mở **DB Browser for SQLite** -> Mở file `auction-system.db` -> Show bảng `users` (Chỉ cho thầy thấy cột `password_hash` đã được mã hóa không thể đọc được).
 2.  **Chất lượng Code:** 
-    *   Mở Terminal -> Chạy `mvn test`. Show kết quả **61 tests passed**.
+    *   Mở Terminal -> Chạy `mvn test`. Show kết quả **69 tests passed**.
     *   Mở trình duyệt -> Vào GitHub -> Tab **Actions**. Show lịch sử build tự động (Tick xanh).
 3.  **Cấu trúc dự án:** Show 3 module `common`, `server`, `client` trong IDE để chứng minh kiến trúc chuyên nghiệp.
 

@@ -1,0 +1,184 @@
+/* ================================================
+   BASE — Global reset & foundational styles
+   ================================================ */
+.root {
+    -fx-background-color: -bg;
+    -fx-font-family: -font-body;
+    -fx-font-size: 13px;
+    -fx-text-fill: -text-primary;
+}
+
+/* ================================================
+   LAYOUT ROOTS
+   ================================================ */
+.admin-root,
+.admin-main-bg {
+    -fx-background-color: -bg;
+}
+
+/* ================================================
+   TYPOGRAPHY HIERARCHY
+   ================================================ */
+.screen-title,
+.admin-page-title {
+    -fx-font-family: -font-heading;
+    -fx-font-size: 30px;
+    -fx-font-weight: 700;
+    -fx-text-fill: -text-primary;
+}
+
+.section-title {
+    -fx-font-family: -font-heading;
+    -fx-font-size: 17px;
+    -fx-font-weight: 700;
+    -fx-text-fill: -text-primary;
+}
+
+.muted-label,
+.info-label,
+.footer-text,
+.admin-footer-text {
+    -fx-text-fill: -text-secondary;
+    -fx-font-size: 13px;
+}
+
+.success-label {
+    -fx-text-fill: -active;
+    -fx-font-weight: bold;
+}
+
+.error-label {
+    -fx-text-fill: -danger;
+    -fx-font-weight: bold;
+}
+
+/* ================================================
+   MONOSPACE / PRICE ELEMENTS
+   ================================================ */
+.mono,
+.price-big,
+.price-medium,
+.stat-card-value,
+.stat-card-value-accent,
+.stat-card-value-success,
+.stat-card-value-warning {
+    -fx-font-family: -font-mono;
+}
+
+.price-big {
+    -fx-font-size: 36px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -brand-deep;
+}
+
+.price-medium {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -brand-deep;
+}
+
+/* ================================================
+   COUNTDOWN
+   ================================================ */
+.countdown,
+.countdown-danger {
+    -fx-font-family: -font-mono;
+    -fx-font-weight: bold;
+    -fx-text-fill: -danger;
+    -fx-font-size: 14px;
+}
+
+/* ================================================
+   FOOTER & SEPARATOR
+   ================================================ */
+.app-footer,
+.admin-footer {
+    -fx-background-color: -surface;
+    -fx-padding: 14 28;
+    -fx-border-color: -border transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
+}
+
+.separator .line {
+    -fx-border-color: -border;
+    -fx-border-width: 0 0 1 0;
+}
+
+/* ================================================
+   SCROLL — Minimal, elegant
+   ================================================ */
+.scroll-pane,
+.admin-scroll {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.scroll-pane > .viewport,
+.admin-scroll > .viewport {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar:vertical,
+.scroll-bar:horizontal {
+    -fx-background-color: transparent;
+    -fx-pref-width: 8;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: rgba(148, 163, 184, 0.50);
+    -fx-background-radius: 999;
+    -fx-background-insets: 2;
+}
+
+.scroll-bar .thumb:hover {
+    -fx-background-color: rgba(100, 116, 139, 0.70);
+}
+
+.scroll-bar .thumb:pressed {
+    -fx-background-color: rgba(79, 70, 229, 0.55);
+}
+
+.scroll-bar .track,
+.scroll-bar .increment-button,
+.scroll-bar .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.scroll-bar .increment-arrow,
+.scroll-bar .decrement-arrow {
+    -fx-shape: "";
+    -fx-padding: 0;
+}
+
+/* ================================================
+   HYPERLINKS
+   ================================================ */
+.hyperlink {
+    -fx-text-fill: -brand-deep;
+    -fx-border-color: transparent;
+    -fx-underline: false;
+    -fx-font-weight: 600;
+    -fx-cursor: hand;
+    -fx-padding: 0 2;
+}
+
+.hyperlink:hover {
+    -fx-text-fill: -brand-deep-2;
+    -fx-underline: true;
+}
+
+.hyperlink:visited {
+    -fx-text-fill: -brand-deep;
+}
+
+/* ================================================
+   TEXT SELECTION
+   ================================================ */
+.text-field,
+.password-field,
+.text-area {
+    -fx-highlight-fill: rgba(79, 70, 229, 0.18);
+    -fx-highlight-text-fill: -text-primary;
+}

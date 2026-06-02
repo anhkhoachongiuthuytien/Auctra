@@ -26,6 +26,15 @@ public class AuctionDto implements Serializable {
     private String winnerName;
     private String winnerEmail;
     private List<BidDto> bids;
+    private String endTime;
+
+    public String getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(String endTime) {
+        this.endTime = endTime;
+    }
 
     public String getId() {
         return id;

@@ -1,0 +1,145 @@
+/* ================================================
+   DIALOG, MODAL & TOAST
+   ================================================ */
+
+/* ── TOAST NOTIFICATION ── */
+.toast {
+    -fx-background-color: rgba(15, 23, 42, 0.94);
+    -fx-text-fill: white;
+    -fx-background-radius: 999;
+    -fx-padding: 13 28;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-font-family: -font-body;
+    -fx-effect: dropshadow(gaussian, rgba(15, 23, 42, 0.35), 20, 0, 0, 7);
+}
+
+.toast-success {
+    -fx-background-color: linear-gradient(to right, #059669, #10b981);
+}
+
+.toast-error {
+    -fx-background-color: linear-gradient(to right, #e11d48, #f43f5e);
+}
+
+.toast-info {
+    -fx-background-color: rgba(15, 23, 42, 0.94);
+}
+
+/* ── LOADING & OVERLAY ── */
+.loading-overlay {
+    -fx-background-color: rgba(248, 250, 252, 0.88);
+}
+
+.spinner {
+    -fx-progress-color: -brand-deep;
+}
+
+.modal-backdrop {
+    -fx-background-color: rgba(15, 23, 42, 0.55);
+}
+
+/* ── MODAL CARD ── */
+.modal-card {
+    -fx-background-color: -surface;
+    -fx-background-radius: 22;
+    -fx-padding: 32;
+    -fx-effect: dropshadow(gaussian, rgba(15, 23, 42, 0.32), 36, 0, 0, 12);
+    -fx-max-width: 480;
+    -fx-border-color: rgba(255, 255, 255, 0.65);
+    -fx-border-radius: 22;
+    -fx-border-width: 1;
+}
+
+.modal-title {
+    -fx-font-family: -font-heading;
+    -fx-font-size: 22px;
+    -fx-font-weight: 700;
+    -fx-text-fill: -text-primary;
+}
+
+.modal-message {
+    -fx-font-size: 14px;
+    -fx-text-fill: -text-secondary;
+    -fx-wrap-text: true;
+}
+
+/* ── GOOGLE-STYLE MODAL ── */
+.google-modal-card {
+    -fx-background-color: -surface;
+    -fx-background-radius: 20;
+    -fx-padding: 28;
+    -fx-effect: dropshadow(gaussian, rgba(15, 23, 42, 0.20), 36, 0, 0, 13);
+    -fx-min-width: 440;
+    -fx-max-width: 500;
+    -fx-spacing: 20;
+    -fx-border-color: -border;
+    -fx-border-radius: 20;
+    -fx-border-width: 1;
+}
+
+.google-modal-title {
+    -fx-font-family: -font-heading;
+    -fx-font-size: 24px;
+    -fx-font-weight: 700;
+    -fx-text-fill: -text-primary;
+}
+
+/* ── GOOGLE FIELD CONTAINER ── */
+.google-field-container {
+    -fx-spacing: 6;
+}
+
+.google-field-label {
+    -fx-font-family: -font-heading;
+    -fx-font-size: 12px;
+    -fx-font-weight: 700;
+    -fx-text-fill: -text-secondary;
+    -fx-padding: 0 0 0 4;
+}
+
+/* ── DIALOG ACTION BUTTONS ── */
+.google-btn-cancel {
+    -fx-background-color: transparent;
+    -fx-text-fill: -brand-deep;
+    -fx-cursor: hand;
+    -fx-font-size: 14px;
+    -fx-font-weight: 600;
+    -fx-font-family: -font-body;
+    -fx-padding: 10 18;
+    -fx-background-radius: 10;
+    -fx-border-color: transparent;
+}
+
+.google-btn-cancel:hover {
+    -fx-background-color: -color-brand-50;
+}
+
+.google-btn-cancel:pressed {
+    -fx-scale-x: 0.96;
+    -fx-scale-y: 0.96;
+}
+
+.google-btn-save {
+    -fx-background-color: linear-gradient(to bottom, #5b52ed, #4338ca);
+    -fx-text-fill: white;
+    -fx-cursor: hand;
+    -fx-font-size: 14px;
+    -fx-font-weight: 700;
+    -fx-font-family: -font-heading;
+    -fx-padding: 10 24;
+    -fx-background-radius: 10;
+    -fx-border-color: transparent;
+    -fx-effect: dropshadow(gaussian, rgba(79, 70, 229, 0.22), 10, 0, 0, 3);
+}
+
+.google-btn-save:hover {
+    -fx-background-color: linear-gradient(to bottom, #4f46e5, #3730a3);
+    -fx-effect: dropshadow(gaussian, rgba(79, 70, 229, 0.35), 16, 0, 0, 5);
+}
+
+.google-btn-save:pressed {
+    -fx-scale-x: 0.96;
+    -fx-scale-y: 0.96;
+    -fx-effect: none;
+}

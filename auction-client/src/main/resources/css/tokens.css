@@ -1,0 +1,125 @@
+.root {
+    /* =============================================
+       BRAND PALETTE — Indigo / Slate / Amber
+    ============================================= */
+    -color-brand-50:  #eef2ff;
+    -color-brand-100: #e0e7ff;
+    -color-brand-200: #c7d2fe;
+    -color-brand-400: #818cf8;
+    -color-brand-500: #6366f1;
+    -color-brand-600: #4f46e5;
+    -color-brand-700: #4338ca;
+    -color-brand-800: #3730a3;
+    -color-brand-900: #312e81;
+
+    -color-gold-50:  #fefce8;
+    -color-gold-100: #fef9c3;
+    -color-gold-200: #fef08a;
+    -color-gold-400: #facc15;
+    -color-gold-500: #eab308;
+    -color-gold-600: #ca8a04;
+    -color-gold-700: #a16207;
+
+    /* =============================================
+       SEMANTIC STATUS
+    ============================================= */
+    -color-success:        #10b981;
+    -color-success-light:  #34d399;
+    -color-success-bg:     #f0fdf4;
+    -color-success-border: #bbf7d0;
+
+    -color-danger:         #f43f5e;
+    -color-danger-light:   #fb7185;
+    -color-danger-bg:      #fff1f2;
+    -color-danger-border:  #fecdd3;
+
+    -color-warning:        #f59e0b;
+    -color-warning-bg:     #fffbeb;
+    -color-warning-border: #fde68a;
+
+    -color-info:           #0ea5e9;
+    -color-info-bg:        #f0f9ff;
+    -color-info-border:    #bae6fd;
+
+    /* =============================================
+       SURFACE & LAYOUT — Premium Slate Light
+    ============================================= */
+    -color-bg:             #f8fafc;
+    -color-bg-raised:      #f1f5f9;
+    -color-surface:        #ffffff;
+    -color-surface-2:      #f1f5f9;
+    -color-surface-3:      #e2e8f0;
+    -color-surface-glass:  rgba(255, 255, 255, 0.80);
+    -color-border:         #e2e8f0;
+    -color-border-strong:  #cbd5e1;
+    -color-border-focus:   #4f46e5;
+    -color-overlay:        rgba(15, 23, 42, 0.50);
+
+    /* =============================================
+       TYPOGRAPHY
+    ============================================= */
+    -color-text-900:     #0f172a;
+    -color-text-700:     #334155;
+    -color-text-500:     #64748b;
+    -color-text-400:     #94a3b8;
+    -color-text-white:   #ffffff;
+    -color-text-gold:    #92400e;
+    -color-text-on-gold: #0f172a;
+
+    /* Short aliases — used broadly across components */
+    -brand-deep:       #4f46e5;
+    -brand-deep-2:     #3730a3;
+    -brand-light:      #818cf8;
+    -brand-gold:       #eab308;
+    -brand-gold-light: #fef08a;
+    -active:           #10b981;
+    -danger:           #f43f5e;
+    -info:             #0ea5e9;
+    -warning:          #f59e0b;
+
+    -bg:              #f8fafc;
+    -surface:         #ffffff;
+    -surface-2:       #f1f5f9;
+    -surface-3:       #e2e8f0;
+    -border:          #e2e8f0;
+    -text-primary:    #0f172a;
+    -text-secondary:  #334155;
+    -text-muted:      #64748b;
+
+    /* =============================================
+       SHADOWS — layered depth system
+    ============================================= */
+    -shadow-xs:     dropshadow(gaussian, rgba(15, 23, 42, 0.04), 6,  0, 0, 2);
+    -shadow-sm:     dropshadow(gaussian, rgba(15, 23, 42, 0.05), 12, 0, 0, 3);
+    -shadow-md:     dropshadow(gaussian, rgba(15, 23, 42, 0.07), 20, 0, 0, 6);
+    -shadow-lg:     dropshadow(gaussian, rgba(15, 23, 42, 0.10), 32, 0, 0, 10);
+    -shadow-xl:     dropshadow(gaussian, rgba(15, 23, 42, 0.15), 48, 0, 0, 16);
+    -shadow-brand:  dropshadow(gaussian, rgba(79, 70, 229, 0.22), 22, 0, 0, 7);
+    -shadow-brand-lg: dropshadow(gaussian, rgba(79, 70, 229, 0.30), 36, 0, 0, 12);
+    -shadow-gold:   dropshadow(gaussian, rgba(234, 179, 8, 0.28),  18, 0, 0, 5);
+    -shadow-success: dropshadow(gaussian, rgba(16, 185, 129, 0.22), 16, 0, 0, 5);
+    -shadow-danger:  dropshadow(gaussian, rgba(244, 63, 94, 0.22),  16, 0, 0, 5);
+
+    /* Legacy aliases kept for backward-compat */
+    -shadow-soft:   dropshadow(three-pass-box, rgba(15, 23, 42, 0.03), 12, 0, 0, 4);
+    -shadow-card:   dropshadow(three-pass-box, rgba(15, 23, 42, 0.05), 24, 0, 0, 8);
+    -shadow-strong: dropshadow(three-pass-box, rgba(15, 23, 42, 0.10), 32, 0, 0, 12);
+    -shadow-glow:   dropshadow(three-pass-box, rgba(79, 70, 229, 0.12), 20, 0, 0, 6);
+
+    /* =============================================
+       SHAPE / RADIUS
+    ============================================= */
+    -radius-xs:  6;
+    -radius-sm:  10;
+    -radius-md:  14;
+    -radius-lg:  20;
+    -radius-xl:  28;
+    -radius-pill: 999;
+
+    /* =============================================
+       TYPOGRAPHY FONTS
+    ============================================= */
+    -font-heading: "Segoe UI Variable Display", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+    -font-body:    "Segoe UI Variable Text",    "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+    -font-mono:    "JetBrains Mono", "Cascadia Code", "Consolas", monospace;
+}

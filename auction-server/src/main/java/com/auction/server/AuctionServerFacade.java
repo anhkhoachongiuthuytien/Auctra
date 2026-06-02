@@ -85,4 +85,35 @@ public class AuctionServerFacade {
     public List<User> listUsers() {
         return serverContext.getUserService().getAllUsers();
     }
+
+    public void registerAutoBid(String auctionId, String bidderId, double maxPrice, double increment) {
+        serverContext.getAutoBidDao().save(new com.auction.model.auction.AutoBidConfig(auctionId, bidderId, maxPrice, increment));
+    }
+
+    public void cancelAutoBid(String auctionId, String bidderId) {
+        serverContext.getAutoBidDao().delete(auctionId, bidderId);
+    }
+
+    public com.auction.model.auction.AutoBidConfig getAutoBid(String auctionId, String bidderId) {
+        return serverContext.getAutoBidDao().find(auctionId, bidderId);
+    }
+
+    public User updateUser(String userId, String username, String email) {
+        return updateUser(userId, username, email, null, null, null, null, null, null);
+    }
+
+    public User updateUser(String userId, String username, String email,
+                           String shippingAddress, String phoneNumber,
+                           String storeName, String storeDescription,
+                           String department) {
+        return updateUser(userId, username, email, shippingAddress, phoneNumber, storeName, storeDescription, department, null);
+    }
+
+    public User updateUser(String userId, String username, String email,
+                           String shippingAddress, String phoneNumber,
+                           String storeName, String storeDescription,
+                           String department, String avatarPath) {
+        return serverContext.getUserService().updateUser(userId, username, email,
+                shippingAddress, phoneNumber, storeName, storeDescription, department, avatarPath);
+    }
 }

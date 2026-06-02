@@ -5,6 +5,7 @@ import com.auction.model.item.Art;
 import com.auction.model.item.Electronics;
 import com.auction.model.item.Item;
 import com.auction.model.item.Vehicle;
+import com.auction.model.item.Other;
 import com.auction.model.user.Admin;
 import com.auction.model.user.Bidder;
 import com.auction.model.user.Seller;
@@ -28,12 +29,28 @@ public final class DbMappers {
     }
 
     public static User createUser(String role, String id, String username, String email) {
-        return switch (role.toUpperCase()) {
-            case "SELLER" -> new Seller(id, username, email);
-            case "BIDDER" -> new Bidder(id, username, email);
-            case "ADMIN" -> new Admin(id, username, email);
+        return createUser(role, id, username, email, null, null, null, null, null, null);
+    }
+
+    public static User createUser(String role, String id, String username, String email,
+                                  String shippingAddress, String phoneNumber,
+                                  String storeName, String storeDescription,
+                                  String department) {
+        return createUser(role, id, username, email, shippingAddress, phoneNumber, storeName, storeDescription, department, null);
+    }
+
+    public static User createUser(String role, String id, String username, String email,
+                                  String shippingAddress, String phoneNumber,
+                                  String storeName, String storeDescription,
+                                  String department, String avatarPath) {
+        User user = switch (role.toUpperCase()) {
+            case "SELLER" -> new Seller(id, username, email, storeName, storeDescription);
+            case "BIDDER" -> new Bidder(id, username, email, shippingAddress, phoneNumber);
+            case "ADMIN" -> new Admin(id, username, email, department);
             default -> throw new IllegalArgumentException("Unsupported role: " + role);
         };
+        user.setAvatarPath(avatarPath);
+        return user;
     }
 
     public static String detectItemType(Item item) {
@@ -45,6 +62,9 @@ public final class DbMappers {
         }
         if (item instanceof Vehicle) {
             return ItemType.VEHICLE.name();
+        }
+        if (item instanceof Other) {
+            return ItemType.OTHER.name();
         }
         throw new IllegalArgumentException("Unsupported item type: " + item.getClass().getName());
     }
@@ -59,6 +79,7 @@ public final class DbMappers {
             case ART -> new Art(id, name, description, startingPrice);
             case ELECTRONICS -> new Electronics(id, name, description, startingPrice);
             case VEHICLE -> new Vehicle(id, name, description, startingPrice);
+            case OTHER -> new Other(id, name, description, startingPrice);
         };
         item.setImagePath(imagePath);
         return item;

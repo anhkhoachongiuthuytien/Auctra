@@ -1,0 +1,14 @@
+.countdown-timer {
+    -fx-font-family: -font-mono;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -brand-deep;
+}
+
+.countdown-timer-warning {
+    -fx-text-fill: -warning;
+}
+
+.countdown-timer-danger {
+    -fx-text-fill: -danger;
+}

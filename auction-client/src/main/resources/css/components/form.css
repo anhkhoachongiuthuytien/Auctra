@@ -1,0 +1,211 @@
+/* ================================================
+   FORM COMPONENTS — Premium input system
+   ================================================ */
+
+/* ── BASE INPUTS ── */
+.text-field,
+.password-field,
+.text-area,
+.combo-box-base,
+.google-input {
+    -fx-background-color: -surface;
+    -fx-background-radius: 12;
+    -fx-border-color: -border;
+    -fx-border-radius: 12;
+    -fx-border-width: 1.5;
+    -fx-padding: 11 16;
+    -fx-text-fill: -text-primary;
+    -fx-prompt-text-fill: -text-muted;
+    -fx-font-size: 13.5px;
+    -fx-font-family: -font-body;
+}
+
+.text-area .content {
+    -fx-background-color: -surface;
+    -fx-background-radius: 12;
+}
+
+.text-field:hover,
+.password-field:hover,
+.text-area:hover,
+.combo-box-base:hover,
+.google-input:hover {
+    -fx-border-color: -color-border-strong;
+}
+
+.text-field:focused,
+.password-field:focused,
+.text-area:focused,
+.combo-box-base:focused,
+.google-input:focused {
+    -fx-border-color: -brand-deep;
+    -fx-border-width: 2;
+    -fx-background-color: -surface;
+    -fx-padding: 10.5 15.5;
+    -fx-effect: dropshadow(gaussian, rgba(79, 70, 229, 0.10), 14, 0, 0, 4);
+}
+
+/* ── LABELS ── */
+.field-label,
+.login-field-label {
+    -fx-text-fill: -text-secondary;
+    -fx-font-size: 12.5px;
+    -fx-font-weight: 700;
+    -fx-font-family: -font-heading;
+    -fx-padding: 0 0 3 0;
+}
+
+.field-label-filled {
+    -fx-text-fill: -brand-deep;
+}
+
+.field-label-empty {
+    -fx-text-fill: -text-secondary;
+}
+
+.field-shell {
+    -fx-spacing: 6;
+}
+
+.field-icon {
+    -fx-text-fill: -brand-deep;
+    -fx-font-weight: bold;
+}
+
+/* ── TOPBAR / INNER SEARCH ── */
+.admin-inner-search {
+    -fx-background-color: -surface-2;
+    -fx-border-color: transparent;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-padding: 7 14;
+}
+
+.admin-inner-search:hover {
+    -fx-background-color: -surface-3;
+}
+
+.admin-inner-search-field {
+    -fx-background-color: transparent;
+    -fx-pref-height: 30;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-font-size: 13.5px;
+    -fx-text-fill: -text-primary;
+}
+
+.admin-inner-search-field:focused {
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-effect: none;
+}
+
+/* ── BID INPUT — special monospace input ── */
+.bid-input {
+    -fx-background-color: -surface;
+    -fx-border-color: -brand-deep;
+    -fx-border-width: 1.5;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-font-family: -font-mono;
+    -fx-padding: 11 16;
+    -fx-text-fill: -text-primary;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, rgba(79, 70, 229, 0.06), 10, 0, 0, 3);
+}
+
+.bid-input:focused {
+    -fx-border-width: 2.2;
+    -fx-padding: 10.5 15.5;
+    -fx-effect: dropshadow(gaussian, rgba(79, 70, 229, 0.16), 18, 0, 0, 5);
+}
+
+/* ── GOOGLE-STYLE DIALOG FIELDS ── */
+.google-text-field {
+    -fx-background-color: -surface;
+    -fx-background-radius: 10;
+    -fx-border-color: -border;
+    -fx-border-radius: 10;
+    -fx-border-width: 1.5;
+    -fx-padding: 10 14;
+    -fx-font-size: 14px;
+    -fx-text-fill: -text-primary;
+    -fx-font-family: -font-body;
+}
+
+.google-text-field:hover {
+    -fx-border-color: -color-border-strong;
+}
+
+.google-text-field:focused {
+    -fx-border-color: -brand-deep;
+    -fx-border-width: 2;
+    -fx-padding: 9 13;
+    -fx-effect: dropshadow(gaussian, rgba(79, 70, 229, 0.10), 12, 0, 0, 3);
+}
+
+/* ── CHECKBOX ── */
+.check-box {
+    -fx-text-fill: -text-secondary;
+    -fx-cursor: hand;
+    -fx-font-size: 13px;
+}
+
+.check-box .box {
+    -fx-background-color: -surface;
+    -fx-border-color: -border;
+    -fx-border-width: 1.5;
+    -fx-background-radius: 5;
+    -fx-border-radius: 5;
+}
+
+.check-box:hover .box {
+    -fx-border-color: -brand-deep;
+    -fx-background-color: -color-brand-50;
+}
+
+.check-box:selected .mark {
+    -fx-background-color: white;
+}
+
+.check-box:selected .box {
+    -fx-background-color: linear-gradient(to bottom, #5b52ed, #4338ca);
+    -fx-border-color: transparent;
+}
+
+/* ── COMBO BOX ── */
+.combo-box .list-cell {
+    -fx-text-fill: -text-primary;
+    -fx-font-size: 13px;
+    -fx-padding: 9 14;
+}
+
+.combo-box-popup .list-view {
+    -fx-background-color: -surface;
+    -fx-background-radius: 12;
+    -fx-border-color: -border;
+    -fx-border-radius: 12;
+    -fx-effect: dropshadow(gaussian, rgba(15, 23, 42, 0.12), 24, 0, 0, 8);
+}
+
+.combo-box-popup .list-view .list-cell:hover {
+    -fx-background-color: -surface-2;
+}
+
+.combo-box-popup .list-view .list-cell:selected {
+    -fx-background-color: -color-brand-100;
+    -fx-text-fill: -brand-deep;
+}
+
+/* ── PROGRESS BAR ── */
+.progress-bar > .bar {
+    -fx-background-color: linear-gradient(to right, #818cf8, #4f46e5);
+    -fx-background-radius: 999;
+}
+
+.progress-bar > .track {
+    -fx-background-color: -surface-2;
+    -fx-background-radius: 999;
+    -fx-pref-height: 6;
+}

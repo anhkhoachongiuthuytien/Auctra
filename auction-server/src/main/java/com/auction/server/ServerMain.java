@@ -32,9 +32,14 @@ public class ServerMain {
         AuctionServerFacade facade = new AuctionServerFacade(serverContext);
         AuctionSocketServer socketServer = new AuctionSocketServer(facade, port);
 
+        // Khởi động scheduler kiểm tra và tự động kết thúc auction hết hạn
+        AuctionExpiryScheduler expiryScheduler = new AuctionExpiryScheduler(serverContext.getAuctionService());
+        expiryScheduler.start();
+
         // Đăng ký shutdown hook để đóng server sạch khi Ctrl+C
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             System.out.println("\nĐang tắt server...");
+            expiryScheduler.stop();
             socketServer.stop();
         }));
 

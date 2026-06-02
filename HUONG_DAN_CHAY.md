@@ -115,20 +115,24 @@ mvn test -Dtest=ConcurrentBidTest
 
 | Module | Test Class | So luong | Noi dung |
 |--------|-----------|---------|----------|
-| auction-common | AuctionTest | 12 test | Vong doi auction, bid, observer |
-| auction-server | AuctionServiceTest | 11 test | CRUD auction qua service |
-| auction-server | BidServiceTest | 7 test | Dat gia, validation |
-| auction-server | AuthServiceTest | 9 test | Dang ky, dang nhap, mat khau |
+| auction-common | AuctionTest | 16 test | Vong doi auction, bid, observer |
+| auction-server | AuctionServiceTest | 12 test | CRUD auction qua service |
+| auction-server | BidServiceTest | 8 test | Dat gia, validation |
+| auction-server | AuthServiceTest | 10 test | Dang ky, dang nhap, mat khau |
 | auction-server | SellerServiceTest | 4 test | Tao item, tao auction |
 | auction-server | ConcurrentBidTest | 1 test | Dat gia dong thoi 2 thread |
 | auction-server | InMemoryAuctionDaoTest | 3 test | CRUD in-memory |
 | auction-server | InMemoryItemDaoTest | 3 test | CRUD in-memory |
-| auction-server | InMemoryUserDaoTest | 3 test | CRUD in-memory |
-| auction-server | SqlitePersistenceTest | 5 test | Luu/doc SQLite that |
+| auction-server | InMemoryUserDaoTest | 4 test | CRUD in-memory |
+| auction-server | SqlitePersistenceTest | 1 test | Luu/doc SQLite that |
+| auction-server | AntiSnipingTest | 2 test | Thoi gian gia han tu dong |
+| auction-server | AutoBidPriorityQueueTest | 1 test | Tinh toan thau tu dong |
+| auction-client | FxmlLoadTest | 1 test | Kiem tra load file FXML |
+| auction-client | SceneNavigatorSmokeTest | 2 test | Kiem tra dieu huong man hinh |
 | auction-client | AuctionListViewModelTest | 1 test | ViewModel bid message |
 | auction-client | LoginViewModelTest | 2 test | Dang ky, xac nhan MK |
 
-**Tong: 61 tests**
+**Tong: 69 tests**
 
 ---
 

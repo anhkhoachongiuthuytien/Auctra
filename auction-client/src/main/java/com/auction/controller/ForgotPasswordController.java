@@ -3,6 +3,7 @@ package com.auction.controller;
 import com.auction.app.AppContext;
 import com.auction.app.SceneNavigator;
 import com.auction.presentation.LoginViewModel;
+import com.auction.ui.UIAnimations;
 import com.auction.util.UiEffects;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -50,6 +51,7 @@ public class ForgotPasswordController {
         );
         showMessage(result);
         if (!result.success()) {
+            UIAnimations.shakeField(emailField);
             UiEffects.showToast(rootPane, result.message(), UiEffects.ToastType.ERROR, 2400);
             return;
         }
@@ -71,5 +73,12 @@ public class ForgotPasswordController {
         messageLabel.setText(result.message());
         messageLabel.getStyleClass().removeAll("error-label", "success-label");
         messageLabel.getStyleClass().add(result.success() ? "success-label" : "error-label");
+    }
+
+    @FXML
+    private void handleToggleTheme() {
+        if (rootPane != null && rootPane.getScene() != null) {
+            com.auction.ui.ThemeManager.toggle(rootPane.getScene());
+        }
     }
 }

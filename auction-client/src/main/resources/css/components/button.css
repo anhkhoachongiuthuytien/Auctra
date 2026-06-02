@@ -1,0 +1,216 @@
+/* ================================================
+   BUTTONS — Premium tactile system
+   ================================================ */
+
+/* Base shared properties */
+.button,
+.button-primary,
+.google-btn-primary {
+    -fx-background-color: linear-gradient(to bottom, #5b52ed, #4338ca);
+    -fx-text-fill: white;
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-padding: 11 24;
+    -fx-font-family: -font-heading;
+    -fx-font-weight: 700;
+    -fx-font-size: 13.5px;
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+    -fx-effect: dropshadow(gaussian, rgba(79, 70, 229, 0.22), 12, 0, 0, 3);
+}
+
+.button:hover,
+.button-primary:hover,
+.google-btn-primary:hover {
+    -fx-background-color: linear-gradient(to bottom, #4f46e5, #3730a3);
+    -fx-effect: dropshadow(gaussian, rgba(79, 70, 229, 0.35), 18, 0, 0, 5);
+}
+
+.button:pressed,
+.button-primary:pressed,
+.google-btn-primary:pressed {
+    -fx-background-color: #3730a3;
+    -fx-scale-x: 0.96;
+    -fx-scale-y: 0.96;
+    -fx-effect: dropshadow(gaussian, rgba(79, 70, 229, 0.12), 6, 0, 0, 2);
+}
+
+.button:disabled,
+.button-primary:disabled {
+    -fx-opacity: 0.45;
+    -fx-effect: none;
+    -fx-cursor: default;
+}
+
+/* ── SUCCESS ── */
+.button-success {
+    -fx-background-color: linear-gradient(to bottom, #10b981, #059669);
+    -fx-text-fill: white;
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-padding: 11 24;
+    -fx-font-family: -font-heading;
+    -fx-font-weight: 700;
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+    -fx-effect: dropshadow(gaussian, rgba(16, 185, 129, 0.22), 12, 0, 0, 3);
+}
+
+.button-success:hover {
+    -fx-background-color: linear-gradient(to bottom, #059669, #047857);
+    -fx-effect: dropshadow(gaussian, rgba(16, 185, 129, 0.35), 18, 0, 0, 5);
+}
+
+.button-success:pressed {
+    -fx-background-color: #047857;
+    -fx-scale-x: 0.96;
+    -fx-scale-y: 0.96;
+    -fx-effect: none;
+}
+
+/* ── DANGER ── */
+.button-danger {
+    -fx-background-color: linear-gradient(to bottom, #f43f5e, #e11d48);
+    -fx-text-fill: white;
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-padding: 11 24;
+    -fx-font-family: -font-heading;
+    -fx-font-weight: 700;
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+    -fx-effect: dropshadow(gaussian, rgba(244, 63, 94, 0.22), 12, 0, 0, 3);
+}
+
+.button-danger:hover {
+    -fx-background-color: linear-gradient(to bottom, #e11d48, #be123c);
+    -fx-effect: dropshadow(gaussian, rgba(244, 63, 94, 0.35), 18, 0, 0, 5);
+}
+
+.button-danger:pressed {
+    -fx-background-color: #be123c;
+    -fx-scale-x: 0.96;
+    -fx-scale-y: 0.96;
+    -fx-effect: none;
+}
+
+/* ── GHOST / OUTLINE ── */
+.button-ghost {
+    -fx-background-color: -surface;
+    -fx-text-fill: -text-secondary;
+    -fx-border-color: -border;
+    -fx-border-radius: 12;
+    -fx-border-width: 1.5;
+    -fx-background-radius: 12;
+    -fx-padding: 10 22;
+    -fx-font-family: -font-body;
+    -fx-font-weight: 600;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(15, 23, 42, 0.04), 8, 0, 0, 2);
+}
+
+.button-ghost:hover {
+    -fx-background-color: -surface-2;
+    -fx-text-fill: -text-primary;
+    -fx-border-color: -color-border-strong;
+    -fx-effect: dropshadow(gaussian, rgba(15, 23, 42, 0.07), 12, 0, 0, 3);
+}
+
+.button-ghost:pressed {
+    -fx-scale-x: 0.96;
+    -fx-scale-y: 0.96;
+    -fx-effect: none;
+}
+
+/* ── ICON (transparent background) ── */
+.button-icon {
+    -fx-background-color: transparent;
+    -fx-text-fill: -text-secondary;
+    -fx-padding: 8 12;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+    -fx-background-radius: 10;
+    -fx-effect: none;
+}
+
+.button-icon:hover {
+    -fx-background-color: -surface-2;
+    -fx-text-fill: -brand-deep;
+}
+
+.button-icon:pressed {
+    -fx-scale-x: 0.94;
+    -fx-scale-y: 0.94;
+}
+
+/* ── SIZE MODIFIERS ── */
+.button-row {
+    -fx-padding: 8 16;
+    -fx-font-size: 12.5px;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+}
+
+.button-compact {
+    -fx-padding: 7 14;
+    -fx-font-size: 11.5px;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+}
+
+.button-full {
+    -fx-pref-height: 46;
+    -fx-max-width: Infinity;
+}
+
+.button-full:hover {
+    -fx-scale-y: 1.01;
+}
+
+/* ── MINI ICON (image remove etc) ── */
+.button-icon-mini {
+    -fx-background-color: rgba(255, 255, 255, 0.94);
+    -fx-background-radius: 999;
+    -fx-border-color: -color-danger-border;
+    -fx-border-radius: 999;
+    -fx-border-width: 1;
+    -fx-padding: 3 9;
+    -fx-text-fill: -danger;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, rgba(15, 23, 42, 0.08), 8, 0, 0, 2);
+    -fx-cursor: hand;
+}
+
+.button-icon-mini:hover {
+    -fx-background-color: -color-danger-bg;
+    -fx-border-color: -danger;
+    -fx-effect: dropshadow(gaussian, rgba(244, 63, 94, 0.18), 10, 0, 0, 3);
+}
+
+/* ── GOLD / ACCENT BUTTON ── */
+.button-gold {
+    -fx-background-color: linear-gradient(to bottom, #facc15, #eab308);
+    -fx-text-fill: #0f172a;
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-padding: 11 24;
+    -fx-font-family: -font-heading;
+    -fx-font-weight: 700;
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+    -fx-effect: dropshadow(gaussian, rgba(234, 179, 8, 0.30), 12, 0, 0, 3);
+}
+
+.button-gold:hover {
+    -fx-background-color: linear-gradient(to bottom, #eab308, #ca8a04);
+    -fx-effect: dropshadow(gaussian, rgba(234, 179, 8, 0.45), 18, 0, 0, 5);
+}
+
+.button-gold:pressed {
+    -fx-scale-x: 0.96;
+    -fx-scale-y: 0.96;
+    -fx-effect: none;
+}

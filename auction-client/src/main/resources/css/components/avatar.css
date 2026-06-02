@@ -1,0 +1,58 @@
+/* ================================================
+   AVATAR — Circular user avatar components
+   ================================================ */
+.avatar-sm,
+.avatar-md,
+.avatar-lg {
+    -fx-background-color: linear-gradient(to bottom right, -brand-light, -brand-deep);
+    -fx-background-radius: 999;
+    -fx-alignment: center;
+    -fx-effect: dropshadow(gaussian, rgba(79, 70, 229, 0.16), 10, 0, 0, 3);
+}
+
+.avatar-sm {
+    -fx-pref-width: 32;
+    -fx-pref-height: 32;
+    -fx-min-width: 32;
+    -fx-min-height: 32;
+}
+
+.avatar-md {
+    -fx-pref-width: 42;
+    -fx-pref-height: 42;
+    -fx-min-width: 42;
+    -fx-min-height: 42;
+}
+
+.avatar-lg {
+    -fx-pref-width: 96;
+    -fx-pref-height: 96;
+    -fx-min-width: 96;
+    -fx-min-height: 96;
+    -fx-border-color: rgba(255, 255, 255, 0.90);
+    -fx-border-width: 3;
+    -fx-border-radius: 999;
+}
+
+.avatar-text {
+    -fx-text-fill: white;
+    -fx-font-weight: 700;
+    -fx-font-family: -font-heading;
+}
+
+.avatar-sm .avatar-text { -fx-font-size: 12px; }
+.avatar-md .avatar-text { -fx-font-size: 15px; }
+.avatar-lg .avatar-text { -fx-font-size: 36px; }
+
+/* Variant colors */
+.avatar-success {
+    -fx-background-color: linear-gradient(to bottom right, #34d399, #10b981);
+}
+
+.avatar-gold {
+    -fx-background-color: linear-gradient(to bottom right, #facc15, #eab308);
+}
+
+.avatar-danger {
+    -fx-background-color: linear-gradient(to bottom right, #fb7185, #f43f5e);
+}
