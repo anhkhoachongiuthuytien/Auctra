@@ -80,6 +80,7 @@ public final class DbMappers {
             case ELECTRONICS -> new Electronics(id, name, description, startingPrice);
             case VEHICLE -> new Vehicle(id, name, description, startingPrice);
             case OTHER -> new Other(id, name, description, startingPrice);
+            default -> new Other(id, name, description, startingPrice); // Dòng này xử lý FASHION và các loại mới sau này
         };
         item.setImagePath(imagePath);
         return item;
