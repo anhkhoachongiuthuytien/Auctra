@@ -25,6 +25,13 @@ public interface AuctionClientGateway {
     Auction createAuctionForSeller(Seller seller, String itemType, String name, String description,
                                    double startingPrice, String imagePath);
 
+    Auction createAuctionForSeller(Seller seller, String itemType, String name, String description,
+                                   double startingPrice, String imagePath, int durationMinutes);
+
+    default void updateItemImagePath(String itemId, String imagePath) {
+        throw new UnsupportedOperationException();
+    }
+
     void startAuction(String auctionId);
 
     void finishAuction(String auctionId);

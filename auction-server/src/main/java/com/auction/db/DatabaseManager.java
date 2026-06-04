@@ -46,6 +46,7 @@ public class DatabaseManager {
             ensureUsersColumn(connection, "avatar_path", "TEXT");
             ensureItemsImagePathColumn(connection);
             ensureAuctionsEndTimeColumn(connection);
+            ensureAuctionsDurationMinutesColumn(connection);
         } catch (SQLException e) {
             throw new IllegalStateException("Failed to initialize database schema", e);
         }
@@ -53,7 +54,7 @@ public class DatabaseManager {
 
     private void ensureUsersColumn(Connection connection, String columnName, String columnDefinition) throws SQLException {
         try (Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery("PRAGMA table_info(users)")) {
+            ResultSet resultSet = statement.executeQuery("PRAGMA table_info(users)")) {
             while (resultSet.next()) {
                 if (columnName.equalsIgnoreCase(resultSet.getString("name"))) {
                     return;
@@ -68,7 +69,7 @@ public class DatabaseManager {
 
     private void ensureUsersPasswordHashColumn(Connection connection) throws SQLException {
         try (Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery("PRAGMA table_info(users)")) {
+            ResultSet resultSet = statement.executeQuery("PRAGMA table_info(users)")) {
             while (resultSet.next()) {
                 if ("password_hash".equalsIgnoreCase(resultSet.getString("name"))) {
                     return;
@@ -83,7 +84,7 @@ public class DatabaseManager {
 
     private void ensureItemsImagePathColumn(Connection connection) throws SQLException {
         try (Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery("PRAGMA table_info(items)")) {
+            ResultSet resultSet = statement.executeQuery("PRAGMA table_info(items)")) {
             while (resultSet.next()) {
                 if ("image_path".equalsIgnoreCase(resultSet.getString("name"))) {
                     return;
@@ -98,7 +99,7 @@ public class DatabaseManager {
 
     private void ensureAuctionsEndTimeColumn(Connection connection) throws SQLException {
         try (Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery("PRAGMA table_info(auctions)")) {
+            ResultSet resultSet = statement.executeQuery("PRAGMA table_info(auctions)")) {
             while (resultSet.next()) {
                 if ("end_time".equalsIgnoreCase(resultSet.getString("name"))) {
                     return;
@@ -108,6 +109,21 @@ public class DatabaseManager {
 
         try (Statement statement = connection.createStatement()) {
             statement.execute("ALTER TABLE auctions ADD COLUMN end_time TEXT");
+        }
+    }
+
+    private void ensureAuctionsDurationMinutesColumn(Connection connection) throws SQLException {
+        try (Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery("PRAGMA table_info(auctions)")) {
+            while (resultSet.next()) {
+                if ("duration_minutes".equalsIgnoreCase(resultSet.getString("name"))) {
+                    return;
+                }
+            }
+        }
+
+        try (Statement statement = connection.createStatement()) {
+            statement.execute("ALTER TABLE auctions ADD COLUMN duration_minutes INTEGER DEFAULT 5");
         }
     }
 

@@ -35,6 +35,7 @@ CREATE TABLE IF NOT EXISTS auctions (
     status TEXT NOT NULL,
     winner_id TEXT,
     end_time TEXT,
+    duration_minutes INTEGER DEFAULT 5,
     FOREIGN KEY (item_id) REFERENCES items(id),
     FOREIGN KEY (seller_id) REFERENCES users(id),
     FOREIGN KEY (winner_id) REFERENCES users(id)

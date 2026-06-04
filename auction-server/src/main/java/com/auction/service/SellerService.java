@@ -49,6 +49,10 @@ public class SellerService {
     }
 
     public Auction createAuction(Item item, Seller seller) {
+        return createAuction(item, seller, 5);
+    }
+
+    public Auction createAuction(Item item, Seller seller, int durationMinutes) {
         if (item == null) {
             throw new AuctionException("Không tìm thấy vật phẩm");
         }
@@ -57,6 +61,7 @@ public class SellerService {
         }
 
         Auction auction = new Auction(IdGenerator.generateId(), item, seller);
+        auction.setDurationMinutes(durationMinutes);
         auctionDao.save(auction);
         return auction;
     }
@@ -66,6 +71,13 @@ public class SellerService {
         if (item == null) {
             throw new AuctionException("Không tìm thấy vật phẩm");
         }
+        return item;
+    }
+
+    public Item updateItemImagePath(String itemId, String imagePath) {
+        Item item = getItemById(itemId);
+        item.setImagePath(imagePath);
+        itemDao.save(item);
         return item;
     }
 }

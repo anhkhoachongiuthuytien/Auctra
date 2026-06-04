@@ -153,9 +153,15 @@ class SceneNavigatorSmokeTest {
 
         @Override
         public Auction createAuctionForSeller(Seller seller, String itemType, String name, String description, double startingPrice, String imagePath) {
+            return createAuctionForSeller(seller, itemType, name, description, startingPrice, imagePath, 5);
+        }
+
+        @Override
+        public Auction createAuctionForSeller(Seller seller, String itemType, String name, String description, double startingPrice, String imagePath, int durationMinutes) {
             Item item = new Item("IN", name, description, startingPrice);
             item.setImagePath(imagePath);
             Auction auction = new Auction("AUN", item, seller);
+            auction.setDurationMinutes(durationMinutes);
             auctions.add(auction);
             return auction;
         }

@@ -21,5 +21,6 @@ public enum RequestType {
     REGISTER_AUTO_BID,
     CANCEL_AUTO_BID,
     GET_AUTO_BID_STATUS,
-    UPDATE_USER
+    UPDATE_USER,
+    UPDATE_ITEM_IMAGE
 }

@@ -5,7 +5,7 @@ public class Item extends Entity {
     private String name;
     private String description;
     private double startingPrice;
-    private String imagePath; // Đường dẫn tới file ảnh (tuyệt đối trên máy local)
+    private String imagePath; // Portable image references separated by semicolon.
 
     public Item() {}
 

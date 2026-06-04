@@ -7,6 +7,7 @@ import com.auction.model.auction.Auction;
 import com.auction.model.user.User;
 import com.auction.presentation.AuctionListViewModel;
 import com.auction.ui.BadgeFactory;
+import com.auction.util.ItemImageHelper;
 import com.auction.util.UiEffects;
 import javafx.collections.FXCollections;
 import javafx.collections.transformation.FilteredList;
@@ -14,14 +15,12 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
@@ -35,6 +34,8 @@ public class AuctionController {
     @FXML private Label actionMessageLabel;
     @FXML private Label selectedAuctionLabel;
     @FXML private Label userInitialsLabel;
+    @FXML private Label sidebarUserNameLabel;
+    @FXML private Label sidebarUserMetaLabel;
 
     @FXML private FlowPane auctionGrid;
 
@@ -87,6 +88,12 @@ public class AuctionController {
                 ? "U"
                 : name.substring(0, 1).toUpperCase(Locale.ROOT));
         com.auction.util.UserImageHelper.setupAvatar(userInitialsLabel, currentUser.getId(), currentUser.getAvatarPath());
+        if (sidebarUserNameLabel != null) {
+            sidebarUserNameLabel.setText(currentUser.getUsername());
+        }
+        if (sidebarUserMetaLabel != null) {
+            sidebarUserMetaLabel.setText(currentUser.getEmail());
+        }
     }
 
     private void configureActionsVisibility() {
@@ -209,18 +216,9 @@ public class AuctionController {
 
         java.util.List<String> imagePaths = a.getItem().getImagePaths();
         String imagePath = imagePaths.isEmpty() ? null : imagePaths.get(0);
-        if (com.auction.util.ImageStorage.exists(imagePath)) {
-            try {
-                ImageView imgView = new ImageView(new Image(new File(imagePath).toURI().toString(), true));
-                imgView.setFitWidth(180);
-                imgView.setFitHeight(110);
-                imgView.setPreserveRatio(true);
-                imageBox.getChildren().add(imgView);
-            } catch (Exception ex) {
-                Label placeholder = new Label("Ảnh");
-                placeholder.getStyleClass().add("auction-card-placeholder");
-                imageBox.getChildren().add(placeholder);
-            }
+        ImageView imgView = ItemImageHelper.createImageView(imagePath, 180, 110);
+        if (imgView != null) {
+            imageBox.getChildren().add(imgView);
         } else {
             Label placeholder = new Label("Ảnh");
             placeholder.getStyleClass().add("auction-card-placeholder");

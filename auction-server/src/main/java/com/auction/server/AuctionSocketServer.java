@@ -179,16 +179,33 @@ public class AuctionSocketServer {
                             request.get("sellerName"),
                             request.get("sellerEmail")
                     );
+                    int durationMinutes = 5;
+                    if (request.get("durationMinutes") != null) {
+                        try {
+                            durationMinutes = Integer.parseInt(request.get("durationMinutes"));
+                        } catch (NumberFormatException e) {
+                            durationMinutes = 5;
+                        }
+                    }
                     Auction created = facade.createAuctionForSeller(
                             seller,
                             request.get("itemType"),
                             request.get("itemName"),
                             request.get("itemDescription"),
                             request.getDouble("startingPrice"),
-                            request.get("imagePath")
+                            request.get("imagePath"),
+                            durationMinutes
                     );
                     BroadcastManager.broadcast(new AuctionEvent("AUCTION_CREATED"));
                     return AuctionResponse.ok(DtoMapper.toDto(created));
+                }
+                case UPDATE_ITEM_IMAGE: {
+                    facade.updateItemImagePath(
+                            request.get("itemId"),
+                            request.get("imagePath")
+                    );
+                    BroadcastManager.broadcast(new AuctionEvent("AUCTION_IMAGE_UPDATED"));
+                    return AuctionResponse.ok();
                 }
                 case START_AUCTION: {
                     facade.startAuction(request.get("auctionId"));

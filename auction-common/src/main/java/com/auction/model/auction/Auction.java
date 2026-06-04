@@ -27,9 +27,9 @@ public class Auction extends Entity {
     private final List<BidTransaction> bids;
     private Bidder winner;
     private final List<BidObserver> bidObservers;
-    // stateLock bảo vệ các thay đổi trạng thái và currentPrice bên trong cùng một auction.
     private final ReentrantLock stateLock;
     private java.time.LocalDateTime endTime;
+    private int durationMinutes = 5;
 
     public Auction() {
         this(null, null, null);
@@ -46,6 +46,7 @@ public class Auction extends Entity {
         this.bidObservers = new CopyOnWriteArrayList<>();
         this.stateLock = new ReentrantLock();
         this.endTime = java.time.LocalDateTime.now().plusMinutes(5);
+        this.durationMinutes = 5;
     }
 
     public void start() {
@@ -53,6 +54,7 @@ public class Auction extends Entity {
         try {
             if (status == AuctionStatus.OPEN) {
                 status = AuctionStatus.RUNNING;
+                this.endTime = java.time.LocalDateTime.now().plusMinutes(durationMinutes);
                 return;
             }
             throw new AuctionException("Không thể bắt đầu phiên đấu giá khi đang ở trạng thái: " + status);
@@ -179,6 +181,14 @@ public class Auction extends Entity {
 
     public void setEndTime(java.time.LocalDateTime endTime) {
         this.endTime = endTime;
+    }
+
+    public int getDurationMinutes() {
+        return durationMinutes;
+    }
+
+    public void setDurationMinutes(int durationMinutes) {
+        this.durationMinutes = durationMinutes;
     }
 
     /**

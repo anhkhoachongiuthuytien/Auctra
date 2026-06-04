@@ -54,11 +54,17 @@ public class AuctionServerFacade {
 
     public Auction createAuctionForSeller(Seller seller, String itemType, String name, String description,
                                           double startingPrice, String imagePath) {
+        return createAuctionForSeller(seller, itemType, name, description, startingPrice, imagePath, 5);
+    }
+
+    public Auction createAuctionForSeller(Seller seller, String itemType, String name, String description,
+                                          double startingPrice, String imagePath, int durationMinutes) {
         return serverContext.getSellerService().createAuction(
                 serverContext.getSellerService().createItem(
                         com.auction.enums.ItemType.fromString(itemType),
                         name, description, startingPrice, imagePath),
-                seller
+                seller,
+                durationMinutes
         );
     }
 
@@ -80,6 +86,10 @@ public class AuctionServerFacade {
 
     public void placeBid(String auctionId, Bidder bidder, double amount) {
         serverContext.getBidService().placeBid(auctionId, bidder, amount);
+    }
+
+    public void updateItemImagePath(String itemId, String imagePath) {
+        serverContext.getSellerService().updateItemImagePath(itemId, imagePath);
     }
 
     public List<User> listUsers() {

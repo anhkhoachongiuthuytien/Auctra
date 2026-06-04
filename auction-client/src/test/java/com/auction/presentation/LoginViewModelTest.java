@@ -57,6 +57,74 @@ class LoginViewModelTest {
         assertTrue(result.message().contains("không khớp"));
     }
 
+    @Test
+    void testLoginSuccess() {
+        viewModel.register("bidder", "bidder@test.com", PASSWORD, PASSWORD, "Bidder");
+        LoginViewModel.LoginResult result = viewModel.login("bidder@test.com", PASSWORD);
+        assertTrue(result.success());
+        assertNotNull(result.user());
+        assertEquals("bidder", result.user().getUsername());
+    }
+
+    @Test
+    void testLoginFailure() {
+        LoginViewModel.LoginResult result = viewModel.login("nonexist@test.com", PASSWORD);
+        assertFalse(result.success());
+        assertNotNull(result.message());
+        assertFalse(result.message().isBlank());
+    }
+
+    @Test
+    void testRegisterNullRoleFails() {
+        LoginViewModel.LoginResult result = viewModel.register("user", "user@test.com", PASSWORD, PASSWORD, null);
+        assertFalse(result.success());
+        assertEquals("Vui lòng chọn loại tài khoản.", result.message());
+
+        LoginViewModel.LoginResult result2 = viewModel.register("user", "user@test.com", PASSWORD, PASSWORD, "  ");
+        assertFalse(result2.success());
+        assertEquals("Vui lòng chọn loại tài khoản.", result2.message());
+    }
+
+    @Test
+    void testRegisterFailure() {
+        viewModel.register("bidder1", "bidder@test.com", PASSWORD, PASSWORD, "Bidder");
+        LoginViewModel.LoginResult result = viewModel.register("bidder2", "bidder@test.com", PASSWORD, PASSWORD, "Bidder");
+        assertFalse(result.success());
+    }
+
+    @Test
+    void testGetAvailableRegistrationRoles() {
+        List<String> roles = viewModel.getAvailableRegistrationRoles();
+        assertEquals(2, roles.size());
+        assertTrue(roles.contains("Bidder"));
+        assertTrue(roles.contains("Seller"));
+    }
+
+    @Test
+    void testGetDemoAccountsMessage() {
+        assertNotNull(viewModel.getDemoAccountsMessage());
+    }
+
+    @Test
+    void testResetPasswordSuccess() {
+        LoginViewModel.LoginResult result = viewModel.resetPassword("bidder@test.com", "bidder", PASSWORD, PASSWORD);
+        assertTrue(result.success());
+    }
+
+    @Test
+    void testResetPasswordConfirmPasswordMismatch() {
+        LoginViewModel.LoginResult result = viewModel.resetPassword("bidder@test.com", "bidder", PASSWORD, "diff");
+        assertFalse(result.success());
+        assertEquals("Mật khẩu xác nhận không khớp.", result.message());
+    }
+
+    @Test
+    void testResetPasswordFailure() {
+        LoginViewModel.LoginResult result = viewModel.resetPassword("fail@test.com", "bidder", PASSWORD, PASSWORD);
+        assertFalse(result.success());
+        assertEquals("Lỗi đặt lại mật khẩu", result.message());
+    }
+
     private static final class TestGateway implements AuctionClientGateway {
         private final AuthService authService;
 
@@ -84,7 +152,9 @@ class LoginViewModelTest {
 
         @Override
         public void resetPassword(String email, String username, String newPassword) {
-            throw new UnsupportedOperationException();
+            if ("fail@test.com".equalsIgnoreCase(email)) {
+                throw new com.auction.exception.AuctionException("Lỗi đặt lại mật khẩu");
+            }
         }
 
         @Override
@@ -116,6 +186,19 @@ class LoginViewModelTest {
                 String description,
                 double startingPrice,
                 String imagePath
+        ) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public com.auction.model.auction.Auction createAuctionForSeller(
+                com.auction.model.user.Seller seller,
+                String itemType,
+                String name,
+                String description,
+                double startingPrice,
+                String imagePath,
+                int durationMinutes
         ) {
             throw new UnsupportedOperationException();
         }

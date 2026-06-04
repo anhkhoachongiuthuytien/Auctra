@@ -27,6 +27,15 @@ public class AuctionDto implements Serializable {
     private String winnerEmail;
     private List<BidDto> bids;
     private String endTime;
+    private int durationMinutes;
+
+    public int getDurationMinutes() {
+        return durationMinutes;
+    }
+
+    public void setDurationMinutes(int durationMinutes) {
+        this.durationMinutes = durationMinutes;
+    }
 
     public String getEndTime() {
         return endTime;

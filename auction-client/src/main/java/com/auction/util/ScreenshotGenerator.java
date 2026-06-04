@@ -44,6 +44,7 @@ public class ScreenshotGenerator extends Application {
         @Override public List<Auction> listAuctionsForSeller(String sellerId) { return new ArrayList<>(); }
         @Override public Auction createAuctionForSeller(Seller seller, String itemType, String name, String description, double startingPrice) { return null; }
         @Override public Auction createAuctionForSeller(Seller seller, String itemType, String name, String description, double startingPrice, String imagePath) { return null; }
+        @Override public Auction createAuctionForSeller(Seller seller, String itemType, String name, String description, double startingPrice, String imagePath, int durationMinutes) { return null; }
         @Override public void startAuction(String auctionId) {}
         @Override public void finishAuction(String auctionId) {}
         @Override public void cancelAuction(String auctionId) {}

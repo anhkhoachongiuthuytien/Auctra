@@ -35,6 +35,8 @@ public class ProfileController {
     @FXML private Label profileAvatarStatusValue;
     @FXML private Label navBrandLabel;
     @FXML private VBox metaRowsContainer;
+    @FXML private Label sidebarUserNameLabel;
+    @FXML private Label sidebarUserMetaLabel;
 
     // Nav items (giữ để highlight active)
     @FXML private javafx.scene.control.Button navHome;
@@ -64,6 +66,12 @@ public class ProfileController {
         userRoleLabel.setText(currentUser.getClass().getSimpleName());
         userIdLabel.setText(currentUser.getId());
         updateProfileStatus(currentUser);
+        if (sidebarUserNameLabel != null) {
+            sidebarUserNameLabel.setText(currentUser.getUsername());
+        }
+        if (sidebarUserMetaLabel != null) {
+            sidebarUserMetaLabel.setText(currentUser.getEmail());
+        }
 
         configureRoleAwareNavigation();
 
@@ -375,6 +383,12 @@ public class ProfileController {
         userRoleLabel.setText(user.getClass().getSimpleName());
         userIdLabel.setText(user.getId());
         updateProfileStatus(user);
+        if (sidebarUserNameLabel != null) {
+            sidebarUserNameLabel.setText(user.getUsername());
+        }
+        if (sidebarUserMetaLabel != null) {
+            sidebarUserMetaLabel.setText(user.getEmail());
+        }
     }
 
     private void updateProfileStatus(User user) {

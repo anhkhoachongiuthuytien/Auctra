@@ -5,6 +5,7 @@ import com.auction.model.item.Art;
 import com.auction.model.item.Electronics;
 import com.auction.model.item.Item;
 import com.auction.model.item.Vehicle;
+import com.auction.model.item.Other;
 
 public class ItemFactory {
     public static Item createItem(ItemType type, String id, String name, String description, double startingPrice) {
@@ -19,6 +20,8 @@ public class ItemFactory {
                 return new Electronics(id, name, description, startingPrice);
             case VEHICLE:
                 return new Vehicle(id, name, description, startingPrice);
+            case OTHER:
+                return new Other(id, name, description, startingPrice);
             default:
                 throw new IllegalArgumentException("Unsupported item type: " + type);
         }

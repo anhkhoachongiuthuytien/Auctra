@@ -128,6 +128,7 @@ public final class DtoMapper {
         if (auction.getEndTime() != null) {
             dto.setEndTime(auction.getEndTime().toString());
         }
+        dto.setDurationMinutes(auction.getDurationMinutes());
 
         return dto;
     }
@@ -167,6 +168,7 @@ public final class DtoMapper {
                 restoredBids,
                 endTime
         );
+        auction.setDurationMinutes(dto.getDurationMinutes());
 
         return auction;
     }
@@ -205,8 +207,7 @@ public final class DtoMapper {
         return "Electronics";
     }
 
-    private static Item createItem(String typeName, String id, String name, String desc,
-                                   double startingPrice, String imagePath) {
+    private static Item createItem(String typeName, String id, String name, String desc,double startingPrice, String imagePath) {
         Item item;
         if ("Art".equalsIgnoreCase(typeName)) {
             item = new Art(id, name, desc, startingPrice);

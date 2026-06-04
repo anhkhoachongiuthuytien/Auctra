@@ -5,6 +5,7 @@ import com.auction.model.user.Bidder;
 import com.auction.model.user.Seller;
 import com.auction.model.user.User;
 import com.auction.server.AuctionServerFacade;
+import com.auction.util.ItemImageMigrationHelper;
 import javafx.application.Platform;
 
 import java.util.List;
@@ -38,12 +39,16 @@ public class LocalAuctionClientGateway implements AuctionClientGateway {
 
     @Override
     public List<Auction> listAuctions() {
-        return serverFacade.listAuctions();
+        List<Auction> auctions = serverFacade.listAuctions();
+        ItemImageMigrationHelper.migrateLocalImagePaths(auctions, this);
+        return auctions;
     }
 
     @Override
     public List<Auction> listAuctionsForSeller(String sellerId) {
-        return serverFacade.listAuctionsForSeller(sellerId);
+        List<Auction> auctions = serverFacade.listAuctionsForSeller(sellerId);
+        ItemImageMigrationHelper.migrateLocalImagePaths(auctions, this);
+        return auctions;
     }
 
     @Override
@@ -59,6 +64,20 @@ public class LocalAuctionClientGateway implements AuctionClientGateway {
         Auction auction = serverFacade.createAuctionForSeller(seller, itemType, name, description, startingPrice, imagePath);
         fireLocalUpdate();
         return auction;
+    }
+
+    @Override
+    public Auction createAuctionForSeller(Seller seller, String itemType, String name, String description,
+                                          double startingPrice, String imagePath, int durationMinutes) {
+        Auction auction = serverFacade.createAuctionForSeller(seller, itemType, name, description, startingPrice, imagePath, durationMinutes);
+        fireLocalUpdate();
+        return auction;
+    }
+
+    @Override
+    public void updateItemImagePath(String itemId, String imagePath) {
+        serverFacade.updateItemImagePath(itemId, imagePath);
+        fireLocalUpdate();
     }
 
     @Override

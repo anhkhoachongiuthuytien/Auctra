@@ -10,6 +10,7 @@ import com.auction.protocol.AuctionResponse;
 import com.auction.protocol.DtoMapper;
 import com.auction.protocol.RequestType;
 import com.auction.protocol.UserDto;
+import com.auction.util.ItemImageMigrationHelper;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -191,6 +192,7 @@ public class SocketAuctionClientGateway implements AuctionClientGateway {
         for (AuctionDto dto : dtos) {
             auctions.add(DtoMapper.toAuction(dto));
         }
+        ItemImageMigrationHelper.migrateLocalImagePaths(auctions, this);
         return auctions;
     }
 
@@ -205,6 +207,7 @@ public class SocketAuctionClientGateway implements AuctionClientGateway {
         for (AuctionDto dto : dtos) {
             auctions.add(DtoMapper.toAuction(dto));
         }
+        ItemImageMigrationHelper.migrateLocalImagePaths(auctions, this);
         return auctions;
     }
 
@@ -217,6 +220,12 @@ public class SocketAuctionClientGateway implements AuctionClientGateway {
     @Override
     public Auction createAuctionForSeller(Seller seller, String itemType, String name,
                                           String description, double startingPrice, String imagePath) {
+        return createAuctionForSeller(seller, itemType, name, description, startingPrice, imagePath, 5);
+    }
+
+    @Override
+    public Auction createAuctionForSeller(Seller seller, String itemType, String name,
+                                          String description, double startingPrice, String imagePath, int durationMinutes) {
         AuctionRequest req = new AuctionRequest(RequestType.CREATE_AUCTION)
                 .put("sellerId", seller.getId())
                 .put("sellerName", seller.getUsername())
@@ -225,9 +234,18 @@ public class SocketAuctionClientGateway implements AuctionClientGateway {
                 .put("itemName", name)
                 .put("itemDescription", description)
                 .put("startingPrice", String.valueOf(startingPrice))
-                .put("imagePath", imagePath);
+                .put("imagePath", imagePath)
+                .put("durationMinutes", String.valueOf(durationMinutes));
         AuctionResponse resp = send(req);
         return DtoMapper.toAuction((AuctionDto) resp.getData());
+    }
+
+    @Override
+    public void updateItemImagePath(String itemId, String imagePath) {
+        AuctionRequest req = new AuctionRequest(RequestType.UPDATE_ITEM_IMAGE)
+                .put("itemId", itemId)
+                .put("imagePath", imagePath);
+        send(req);
     }
 
     @Override

@@ -10,7 +10,7 @@
     <top>
         <HBox alignment="CENTER_LEFT" spacing="20.0" styleClass="admin-top-nav">
             <padding><Insets top="12" right="24" bottom="12" left="24"/></padding>
-            <HBox alignment="CENTER_LEFT" spacing="10" prefWidth="220">
+            <HBox alignment="CENTER_LEFT" spacing="10" prefWidth="220" onMouseClicked="#goToHome" style="-fx-cursor: hand;">
                 <StackPane styleClass="brand-mark">
                     <Label styleClass="brand-mark-text" text="A"/>
                 </StackPane>
@@ -39,9 +39,9 @@
             <Button fx:id="navProfile" styleClass="nav-link-active" mnemonicParsing="false"
                     onAction="#goToProfile" text="Tài khoản" alignment="BASELINE_LEFT" maxWidth="Infinity"/>
             <Region VBox.vgrow="ALWAYS"/>
-            <VBox styleClass="sidebar-user-card" spacing="3">
-                <Label styleClass="sidebar-user-name" text="Hồ sơ cá nhân"/>
-                <Label styleClass="sidebar-user-meta" text="Thông tin tài khoản"/>
+            <VBox styleClass="sidebar-user-card" spacing="3" onMouseClicked="#goToHome" style="-fx-cursor: hand;">
+                <Label fx:id="sidebarUserNameLabel" styleClass="sidebar-user-name" text="Hồ sơ cá nhân"/>
+                <Label fx:id="sidebarUserMetaLabel" styleClass="sidebar-user-meta" text="Thông tin tài khoản"/>
             </VBox>
             <Button styleClass="nav-link" mnemonicParsing="false"
                     onAction="#handleLogout" text="Đăng xuất" alignment="BASELINE_LEFT" maxWidth="Infinity"/>
@@ -52,7 +52,7 @@
         <VBox spacing="0" styleClass="admin-main-bg">
             <HBox alignment="CENTER_LEFT" spacing="8" styleClass="admin-content-header">
                 <padding><Insets top="16" right="32" bottom="16" left="32"/></padding>
-                <Label styleClass="admin-breadcrumb-text" text="Trang chủ"/>
+                <Label styleClass="admin-breadcrumb-text" text="Trang chủ" onMouseClicked="#goToHome" style="-fx-cursor: hand;"/>
                 <Label styleClass="admin-breadcrumb-sep" text="/"/>
                 <Label styleClass="admin-breadcrumb-active" text="Tài khoản"/>
             </HBox>

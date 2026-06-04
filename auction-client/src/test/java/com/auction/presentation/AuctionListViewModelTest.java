@@ -100,6 +100,12 @@ class AuctionListViewModelTest {
         }
 
         @Override
+        public Auction createAuctionForSeller(Seller seller, String itemType, String name, String description,
+                                              double startingPrice, String imagePath, int durationMinutes) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
         public void startAuction(String auctionId) {
             auctionService.startAuction(auctionId);
         }

@@ -7,6 +7,7 @@ import com.auction.model.auction.Auction;
 import com.auction.model.user.Seller;
 import com.auction.ui.UIAnimations;
 import com.auction.util.ImageStorage;
+import com.auction.util.ItemImageHelper;
 import com.auction.util.UiEffects;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -40,6 +41,8 @@ public class SellerController {
     @FXML private Label welcomeLabel;
     @FXML private Label actionMessageLabel;
     @FXML private Label userInitialsLabel;
+    @FXML private Label sidebarUserNameLabel;
+    @FXML private Label sidebarUserMetaLabel;
     @FXML private Label statSellerTotal;
     @FXML private Label statSellerRunning;
     @FXML private Label statSellerFinished;
@@ -49,6 +52,7 @@ public class SellerController {
     @FXML private TextField itemNameField;
     @FXML private TextField itemDescriptionField;
     @FXML private TextField startingPriceField;
+    @FXML private TextField durationField;
 
     @FXML private FlowPane imagePreviewContainer;
     @FXML private VBox dropZone;
@@ -74,6 +78,12 @@ public class SellerController {
         if (userInitialsLabel != null && currentSeller.getUsername() != null && !currentSeller.getUsername().isBlank()) {
             userInitialsLabel.setText(currentSeller.getUsername().substring(0, 1).toUpperCase(Locale.ROOT));
             com.auction.util.UserImageHelper.setupAvatar(userInitialsLabel, currentSeller.getId(), currentSeller.getAvatarPath());
+        }
+        if (sidebarUserNameLabel != null) {
+            sidebarUserNameLabel.setText(currentSeller.getUsername());
+        }
+        if (sidebarUserMetaLabel != null) {
+            sidebarUserMetaLabel.setText(currentSeller.getEmail());
         }
         itemTypeComboBox.setItems(FXCollections.observableArrayList("Art", "Electronics", "Vehicle", "Other"));
         itemTypeComboBox.getSelectionModel().select("Electronics");
@@ -245,28 +255,40 @@ public class SellerController {
     // ===== Create auction =====
     @FXML
     private void handleCreateAuction() {
-        List<String> savedPaths = new java.util.ArrayList<>();
+        List<String> imageReferences = new java.util.ArrayList<>();
         for (Path file : pendingImageFiles) {
             try {
-                String savedPath = ImageStorage.copyIntoStorage(file);
-                savedPaths.add(savedPath);
+                String imageReference = ImageStorage.toPortableReference(file);
+                imageReferences.add(imageReference);
             } catch (IOException ex) {
                 UiEffects.showToast(rootPane, "Không lưu được ảnh: " + ex.getMessage(),
                         UiEffects.ToastType.ERROR, 2400);
                 return;
             }
         }
-        String imagePath = savedPaths.isEmpty() ? null : String.join(";", savedPaths);
+        String imagePath = imageReferences.isEmpty() ? null : String.join(";", imageReferences);
 
         try {
             double startingPrice = Double.parseDouble(startingPriceField.getText());
+            int durationMinutes = 5;
+            if (durationField != null && durationField.getText() != null && !durationField.getText().trim().isEmpty()) {
+                try {
+                    durationMinutes = Integer.parseInt(durationField.getText().trim());
+                    if (durationMinutes <= 0) {
+                        durationMinutes = 5;
+                    }
+                } catch (NumberFormatException e) {
+                    durationMinutes = 5;
+                }
+            }
             Auction auction = appContext.getGateway().createAuctionForSeller(
                     currentSeller,
                     itemTypeComboBox.getValue(),
                     itemNameField.getText(),
                     itemDescriptionField.getText(),
                     startingPrice,
-                    imagePath
+                    imagePath,
+                    durationMinutes
             );
             clearItemForm();
             refreshAuctions();
@@ -435,20 +457,9 @@ public class SellerController {
 
         java.util.List<String> imagePaths = a.getItem().getImagePaths();
         String imagePath = imagePaths.isEmpty() ? null : imagePaths.get(0);
-        if (com.auction.util.ImageStorage.exists(imagePath)) {
-            try {
-                javafx.scene.image.ImageView imgView = new javafx.scene.image.ImageView(
-                    new javafx.scene.image.Image(new File(imagePath).toURI().toString(), true)
-                );
-                imgView.setFitWidth(180);
-                imgView.setFitHeight(110);
-                imgView.setPreserveRatio(true);
-                imageBox.getChildren().add(imgView);
-            } catch (Exception ex) {
-                Label placeholder = new Label("Ảnh");
-                placeholder.getStyleClass().add("auction-card-placeholder");
-                imageBox.getChildren().add(placeholder);
-            }
+        ImageView imgView = ItemImageHelper.createImageView(imagePath, 180, 110);
+        if (imgView != null) {
+            imageBox.getChildren().add(imgView);
         } else {
             Label placeholder = new Label("Ảnh");
             placeholder.getStyleClass().add("auction-card-placeholder");
@@ -572,6 +583,9 @@ public class SellerController {
         itemNameField.clear();
         itemDescriptionField.clear();
         startingPriceField.clear();
+        if (durationField != null) {
+            durationField.setText("5");
+        }
         itemTypeComboBox.getSelectionModel().select("Electronics");
         pendingImageFiles.clear();
         updateImagePreviews();

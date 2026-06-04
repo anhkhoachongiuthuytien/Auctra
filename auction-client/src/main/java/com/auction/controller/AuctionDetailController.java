@@ -8,6 +8,7 @@ import com.auction.model.auction.BidTransaction;
 import com.auction.model.user.User;
 import com.auction.presentation.AuctionListViewModel;
 import com.auction.ui.UIAnimations;
+import com.auction.util.ItemImageHelper;
 import com.auction.util.UiEffects;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -171,35 +172,27 @@ public class AuctionDetailController {
                 thumbnailContainer.setManaged(true);
                 thumbnailContainer.setVisible(true);
                 for (String path : imagePaths) {
-                    if (com.auction.util.ImageStorage.exists(path)) {
-                        try {
-                            javafx.scene.image.ImageView thumbView = new javafx.scene.image.ImageView(
-                                    new javafx.scene.image.Image(new java.io.File(path).toURI().toString(), 60, 60, true, true)
-                            );
-                            thumbView.setPreserveRatio(true);
+                    javafx.scene.image.ImageView thumbView = ItemImageHelper.createImageView(path, 60, 60);
+                    if (thumbView != null) {
+                        StackPane thumbBox = new StackPane(thumbView);
+                        thumbBox.getStyleClass().add("image-preview-box");
+                        thumbBox.setPrefSize(64, 64);
+                        thumbBox.setMinSize(64, 64);
+                        thumbBox.setCursor(javafx.scene.Cursor.HAND);
 
-                            StackPane thumbBox = new StackPane(thumbView);
-                            thumbBox.getStyleClass().add("image-preview-box");
-                            thumbBox.setPrefSize(64, 64);
-                            thumbBox.setMinSize(64, 64);
-                            thumbBox.setCursor(javafx.scene.Cursor.HAND);
-
-                            if (path.equals(firstImage)) {
-                                thumbBox.getStyleClass().add("detail-thumbnail-selected");
-                            }
-
-                            thumbBox.setOnMouseClicked(e -> {
-                                setMainImage(path);
-                                for (javafx.scene.Node node : thumbnailContainer.getChildren()) {
-                                    node.getStyleClass().remove("detail-thumbnail-selected");
-                                }
-                                thumbBox.getStyleClass().add("detail-thumbnail-selected");
-                            });
-
-                            thumbnailContainer.getChildren().add(thumbBox);
-                        } catch (Exception ex) {
-                            // ignore broken thumbnail
+                        if (path.equals(firstImage)) {
+                            thumbBox.getStyleClass().add("detail-thumbnail-selected");
                         }
+
+                        thumbBox.setOnMouseClicked(e -> {
+                            setMainImage(path);
+                            for (javafx.scene.Node node : thumbnailContainer.getChildren()) {
+                                node.getStyleClass().remove("detail-thumbnail-selected");
+                            }
+                            thumbBox.getStyleClass().add("detail-thumbnail-selected");
+                        });
+
+                        thumbnailContainer.getChildren().add(thumbBox);
                     }
                 }
             } else if (thumbnailContainer != null) {
@@ -531,16 +524,10 @@ public class AuctionDetailController {
     }
 
     private void setMainImage(String path) {
-        if (com.auction.util.ImageStorage.exists(path)) {
-            try {
-                itemImageView.setImage(new javafx.scene.image.Image(
-                        new java.io.File(path).toURI().toString(),
-                        440, 340, true, true));
-                imagePlaceholderLabel.setVisible(false);
-            } catch (Exception ex) {
-                itemImageView.setImage(null);
-                imagePlaceholderLabel.setVisible(true);
-            }
+        javafx.scene.image.Image image = ItemImageHelper.load(path, 440, 340);
+        if (image != null && !image.isError()) {
+            itemImageView.setImage(image);
+            imagePlaceholderLabel.setVisible(false);
         } else {
             itemImageView.setImage(null);
             imagePlaceholderLabel.setVisible(true);
