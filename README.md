@@ -52,7 +52,7 @@ java -jar auction-server/target/auction-server.jar
 ```
 
 ### Bước 3: Khởi chạy Client
-Mở một cửa sổ terminal mới (vẫn đứng tại thư mục gốc dự án `d:\BaitaplonTest`) và chọn một trong các chế độ chạy sau:
+Mở một cửa sổ terminal mới (vẫn đứng tại thư mục gốc dự án) và chọn một trong các chế độ chạy sau:
 
 *   **Chế độ SOCKET (Kết nối tới Server đang chạy)**:
   *   **Nếu dùng Windows PowerShell**:
