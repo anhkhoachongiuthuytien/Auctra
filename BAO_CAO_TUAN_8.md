@@ -44,6 +44,7 @@ Theo tiêu chí của tuần 8, hệ thống cần:
 
 Nội dung chính:
 
+
 - `AuthService` kiểm tra username/email rỗng trước khi register và login
 - `BidService` kiểm tra:
   - `auctionId` không rỗng
