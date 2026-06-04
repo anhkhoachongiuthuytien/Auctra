@@ -4,6 +4,7 @@ public enum ItemType {
     ART("Art"),
     ELECTRONICS("Electronics"),
     VEHICLE("Vehicle"),
+    FASHION("Fashion"), // <-- THÊM DÒNG NÀY VÀO ĐÂY
     OTHER("Other");
 
     private final String displayName;

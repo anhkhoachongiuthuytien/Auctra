@@ -85,8 +85,8 @@ public class ServerContext {
         Item car = sellerService.createItem("Vehicle", "Used Sedan", "Auction state machine sample", 8000.0);
         Item art = sellerService.createItem("Art", "Landscape Painting", "Observer pattern sample item", 500.0);
         Item phone = sellerService.createItem("Electronics", "iPhone 15 Pro Max", "Likenew titanium gray 256GB with original box", 999.0);
-        Item watch = sellerService.createItem("Fashion", "Luxury Chronograph", "Mechanical self-winding wrist watch with sapphire crystal", 1200.0);
-        Item book = sellerService.createItem("Collectible", "First Edition Novel", "Rare signed copy of classic literature in excellent condition", 300.0);
+        Item watch = sellerService.createItem("Other", "Luxury Chronograph", "Mechanical self-winding wrist watch with sapphire crystal", 1200.0);
+        Item book = sellerService.createItem("Other", "First Edition Novel", "Rare signed copy of classic literature in excellent condition", 300.0);
 
         Auction.addGlobalObserver(new ConsoleBidObserver());
 
