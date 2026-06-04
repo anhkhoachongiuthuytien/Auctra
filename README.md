@@ -36,30 +36,43 @@ d:\BaitaplonTest
 ---
 
 ## 3. Hướng Dẫn Chạy Chương Trình
+> Luôn khởi chạy **Server trước**, sau đó mới khởi chạy **Client**.
 
-**khởi động Server trước**, sau đó mới **khởi động Client**.
-
-### Bước 1: Build toàn bộ dự án
-Mở terminal tại thư mục gốc của dự án (`d:\BaitaplonTest`) và chạy câu lệnh sau để biên dịch dự án và bỏ qua các bài test:
+### Bước 1: Biên dịch và đóng gói toàn bộ dự án
+Chạy lệnh sau để dọn dẹp, tải các thư viện cần thiết, biên dịch mã nguồn và bỏ qua các bài test để tăng tốc:
 ```bash
-mvn clean install -DskipTests
+mvn clean package -DskipTests
 ```
+*Lưu ý: Lệnh này sẽ tạo ra file đóng gói `auction-server.jar` tại đường dẫn `auction-server/target/auction-server.jar`.*
 
 ### Bước 2: Khởi chạy Server
-Server mặc định sẽ khởi động và lắng nghe kết nối tại cổng `9999`.
-- **Trên Windows / Linux / macOS (Sử dụng dòng lệnh)**:
-  ```bash
-  java -jar auction-server/target/auction-server.jar
-  ```
+Khởi chạy tiến trình Server để mở cổng kết nối TCP (mặc định cổng 9999):
+```bash
+java -jar auction-server/target/auction-server.jar
+```
 
 ### Bước 3: Khởi chạy Client
-Client sẽ khởi động và kết nối trực tiếp đến Socket Server tại `localhost:9999`.
+Mở một cửa sổ terminal mới (vẫn đứng tại thư mục gốc dự án `d:\BaitaplonTest`) và chọn một trong các chế độ chạy sau:
 
-- **Trên Windows / Linux / macOS (Sử dụng dòng lệnh)**:
-  ```bash
-  mvn -pl auction-client javafx:run -Djavafx.args="--socket localhost 9999"
-  ```
-  *(Lưu ý: Đối với một số shell trên macOS hoặc Linux, bạn có thể cần bọc tham số args trong nháy đơn: `mvn -pl auction-client javafx:run '-Djavafx.args=--socket localhost 9999'`)*
+*   **Chế độ SOCKET (Kết nối tới Server đang chạy)**:
+  *   **Nếu dùng Windows PowerShell**:
+      ```powershell
+      mvn -pl auction-client javafx:run '-Djavafx.args=--socket localhost 9999'
+      ```
+      *(Lưu ý: Bắt buộc phải dùng dấu nháy đơn `'` bao quanh tham số để PowerShell không hiểu sai cú pháp).*
+  *   **Nếu dùng Windows CMD (Command Prompt)**:
+      ```cmd
+      mvn -pl auction-client javafx:run -Djavafx.args="--socket localhost 9999"
+      ```
+  *   **Nếu dùng Linux / macOS (Bash / Zsh)**:
+      ```bash
+      mvn -pl auction-client javafx:run '-Djavafx.args=--socket localhost 9999'
+      ```
+
+*   **Chế độ LOCAL (Chạy offline, tự động tích hợp DB trong tiến trình, không cần bật Server)**:
+    ```bash
+    mvn -pl auction-client javafx:run
+    ```
 
 ---
 
