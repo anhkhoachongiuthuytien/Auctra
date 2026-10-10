@@ -17,15 +17,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 class FxmlLoadTest {
     @BeforeAll
     static void startToolkit() throws Exception {
-        CountDownLatch latch = new CountDownLatch(1);
-        try {
-            Platform.startup(latch::countDown);
-        } catch (IllegalStateException alreadyStarted) {
-            latch.countDown();
-        }
-        if (!latch.await(10, TimeUnit.SECONDS)) {
-            fail("JavaFX toolkit did not start");
-        }
+        FxTestToolkit.start();
     }
 
     @Test

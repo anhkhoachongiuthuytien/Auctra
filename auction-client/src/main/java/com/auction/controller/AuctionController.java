@@ -78,7 +78,7 @@ public class AuctionController {
             });
         });
 
-        welcomeLabel.setText(viewModel.getWelcomeMessage(currentUser));
+        welcomeLabel.setText("Phiên đấu giá");
     }
 
     // ===== Role / user setup =====
@@ -97,7 +97,8 @@ public class AuctionController {
     }
 
     private void configureActionsVisibility() {
-        actionMessageLabel.setText("Bấm vào hình ảnh hoặc thẻ sản phẩm để thực hiện đặt giá hoặc xem chi tiết.");
+        actionMessageLabel.setText("");
+        actionMessageLabel.managedProperty().bind(actionMessageLabel.textProperty().isNotEmpty());
     }
 
     // ===== Filter + search =====
@@ -236,7 +237,7 @@ public class AuctionController {
         titleLabel.setWrapText(true);
 
         // Price
-        Label priceLabel = new Label(String.format(Locale.US, "$%,.2f", a.getCurrentPrice()));
+        Label priceLabel = new Label("$ " + String.format(Locale.US, "%,.2f", a.getCurrentPrice()));
         priceLabel.getStyleClass().add("auction-card-price");
 
         // Seller
@@ -246,6 +247,19 @@ public class AuctionController {
         card.getChildren().addAll(imageBox, badgeContainer, titleLabel, priceLabel, sellerLabel);
 
         // Click interaction
+        javafx.scene.control.Button details = new javafx.scene.control.Button("Xem phiên đấu giá");
+        details.getStyleClass().add("button-ghost");
+        details.setMaxWidth(Double.MAX_VALUE);
+        details.setOnAction(e -> { e.consume(); onDetailsClicked(a); });
+        card.getChildren().add(details);
+        card.setFocusTraversable(true);
+        card.setAccessibleRole(javafx.scene.AccessibleRole.BUTTON);
+        card.setAccessibleText("Xem phiên " + a.getItem().getName());
+        card.setOnKeyPressed(e -> {
+            if (e.getCode() == javafx.scene.input.KeyCode.ENTER || e.getCode() == javafx.scene.input.KeyCode.SPACE) {
+                e.consume(); onDetailsClicked(a);
+            }
+        });
         card.setOnMouseClicked(e -> onDetailsClicked(a));
 
         return card;

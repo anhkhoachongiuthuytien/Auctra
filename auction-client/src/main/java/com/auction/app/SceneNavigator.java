@@ -30,13 +30,18 @@ public class SceneNavigator {
     }
 
     private FXMLLoader createLoader(String fxmlPath) {
+        com.auction.client.ClientEventManager.clearListeners();
         FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
         loader.setCharset(java.nio.charset.StandardCharsets.UTF_8);
         return loader;
     }
 
     public void showLogin() throws IOException {
-        appContext.getGateway().logout();
+        try {
+            appContext.getGateway().logout();
+        } catch (com.auction.exception.CommunicationException exception) {
+            // Logout clears the local session in finally; a lost connection must not trap navigation.
+        }
         FXMLLoader loader = createLoader("/fxml/login-view.fxml");
         Parent root = loader.load();
         AuthController controller = loader.getController();
@@ -129,8 +134,6 @@ public class SceneNavigator {
     }
 
     private void setScene(Parent root, String title) {
-        boolean isAuthScreen = title.contains("Đăng nhập") || title.contains("Đăng ký") || title.contains("Đặt lại mật khẩu");
-
         if (stage.getScene() == null) {
             // Lần đầu khởi tạo: Đặt kích thước đủ rộng (1180x760) để thấy hết cả 2 panel
             double width = 1180;
@@ -144,14 +147,7 @@ public class SceneNavigator {
         } else {
             // Tái sử dụng scene hiện tại để tránh giật / nhảy cửa sổ
             Scene scene = stage.getScene();
-            boolean wasAuthScreen = stage.getTitle() != null && (
-                    stage.getTitle().contains("Đăng nhập") || 
-                    stage.getTitle().contains("Đăng ký") || 
-                    stage.getTitle().contains("Đặt lại mật khẩu"));
-
-            // Chuyển qua lại giữa các màn hình giữ nguyên kích thước cửa sổ hiện tại của người dùng
-            // (Đã loại bỏ đoạn code ép kích thước về 460 để không bị lỗi co hẹp)
-            
+            // Preserve the user's window size while changing screens.
             scene.setRoot(root);
             ThemeManager.applySavedTheme(scene);
             ResponsiveManager.attach(scene);
@@ -166,6 +162,6 @@ public class SceneNavigator {
         
         stage.show();
 
-        UIAnimations.slideUpFadeIn(root);
+
     }
 }

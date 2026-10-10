@@ -27,6 +27,11 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+        if (getParameters().getRaw().contains("--screenshots")) {
+            com.auction.util.ScreenshotGenerator.generate(com.auction.util.ScreenshotGenerator.defaultOutput());
+            javafx.application.Platform.exit();
+            return;
+        }
         AppContext appContext = createAppContext();
         SceneNavigator navigator = new SceneNavigator(primaryStage, appContext);
         navigator.showLogin();

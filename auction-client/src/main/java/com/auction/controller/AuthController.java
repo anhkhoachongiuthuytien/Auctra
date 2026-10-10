@@ -30,6 +30,7 @@ public class AuthController {
         this.viewModel = new LoginViewModel(appContext.getGateway());
         if (messageLabel != null) {
             messageLabel.setText("");
+            messageLabel.managedProperty().bind(messageLabel.textProperty().isNotEmpty());
         }
     }
 

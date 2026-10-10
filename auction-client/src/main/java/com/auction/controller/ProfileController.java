@@ -160,8 +160,10 @@ public class ProfileController {
         StackPane overlay = new StackPane();
         overlay.getStyleClass().add("modal-backdrop");
 
-        HBox card = new HBox(24);
-        card.getStyleClass().addAll("google-modal-card", "profile-edit-modal");
+        com.auction.ui.ResponsiveColumns card = new com.auction.ui.ResponsiveColumns();
+        card.setGap(24);
+        card.setBreakpoint(600);
+        card.getStyleClass().add("profile-edit-modal");
         card.setMaxWidth(780);
         card.setPadding(new javafx.geometry.Insets(28));
         StackPane.setAlignment(card, javafx.geometry.Pos.CENTER);
@@ -256,7 +258,16 @@ public class ProfileController {
 
         formColumn.getChildren().addAll(titleLabel, subtitleLabel, fieldsContainer, buttonRow);
         card.getChildren().addAll(avatarColumn, formColumn);
-        overlay.getChildren().add(card);
+        javafx.scene.control.ScrollPane editScroll = new javafx.scene.control.ScrollPane(card);
+        editScroll.setFitToWidth(true);
+        editScroll.setHbarPolicy(javafx.scene.control.ScrollPane.ScrollBarPolicy.NEVER);
+        editScroll.setPrefWidth(760);
+        editScroll.setMaxWidth(760);
+        editScroll.setPrefHeight(480);
+        editScroll.maxHeightProperty().bind(rootPane.heightProperty().subtract(64));
+        editScroll.maxWidthProperty().bind(rootPane.widthProperty().subtract(48));
+        editScroll.getStyleClass().add("profile-edit-scroll");
+        overlay.getChildren().add(editScroll);
         rootPane.getChildren().add(overlay);
         javafx.application.Platform.runLater(usernameField::requestFocus);
 
@@ -279,6 +290,8 @@ public class ProfileController {
         };
 
         cancelBtn.setOnAction(e -> closeModal.run());
+        cancelBtn.setCancelButton(true);
+        saveBtn.setDefaultButton(true);
         overlay.setOnMouseClicked(e -> {
             if (e.getTarget() == overlay) {
                 closeModal.run();
@@ -327,6 +340,7 @@ public class ProfileController {
         box.getStyleClass().add("google-field-container");
         box.setPrefWidth(230);
         Label fieldLabel = new Label(label);
+        fieldLabel.setLabelFor(field);
         fieldLabel.getStyleClass().add("google-field-label");
         field.setMaxWidth(Double.MAX_VALUE);
         box.getChildren().addAll(fieldLabel, field);
@@ -393,15 +407,15 @@ public class ProfileController {
 
     private void updateProfileStatus(User user) {
         if (profileRoleValue != null) {
-            profileRoleValue.setText(user.getClass().getSimpleName());
+            profileRoleValue.setText("Vai trò: " + user.getClass().getSimpleName());
         }
         if (profileEmailStatusValue != null) {
             profileEmailStatusValue.setText(user.getEmail() == null || user.getEmail().isBlank()
-                    ? "Chưa có"
-                    : "Đã liên kết");
+                    ? "Chưa có email đăng nhập"
+                    : "Email đăng nhập đã được lưu");
         }
         if (profileAvatarStatusValue != null) {
-            profileAvatarStatusValue.setText(hasUsableAvatar(user) ? "Đã có ảnh" : "Chưa có ảnh");
+            profileAvatarStatusValue.setText(hasUsableAvatar(user) ? "Đã có ảnh đại diện" : "Chưa có ảnh đại diện");
         }
     }
 

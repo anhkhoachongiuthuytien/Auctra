@@ -8,12 +8,13 @@ public final class BadgeFactory {
     }
 
     public static Label create(AuctionStatus status) {
-        Label label = new Label(status == null ? "" : status.name());
+        Label label = new Label(statusText(status));
         applyStatus(label, status);
         return label;
     }
 
     public static void applyStatus(Label label, AuctionStatus status) {
+        label.setText(statusText(status));
         label.getStyleClass().removeAll("badge", "badge-open", "badge-running",
                 "badge-finished", "badge-paid", "badge-canceled");
         label.getStyleClass().add("badge");
@@ -28,5 +29,16 @@ public final class BadgeFactory {
             case PAID -> "badge-paid";
             case CANCELED -> "badge-canceled";
         });
+    }
+
+    public static String statusText(AuctionStatus status) {
+        if (status == null) return "";
+        return switch (status) {
+            case OPEN -> "Chưa bắt đầu";
+            case RUNNING -> "Đang diễn ra";
+            case FINISHED -> "Đã kết thúc";
+            case PAID -> "Đã thanh toán";
+            case CANCELED -> "Đã hủy";
+        };
     }
 }

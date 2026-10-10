@@ -32,15 +32,23 @@ class SceneNavigatorSmokeTest {
 
     @BeforeAll
     static void startToolkit() throws Exception {
-        CountDownLatch latch = new CountDownLatch(1);
-        try {
-            Platform.startup(latch::countDown);
-        } catch (IllegalStateException alreadyStarted) {
-            latch.countDown();
-        }
-        if (!latch.await(10, TimeUnit.SECONDS)) {
-            fail("JavaFX toolkit did not start");
-        }
+        FxTestToolkit.start();
+    }
+
+    @Test
+    void closingLastWindowKeepsToolkitAvailableForLaterTests() throws Exception {
+        runOnFx(() -> {
+            Stage stage = new Stage();
+            stage.setScene(new javafx.scene.Scene(new javafx.scene.layout.StackPane(), 200, 100));
+            stage.show();
+            stage.close();
+        });
+        // A separate queued action must still execute after the last window closes.
+        runOnFx(() -> {
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
+                    getClass().getResource("/fxml/login-view.fxml"));
+            org.junit.jupiter.api.Assertions.assertNotNull(loader.load());
+        });
     }
 
     @Test

@@ -35,11 +35,23 @@ public class RegisterController {
         this.navigator = navigator;
         this.viewModel = new LoginViewModel(appContext.getGateway());
         roleComboBox.getItems().setAll(viewModel.getAvailableRegistrationRoles());
+        roleComboBox.setConverter(new javafx.util.StringConverter<>() {
+            @Override public String toString(String role) {
+                if (role == null) return "";
+                return switch (role) {
+                    case "Bidder" -> "Người mua — tham gia đặt giá";
+                    case "Seller" -> "Người bán — tạo phiên đấu giá";
+                    default -> role;
+                };
+            }
+            @Override public String fromString(String value) { return value; }
+        });
         roleComboBox.getSelectionModel().select("Bidder");
         registerPasswordField.textProperty().addListener((obs, oldValue, newValue) -> updatePasswordStrength(newValue));
         updatePasswordStrength("");
         if (messageLabel != null) {
             messageLabel.setText("");
+            messageLabel.managedProperty().bind(messageLabel.textProperty().isNotEmpty());
         }
     }
 

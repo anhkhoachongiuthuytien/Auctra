@@ -104,28 +104,24 @@ public class AdminController {
         configureSearch();
         refreshData();
         setupOpsChart();
-        
+
         com.auction.client.ClientEventManager.addListener(() -> {
             javafx.application.Platform.runLater(() -> {
                 try { refreshData(); } catch (Exception e) {}
             });
         });
-        
+
         showInfo("Quản trị viên có thể xem danh sách người dùng và quản lý vòng đời đấu giá.");
     }
 
     private void setupOpsChart() {
-        if (opsChart != null) {
-            XYChart.Series<String, Number> series = new XYChart.Series<>();
-            series.setName("Giao dịch");
-            series.getData().add(new XYChart.Data<>("T1", 120));
-            series.getData().add(new XYChart.Data<>("T2", 280));
-            series.getData().add(new XYChart.Data<>("T3", 190));
-            series.getData().add(new XYChart.Data<>("T4", 450));
-            series.getData().add(new XYChart.Data<>("T5", 340));
-            series.getData().add(new XYChart.Data<>("T6", 520));
-            opsChart.getData().setAll(series);
+        if (opsChart == null) return;
+        XYChart.Series<String, Number> series = new XYChart.Series<>();
+        for (AuctionStatus status : AuctionStatus.values()) {
+            long count = auctionMasterList.stream().filter(a -> a.getStatus() == status).count();
+            series.getData().add(new XYChart.Data<>(BadgeFactory.statusText(status), count));
         }
+        opsChart.getData().setAll(series);
     }
 
     // ========= Section navigation =========
@@ -316,6 +312,10 @@ public class AdminController {
             }
 
             card.getChildren().addAll(avatarPane, nameLabel, emailLabel, roleLabel);
+            Button details = new Button("Xem hồ sơ");
+            details.setMaxWidth(Double.MAX_VALUE);
+            details.setOnAction(event -> { event.consume(); showUserDetailPopup(u); });
+            card.getChildren().add(details);
             card.setOnMouseClicked(e -> showUserDetailPopup(u));
 
             userGrid.getChildren().add(card);
@@ -351,7 +351,7 @@ public class AdminController {
         VBox nameRoleBox = new VBox(6);
         Label nameLbl = new Label(u.getUsername());
         nameLbl.setStyle("-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: -text-primary;");
-        
+
         String role = u.getClass().getSimpleName();
         Label roleLabel = new Label(role.toUpperCase(Locale.ROOT));
         roleLabel.getStyleClass().clear();
@@ -362,17 +362,17 @@ public class AdminController {
         } else {
             roleLabel.getStyleClass().add("role-bidder");
         }
-        
+
         nameRoleBox.getChildren().addAll(nameLbl, roleLabel);
         header.getChildren().addAll(avatarPane, nameRoleBox);
 
         // Information fields
         VBox fieldsContainer = new VBox(2);
         fieldsContainer.setStyle("-fx-background-color: -surface-2; -fx-background-radius: 12; -fx-padding: 8;");
-        
+
         addDetailRow(fieldsContainer, "Mã người dùng", u.getId());
         addDetailRow(fieldsContainer, "Email", u.getEmail());
-        
+
         if (u instanceof com.auction.model.user.Bidder bidder) {
             addDetailRow(fieldsContainer, "Số điện thoại", bidder.getPhoneNumber() != null && !bidder.getPhoneNumber().isBlank() ? bidder.getPhoneNumber() : "Chưa cập nhật");
             addDetailRow(fieldsContainer, "Địa chỉ giao hàng", bidder.getShippingAddress() != null && !bidder.getShippingAddress().isBlank() ? bidder.getShippingAddress() : "Chưa cập nhật");
@@ -386,7 +386,7 @@ public class AdminController {
         // Close Button
         HBox buttonRow = new HBox(12);
         buttonRow.setAlignment(javafx.geometry.Pos.CENTER_RIGHT);
-        
+
         javafx.scene.control.Button closeBtn = new javafx.scene.control.Button("Đóng");
         closeBtn.getStyleClass().addAll("button-primary", "button-row");
         closeBtn.setPrefWidth(100);
@@ -465,6 +465,7 @@ public class AdminController {
         userMasterList.setAll(users);
         auctionMasterList.setAll(auctions);
         updateStats(users, auctions);
+        setupOpsChart();
         renderGrid();
         renderUserGrid();
     }
@@ -564,8 +565,8 @@ public class AdminController {
         // Action Overlay
         VBox overlay = new VBox(8);
         overlay.setAlignment(javafx.geometry.Pos.CENTER);
-        overlay.getStyleClass().add("auction-action-overlay");
-        overlay.setVisible(false);
+        overlay.getStyleClass().add("auction-card-actions");
+        overlay.setVisible(true);
 
         Label overlayTitle = new Label("Thao tác phiên");
         overlayTitle.getStyleClass().add("auction-overlay-title");
@@ -608,23 +609,16 @@ public class AdminController {
             overlay.setVisible(false);
         });
 
-        overlay.getChildren().add(overlayTitle);
+
         if (a.getStatus() == AuctionStatus.OPEN || a.getStatus() == AuctionStatus.RUNNING) {
             overlay.getChildren().add(cancelBtn);
         } else if (a.getStatus() == AuctionStatus.FINISHED) {
             overlay.getChildren().add(paidBtn);
         }
-        overlay.getChildren().addAll(detailBtn, closeBtn);
+        overlay.getChildren().add(detailBtn);
 
-        container.getChildren().addAll(card, overlay);
-
-        // Interaction
-        card.setOnMouseClicked(e -> {
-            selectedAuction = a;
-            hideAllOverlays();
-            overlay.setVisible(true);
-        });
-
+        card.getChildren().add(overlay);
+        container.getChildren().add(card);
         return container;
     }
 

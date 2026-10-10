@@ -32,6 +32,9 @@ public final class UiEffects {
      */
     public static void showToast(StackPane root, String message, ToastType type, long durationMs) {
         Label toast = new Label(message);
+        toast.setWrapText(true);
+        toast.setMaxWidth(440);
+        toast.setMouseTransparent(true);
         toast.getStyleClass().add("toast");
         switch (type) {
             case SUCCESS -> toast.getStyleClass().add("toast-success");
@@ -168,17 +171,20 @@ public final class UiEffects {
     }
 
     /**
-     * Chạy một action "giả lập async" với spinner overlay (cho hiệu ứng loading).
+     * Give the overlay a paint opportunity and always remove it after the UI action.
      */
     public static void runWithLoading(StackPane root, long minShowMs, Runnable action, Runnable onDone) {
         Runnable hide = showLoadingOverlay(root);
-        PauseTransition pause = new PauseTransition(Duration.millis(minShowMs));
-        pause.setOnFinished(e -> {
-            action.run();
-            hide.run();
-            if (onDone != null) Platform.runLater(onDone);
+        Platform.runLater(() -> {
+            try {
+                action.run();
+                if (onDone != null) onDone.run();
+            } catch (RuntimeException exception) {
+                showToast(root, exception.getMessage() == null ? "Không tải được dữ liệu. Hãy thử lại." : exception.getMessage(), ToastType.ERROR, 3000);
+            } finally {
+                hide.run();
+            }
         });
-        pause.play();
     }
 }
 

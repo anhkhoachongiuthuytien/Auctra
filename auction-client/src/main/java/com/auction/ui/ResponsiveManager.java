@@ -7,9 +7,6 @@ import javafx.scene.Scene;
 import javafx.scene.layout.Region;
 
 public final class ResponsiveManager {
-    private static final double COLLAPSE_WIDTH = 900;
-    private static final double SIDEBAR_WIDTH = 240;
-    private static final double SIDEBAR_COLLAPSED_WIDTH = 72;
 
     private ResponsiveManager() {
     }
@@ -27,6 +24,7 @@ public final class ResponsiveManager {
         ChangeListener<Number> listener = (obs, oldWidth, newWidth) -> apply(scene);
         scene.getProperties().put(ResponsiveManager.class, listener);
         scene.widthProperty().addListener(listener);
+        apply(scene);
         Platform.runLater(() -> apply(scene));
     }
 
@@ -34,15 +32,20 @@ public final class ResponsiveManager {
         if (scene == null || scene.getRoot() == null) {
             return;
         }
+        boolean compact = scene.getWidth() < 1000;
+        scene.getRoot().getStyleClass().remove("compact");
+        if (compact) scene.getRoot().getStyleClass().add("compact");
         Node sidebar = scene.getRoot().lookup(".admin-sidebar");
-        if (!(sidebar instanceof Region region)) {
-            return;
+        if (sidebar instanceof Region region) {
+            // Preserve readable navigation labels at compact widths.
+            region.setPrefWidth(compact ? 176 : 192);
+            region.setMinWidth(compact ? 176 : 192);
+            region.setMaxWidth(compact ? 176 : 192);
         }
-        boolean collapsed = scene.getWidth() < COLLAPSE_WIDTH;
-        UIAnimations.resizeRegion(region, collapsed ? SIDEBAR_COLLAPSED_WIDTH : SIDEBAR_WIDTH);
-        region.getStyleClass().remove("collapsed");
-        if (collapsed) {
-            region.getStyleClass().add("collapsed");
+        Node brand = scene.getRoot().lookup(".auth-brand-panel");
+        if (brand != null) {
+            brand.setVisible(!compact);
+            brand.setManaged(!compact);
         }
     }
 }

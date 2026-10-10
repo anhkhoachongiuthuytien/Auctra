@@ -103,11 +103,9 @@ public class AuctionDetailController {
 
         configureBidTable();
 
-        // Enter trong ô bid → đặt giá
-        bidAmountField.setOnKeyPressed(e -> {
-            if (e.getCode() == KeyCode.ENTER) {
-                handlePlaceBid();
-            }
+        bidTable.setPlaceholder(new Label("Chưa có lượt đặt giá. Hãy là người đầu tiên."));
+        rootPane.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (oldScene != null && newScene == null && countdownTimeline != null) countdownTimeline.stop();
         });
 
         // Đăng ký nhận sự kiện realtime cho phòng đấu giá này
@@ -123,7 +121,7 @@ public class AuctionDetailController {
 
     private void configureBidTable() {
         bidIndexColumn.setCellValueFactory(cell -> {
-            int index = bidTable.getItems().indexOf(cell.getValue()) + 1;
+            int index = bidTable.getItems().size() - bidTable.getItems().indexOf(cell.getValue());
             return new SimpleIntegerProperty(index);
         });
         bidderColumn.setCellValueFactory(cell -> new SimpleStringProperty(
@@ -208,7 +206,7 @@ public class AuctionDetailController {
             }
         }
 
-        statusLabel.setText(auction.getStatus().name());
+        statusLabel.setText(com.auction.ui.BadgeFactory.statusText(auction.getStatus()));
         statusLabel.getStyleClass().removeAll("badge", "badge-open", "badge-running",
                 "badge-finished", "badge-paid", "badge-canceled");
         statusLabel.getStyleClass().addAll("badge", switch (auction.getStatus()) {
@@ -220,14 +218,15 @@ public class AuctionDetailController {
         });
 
         currentPriceLabel.setText(String.format(Locale.US, "$%,.2f", auction.getCurrentPrice()));
-        UIAnimations.pulsePrice(currentPriceLabel);
+
         startingPriceLabel.setText("Giá khởi điểm: "
                 + String.format(Locale.US, "$%,.2f", auction.getItem().getStartingPrice()));
         winnerLabel.setText(auction.getWinner() == null ? "Chưa có"
                 : auction.getWinner().getUsername());
 
-        // Lịch sử bid — order mới nhất ở cuối (theo addBid logic)
-        bidTable.setItems(FXCollections.observableArrayList(auction.getBids()));
+        List<BidTransaction> history = new java.util.ArrayList<>(auction.getBids());
+        java.util.Collections.reverse(history);
+        bidTable.setItems(FXCollections.observableArrayList(history));
         bidCountLabel.setText(auction.getBids().size() + " lượt");
         if (bidCountChip != null) bidCountChip.setText(auction.getBids().size() + " lượt");
 
@@ -238,7 +237,7 @@ public class AuctionDetailController {
         bidFormPanel.setVisible(canBid);
         bidFormPanel.setManaged(canBid);
         if (canBid) {
-            bidHintLabel.setText("Số tiền tối thiểu: "
+            bidHintLabel.setText("Giá gợi ý: "
                     + String.format(Locale.US, "$%,.2f", auction.getCurrentPrice() + 1));
         }
 
@@ -253,9 +252,9 @@ public class AuctionDetailController {
                 com.auction.model.auction.AutoBidConfig config = appContext.getGateway().getAutoBid(auctionId, currentUser.getId());
                 if (config != null) {
                     currentAutoBid = config;
-                    autoBidStatusLabel.setText(String.format(Locale.US, "Trạng thái: Hoạt động (Max: $%,.2f, Bước: $%,.2f)", 
+                    autoBidStatusLabel.setText(String.format(Locale.US, "Đang bật · Giới hạn $%,.2f · Bước nâng $%,.2f",
                             config.getMaxPrice(), config.getIncrement()));
-                    toggleAutoBidButton.setText("Hủy kích hoạt Auto-Bid");
+                    toggleAutoBidButton.setText("Tắt tự động đặt giá");
                     toggleAutoBidButton.getStyleClass().removeAll("button-success", "button-danger");
                     toggleAutoBidButton.getStyleClass().add("button-danger");
                     autoBidMaxField.setDisable(true);
@@ -269,7 +268,7 @@ public class AuctionDetailController {
                 } else {
                     currentAutoBid = null;
                     autoBidStatusLabel.setText("Trạng thái: Chưa kích hoạt");
-                    toggleAutoBidButton.setText("Kích hoạt Auto-Bid");
+                    toggleAutoBidButton.setText("Bật tự động đặt giá");
                     toggleAutoBidButton.getStyleClass().removeAll("button-success", "button-danger");
                     toggleAutoBidButton.getStyleClass().add("button-success");
                     autoBidMaxField.setDisable(!canBid);
@@ -325,8 +324,8 @@ public class AuctionDetailController {
         priceLineChart.getData().add(series);
         if (realtimeStatusLabel != null) {
             realtimeStatusLabel.setText(bids.isEmpty()
-                    ? "Realtime sẵn sàng, chưa có lượt đặt giá"
-                    : "Cập nhật realtime: " + bids.size() + " lượt đặt giá");
+                    ? "Chưa có lượt đặt giá"
+                    : "Dữ liệu hiện tại: " + bids.size() + " lượt đặt giá");
         }
     }
 
@@ -336,57 +335,65 @@ public class AuctionDetailController {
         }
 
         countdownTimeline = new javafx.animation.Timeline(
-            new javafx.animation.KeyFrame(javafx.util.Duration.seconds(1), e -> {
-                Auction a = currentAuction;
-                if (a == null) {
-                    countdownLabel.setText("Không tìm thấy phiên");
-                    progressBar.setProgress(0);
-                    return;
-                }
-
-                if (a.getStatus() != AuctionStatus.RUNNING) {
-                    countdownLabel.setText("Phiên đấu giá: " + a.getStatus().name());
-                    progressBar.setProgress(0);
-                    countdownTimeline.stop();
-                    return;
-                }
-
-                LocalDateTime now = LocalDateTime.now();
-                LocalDateTime end = a.getEndTime();
-                if (end == null) {
-                    countdownLabel.setText("Không có thời hạn");
-                    progressBar.setProgress(1.0);
-                    return;
-                }
-
-                java.time.Duration remaining = java.time.Duration.between(now, end);
-                long seconds = remaining.getSeconds();
-
-                if (seconds <= 0) {
-                    countdownLabel.setText("Phiên đã kết thúc");
-                    progressBar.setProgress(0);
-                    countdownTimeline.stop();
-                    bidFormPanel.setVisible(false);
-                    autoBidFormPanel.setVisible(false);
-                    reloadAuction();
-                } else {
-                    long h = remaining.toHours();
-                    long m = remaining.toMinutesPart();
-                    long s = remaining.toSecondsPart();
-                    if (h > 0) {
-                        countdownLabel.setText(String.format("Thời gian còn lại: %02dh %02dm %02ds", h, m, s));
-                    } else {
-                        countdownLabel.setText(String.format("Thời gian còn lại: %02d:%02d", m, s));
-                    }
-                    
-                    // Giả định tiến trình: lấy tỉ lệ theo 5 phút (300 giây) hoặc 1.0 nếu lớn hơn
-                    double progress = Math.min(1.0, (double) seconds / (a.getDurationMinutes() * 60.0));
-                    progressBar.setProgress(progress);
-                }
-            })
+            new javafx.animation.KeyFrame(javafx.util.Duration.seconds(1), e -> updateCountdown())
         );
         countdownTimeline.setCycleCount(javafx.animation.Timeline.INDEFINITE);
-        countdownTimeline.play();
+        updateCountdown();
+        if (currentAuction != null && currentAuction.getStatus() == AuctionStatus.RUNNING
+                && currentAuction.getEndTime() != null && LocalDateTime.now().isBefore(currentAuction.getEndTime())) {
+            countdownTimeline.play();
+        }
+    }
+
+    private void updateCountdown() {
+        Auction a = currentAuction;
+        if (a == null) {
+            countdownLabel.setText("Không tìm thấy phiên");
+            progressBar.setProgress(0);
+            return;
+        }
+
+        if (a.getStatus() != AuctionStatus.RUNNING) {
+            countdownLabel.setText("Phiên đấu giá: " + com.auction.ui.BadgeFactory.statusText(a.getStatus()));
+            progressBar.setProgress(0);
+            countdownTimeline.stop();
+            return;
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime end = a.getEndTime();
+        if (end == null) {
+            countdownLabel.setText("Không có thời hạn");
+            progressBar.setProgress(1.0);
+            return;
+        }
+
+        java.time.Duration remaining = java.time.Duration.between(now, end);
+        long seconds = remaining.getSeconds();
+
+        if (seconds <= 0) {
+            countdownLabel.setText("Phiên đã kết thúc");
+            progressBar.setProgress(0);
+            countdownTimeline.stop();
+            bidFormPanel.setVisible(false);
+            bidFormPanel.setManaged(false);
+            autoBidFormPanel.setVisible(false);
+            autoBidFormPanel.setManaged(false);
+            reloadAuction();
+        } else {
+            long h = remaining.toHours();
+            long m = remaining.toMinutesPart();
+            long s = remaining.toSecondsPart();
+            if (h > 0) {
+                countdownLabel.setText(String.format("Thời gian còn lại: %02dh %02dm %02ds", h, m, s));
+            } else {
+                countdownLabel.setText(String.format("Thời gian còn lại: %02d:%02d", m, s));
+            }
+
+            // Fraction of the auction duration remaining.
+            double progress = Math.min(1.0, (double) seconds / (a.getDurationMinutes() * 60.0));
+            progressBar.setProgress(progress);
+        }
     }
 
     @FXML
@@ -496,7 +503,7 @@ public class AuctionDetailController {
         } catch (NumberFormatException ex) {
             base = a.getCurrentPrice();
         }
-        bidAmountField.setText(String.format(Locale.US, "%.0f", base + delta));
+        bidAmountField.setText(String.format(Locale.US, "%.2f", Math.max(base, a.getCurrentPrice()) + delta));
     }
 
     @FXML

@@ -1,232 +1,103 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.chart.*?>
-<?import javafx.collections.FXCollections?>
-
-<StackPane fx:id="rootPane" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-           fx:controller="com.auction.controller.AdminController">
-<BorderPane styleClass="admin-root">
-
-    <!-- ═══════════════════════════════════════════════
-         TOP BAR — Brand + Search + Notification + Avatar
-         ═══════════════════════════════════════════════ -->
-    <top>
-        <HBox alignment="CENTER_LEFT" spacing="20.0" styleClass="admin-top-nav">
-            <padding><Insets top="12" right="28" bottom="12" left="28"/></padding>
-
-            <!-- Brand mark -->
-            <HBox alignment="CENTER_LEFT" spacing="10">
+<?import com.auction.ui.ResponsiveColumns?>
+<StackPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:id="rootPane" fx:controller="com.auction.controller.AdminController">
+    <BorderPane styleClass="admin-root">
+        <top>
+            <HBox alignment="CENTER_LEFT" spacing="12" styleClass="admin-top-nav">
                 <StackPane styleClass="brand-mark">
-                    <Label styleClass="brand-mark-text" text="A"/>
+                    <Label text="A" styleClass="brand-mark-text"/>
                 </StackPane>
-                <VBox spacing="0">
-                    <Label styleClass="brand-word" text="Auctra"/>
-                    <Label styleClass="brand-tag" text="Admin console"/>
-                </VBox>
-            </HBox>
-
-            <!-- Global search -->
-            <HBox alignment="CENTER_LEFT" styleClass="admin-search-box" prefWidth="420">
-                <TextField fx:id="globalSearchField" styleClass="admin-search-field"
-                           HBox.hgrow="ALWAYS" promptText="Tìm kiếm toàn cục..."/>
-            </HBox>
-
-            <Region HBox.hgrow="ALWAYS"/>
-
-            <!-- Notification + User avatar (fixed indentation) -->
-            <HBox alignment="CENTER" spacing="16">
-                <HBox alignment="CENTER" spacing="6" styleClass="notification-pill">
-                    <Label text="Hệ thống"/>
-                    <Label styleClass="notification-badge" text="0"/>
-                </HBox>
-                <HBox alignment="CENTER" spacing="8" onMouseClicked="#goToProfile" style="-fx-cursor: hand;">
-                    <StackPane styleClass="admin-user-avatar">
-                        <Label fx:id="userInitialsLabel" styleClass="admin-user-avatar-text" text="A"/>
-                    </StackPane>
-                    <Label fx:id="topBarGreeting" styleClass="admin-user-name" text="Admin"/>
-                </HBox>
-            </HBox>
-        </HBox>
-    </top>
-
-    <!-- ═══════════════════════════════════════════════
-         SIDEBAR — Navigation + section labels + user card
-         ═══════════════════════════════════════════════ -->
-    <left>
-        <VBox spacing="4" styleClass="admin-sidebar" prefWidth="240">
-            <padding><Insets top="24" right="16" bottom="24" left="16"/></padding>
-
-            <!-- Main menu -->
-            <Label styleClass="sidebar-section-label" text="MENU"/>
-            <Button fx:id="navDashboard" styleClass="nav-link-active" mnemonicParsing="false"
-                    onAction="#handleShowDashboard" text="Tổng quan" alignment="BASELINE_LEFT" maxWidth="Infinity"/>
-            <Button fx:id="navUsers" styleClass="nav-link" mnemonicParsing="false"
-                    onAction="#handleShowUsers" text="Người dùng" alignment="BASELINE_LEFT" maxWidth="Infinity"/>
-            <Button fx:id="navAuctions" styleClass="nav-link" mnemonicParsing="false"
-                    onAction="#handleShowAuctions" text="Phiên đấu giá" alignment="BASELINE_LEFT" maxWidth="Infinity"/>
-
-            <!-- Management section label -->
-            <Region prefHeight="12"/>
-            <Label styleClass="sidebar-section-label" text="QUẢN LÝ"/>
-            <Button styleClass="nav-link" mnemonicParsing="false"
-                    onAction="#goToProfile" text="Hồ sơ" alignment="BASELINE_LEFT" maxWidth="Infinity"/>
-
-            <Region VBox.vgrow="ALWAYS"/>
-
-            <!-- User card -->
-            <VBox styleClass="sidebar-user-card" spacing="3" onMouseClicked="#goToProfile" style="-fx-cursor: hand;">
-                <Label fx:id="sidebarUserNameLabel" styleClass="sidebar-user-name" text="Administrator"/>
-                <Label fx:id="sidebarUserMetaLabel" styleClass="sidebar-user-meta" text="Theo dõi hệ thống"/>
-            </VBox>
-            <Button styleClass="nav-link" mnemonicParsing="false"
-                    onAction="#handleBackToLogin" text="Đăng xuất" alignment="BASELINE_LEFT" maxWidth="Infinity"/>
-        </VBox>
-    </left>
-
-    <!-- ═══════════════════════════════════════════════
-         CENTER — Breadcrumb + ScrollPane content
-         ═══════════════════════════════════════════════ -->
-    <center>
-        <VBox spacing="0" styleClass="admin-main-bg">
-
-            <!-- Breadcrumb bar -->
-            <HBox alignment="CENTER_LEFT" spacing="8" styleClass="admin-content-header">
-                <padding><Insets top="16" right="32" bottom="16" left="32"/></padding>
-                <Label styleClass="admin-breadcrumb-text" text="Trang chủ"/>
-                <Label styleClass="admin-breadcrumb-sep" text="/"/>
-                <Label styleClass="admin-breadcrumb-active" text="Tổng quan"/>
+                <Label text="Auctra" styleClass="brand-word" wrapText="true" minWidth="0"/>
+                <Label text="Quản trị" styleClass="brand-tag" wrapText="true" minWidth="0"/>
                 <Region HBox.hgrow="ALWAYS"/>
-                <Button styleClass="button-ghost button-row" mnemonicParsing="false"
-                        onAction="#handleRefresh" text="Làm mới"/>
+                <Button text="Sáng / tối" onAction="#handleToggleTheme" styleClass="button-ghost" mnemonicParsing="false"/>
+                <Button text="Tài khoản" onAction="#goToProfile" styleClass="button-ghost" mnemonicParsing="false" accessibleText="Mở tài khoản"/>
+                <StackPane styleClass="admin-user-avatar">
+                    <Label fx:id="userInitialsLabel" text="U" styleClass="admin-user-avatar-text" wrapText="true" minWidth="0"/>
+                </StackPane>
             </HBox>
-
-            <!-- Main scrollable content -->
-            <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" styleClass="admin-scroll">
-                <VBox spacing="24">
-                    <padding><Insets top="8" right="32" bottom="32" left="32"/></padding>
-
-                    <!-- ── WELCOME HERO PANEL ── -->
-                    <VBox spacing="4" styleClass="welcome-header">
-                        <Label fx:id="welcomeLabel" styleClass="welcome-title" text="Xin chào, Admin"/>
-                        <Label fx:id="actionMessageLabel" styleClass="welcome-subtitle" wrapText="true"
-                               text="Quản lý hệ thống đấu giá tập trung — theo dõi người dùng, phiên và doanh thu."/>
+        </top>
+        <left>
+            <VBox spacing="6" prefWidth="192" minWidth="176" styleClass="admin-sidebar">
+                <Button fx:id="navDashboard" text="Tổng quan" onAction="#handleShowDashboard" styleClass="nav-link-active" mnemonicParsing="false" maxWidth="Infinity" alignment="CENTER_LEFT"/>
+                <Button fx:id="navUsers" text="Người dùng" onAction="#handleShowUsers" styleClass="nav-link" mnemonicParsing="false" maxWidth="Infinity" alignment="CENTER_LEFT"/>
+                <Button fx:id="navAuctions" text="Phiên đấu giá" onAction="#handleShowAuctions" styleClass="nav-link" mnemonicParsing="false" maxWidth="Infinity" alignment="CENTER_LEFT"/>
+                <Button text="Tài khoản" onAction="#goToProfile" styleClass="nav-link" mnemonicParsing="false" maxWidth="Infinity" alignment="CENTER_LEFT"/>
+                <Region VBox.vgrow="ALWAYS"/>
+                <VBox spacing="4" styleClass="sidebar-user-card">
+                    <Label fx:id="sidebarUserNameLabel" text="" styleClass="sidebar-user-name" wrapText="true" minWidth="0"/>
+                    <Label fx:id="sidebarUserMetaLabel" text="" styleClass="sidebar-user-meta" wrapText="true" minWidth="0"/>
+                </VBox>
+                <Button text="Đăng xuất" onAction="#handleBackToLogin" styleClass="nav-link" mnemonicParsing="false" maxWidth="Infinity" alignment="CENTER_LEFT"/>
+            </VBox>
+        </left>
+        <center>
+            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="page-scroll">
+                <VBox spacing="24" minWidth="0" styleClass="page-content">
+                    <HBox alignment="CENTER_LEFT" spacing="16">
+                        <VBox spacing="6" minWidth="0">
+                            <Label fx:id="welcomeLabel" text="Tổng quan" styleClass="screen-title" wrapText="true" minWidth="0"/>
+                        </VBox>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Button text="Làm mới" onAction="#handleRefresh" styleClass="button-ghost" mnemonicParsing="false"/>
+                    </HBox>
+                    <Label fx:id="actionMessageLabel" text="" styleClass="info-label" wrapText="true" minWidth="0"/>
+                    <VBox fx:id="dashboardSection" spacing="24" minWidth="0">
+                        <FlowPane hgap="28" vgap="16" styleClass="stat-strip">
+                            <VBox spacing="6" prefWidth="165">
+                                <Label text="Người dùng" styleClass="muted-label" wrapText="true" minWidth="0"/>
+                                <Label fx:id="statTotalUsers" text="0" styleClass="stat-value" wrapText="true" minWidth="0"/>
+                            </VBox>
+                            <VBox spacing="6" prefWidth="165">
+                                <Label text="Đang diễn ra" styleClass="muted-label" wrapText="true" minWidth="0"/>
+                                <Label fx:id="statRunningAuctions" text="0" styleClass="stat-value" wrapText="true" minWidth="0"/>
+                            </VBox>
+                            <VBox spacing="6" prefWidth="165">
+                                <Label text="Đã thanh toán" styleClass="muted-label" wrapText="true" minWidth="0"/>
+                                <Label fx:id="statPaidAuctions" text="0" styleClass="stat-value" wrapText="true" minWidth="0"/>
+                            </VBox>
+                            <VBox spacing="6" prefWidth="165">
+                                <Label text="Doanh thu ($)" styleClass="muted-label" wrapText="true" minWidth="0"/>
+                                <Label fx:id="statRevenue" text="0" styleClass="stat-value" wrapText="true" minWidth="0"/>
+                            </VBox>
+                        </FlowPane>
+                        <Label text="Trạng thái các phiên" styleClass="section-title" wrapText="true" minWidth="0"/>
+                        <Label text="Số lượng phiên theo trạng thái trong dữ liệu hiện tại." styleClass="muted-label" wrapText="true" minWidth="0"/>
+                        <BarChart fx:id="opsChart" legendVisible="false" animated="false" prefHeight="280" minWidth="0">
+                            <xAxis>
+                                <CategoryAxis label="Trạng thái"/>
+                            </xAxis>
+                            <yAxis>
+                                <NumberAxis label="Số phiên" tickUnit="1" minorTickVisible="false"/>
+                            </yAxis>
+                        </BarChart>
+                        <FlowPane hgap="10" vgap="10">
+                            <Button text="Quản lý người dùng" onAction="#handleShowUsers" styleClass="button-ghost" mnemonicParsing="false"/>
+                            <Button text="Quản lý phiên đấu giá" onAction="#handleShowAuctions" styleClass="button-ghost" mnemonicParsing="false"/>
+                        </FlowPane>
                     </VBox>
-
-                    <!-- ═══════════════════════════
-                         DASHBOARD SECTION
-                         ═══════════════════════════ -->
-                    <VBox fx:id="dashboardSection" spacing="22">
-
-                        <HBox spacing="16" maxWidth="Infinity">
-                            <VBox styleClass="admin-stat-card" spacing="8" HBox.hgrow="ALWAYS" maxWidth="Infinity">
-                                <Label styleClass="stat-card-label" text="Tổng người dùng"/>
-                                <Label fx:id="statTotalUsers" styleClass="stat-card-value" text="0"/>
-                                <Region styleClass="sparkline"/>
-                            </VBox>
-                            <VBox styleClass="admin-stat-card" spacing="8" HBox.hgrow="ALWAYS" maxWidth="Infinity">
-                                <Label styleClass="stat-card-label" text="Đang diễn ra"/>
-                                <Label fx:id="statRunningAuctions" styleClass="stat-card-value-warning" text="0"/>
-                                <Region styleClass="sparkline-warning"/>
-                            </VBox>
-                            <VBox styleClass="admin-stat-card" spacing="8" HBox.hgrow="ALWAYS" maxWidth="Infinity">
-                                <Label styleClass="stat-card-label" text="Đã thanh toán"/>
-                                <Label fx:id="statPaidAuctions" styleClass="stat-card-value-success" text="0"/>
-                                <Region styleClass="sparkline-success"/>
-                            </VBox>
-                            <VBox styleClass="admin-stat-card" spacing="8" HBox.hgrow="ALWAYS" maxWidth="Infinity">
-                                <Label styleClass="stat-card-label" text="Tổng doanh thu"/>
-                                <Label fx:id="statRevenue" styleClass="stat-card-value-accent" text="0"/>
-                                <Region styleClass="sparkline"/>
-                            </VBox>
-                        </HBox>
-
-                        <!-- Dashboard grid — 50/50 layout -->
-                        <HBox spacing="18">
-                            <!-- Left: Operations overview -->
-                            <VBox styleClass="admin-card" spacing="12" HBox.hgrow="ALWAYS">
-                                <Label styleClass="admin-card-title" text="Tổng quan vận hành"/>
-                                <BarChart fx:id="opsChart" legendVisible="false" prefHeight="200" styleClass="admin-ops-chart">
-                                    <xAxis>
-                                        <CategoryAxis label="Tháng"/>
-                                    </xAxis>
-                                    <yAxis>
-                                        <NumberAxis label="Giao dịch"/>
-                                    </yAxis>
-                                </BarChart>
-                            </VBox>
-
-                            <!-- Right: Recent activity -->
-                            <VBox styleClass="admin-card" spacing="12" HBox.hgrow="ALWAYS">
-                                <Label styleClass="admin-card-title" text="Hoạt động gần đây"/>
-                                <VBox styleClass="activity-feed" spacing="0">
-                                    <Label styleClass="activity-item" text="Hệ thống đã sẵn sàng"/>
-                                    <Label styleClass="activity-item" text="Bảng dữ liệu tự động làm mới"/>
-                                    <Label styleClass="activity-item" text="Quản trị phiên đấu giá tập trung"/>
-                                </VBox>
-                            </VBox>
-                        </HBox>
+                    <VBox fx:id="usersSection" spacing="18" visible="false" managed="false" minWidth="0">
+                        <Label text="Người dùng" styleClass="section-title" wrapText="true" minWidth="0"/>
+                        <VBox spacing="6" minWidth="0">
+                            <Label text="Tìm người dùng" styleClass="field-label" wrapText="true" minWidth="0" labelFor="${userSearchField}"/>
+                            <TextField fx:id="userSearchField" promptText="Tên hoặc email" maxWidth="Infinity" minWidth="0"/>
+                        </VBox>
+                        <FlowPane fx:id="userGrid" hgap="20" vgap="20" minWidth="0"/>
                     </VBox>
-
-                    <!-- ═══════════════════════════
-                         USERS SECTION
-                         ═══════════════════════════ -->
-                    <VBox fx:id="usersSection" styleClass="admin-card" spacing="0" visible="false" managed="false">
-                        <HBox alignment="CENTER_LEFT" spacing="12" styleClass="admin-card-header">
-                            <Label styleClass="admin-card-title" text="Người dùng"/>
-                            <Region HBox.hgrow="ALWAYS"/>
-                            <HBox alignment="CENTER_LEFT" styleClass="admin-inner-search">
-                                <TextField fx:id="userSearchField" styleClass="admin-inner-search-field"
-                                           prefWidth="220.0" promptText="Tìm người dùng..."/>
-                            </HBox>
-                        </HBox>
-                        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
-                                    prefHeight="460.0" styleClass="admin-scroll-transparent" VBox.vgrow="ALWAYS">
-                            <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
-                            <FlowPane fx:id="userGrid" hgap="16" vgap="16" styleClass="auction-grid">
-                                <!-- Dynamic user cards go here -->
-                            </FlowPane>
-                        </ScrollPane>
+                    <VBox fx:id="auctionsSection" spacing="18" visible="false" managed="false" minWidth="0">
+                        <Label text="Phiên đấu giá" styleClass="section-title" wrapText="true" minWidth="0"/>
+                        <VBox spacing="6" minWidth="0">
+                            <Label text="Tìm phiên đấu giá" styleClass="field-label" wrapText="true" minWidth="0" labelFor="${auctionSearchField}"/>
+                            <TextField fx:id="auctionSearchField" promptText="Tên vật phẩm hoặc người bán" maxWidth="Infinity" minWidth="0"/>
+                        </VBox>
+                        <FlowPane fx:id="auctionGrid" hgap="20" vgap="20" minWidth="0"/>
                     </VBox>
-
-                    <!-- ═══════════════════════════
-                         AUCTIONS SECTION
-                         ═══════════════════════════ -->
-                    <VBox fx:id="auctionsSection" styleClass="admin-card" spacing="0" visible="false" managed="false">
-                        <HBox alignment="CENTER_LEFT" spacing="12.0" styleClass="admin-card-header">
-                            <Label styleClass="admin-card-title" text="Phiên đấu giá"/>
-                            <Region HBox.hgrow="ALWAYS"/>
-                            <HBox alignment="CENTER_LEFT" styleClass="admin-inner-search">
-                                <TextField fx:id="auctionSearchField" styleClass="admin-inner-search-field"
-                                           prefWidth="220.0" promptText="Tìm..."/>
-                            </HBox>
-                            <Button styleClass="button-danger button-row" mnemonicParsing="false"
-                                    onAction="#handleCancelAuction" text="Hủy"/>
-                            <Button styleClass="button-success button-row" mnemonicParsing="false"
-                                    onAction="#handleMarkPaid" text="Đã TT"/>
-                        </HBox>
-                        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
-                                    prefHeight="460.0" styleClass="admin-scroll-transparent" VBox.vgrow="ALWAYS">
-                            <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
-                            <FlowPane fx:id="auctionGrid" hgap="16" vgap="16" styleClass="auction-grid">
-                                <!-- Dynamic cards go here -->
-                            </FlowPane>
-                        </ScrollPane>
-                    </VBox>
-
                 </VBox>
             </ScrollPane>
-
-            <!-- Footer -->
-            <HBox alignment="CENTER_LEFT" spacing="12" styleClass="admin-footer">
-                <padding><Insets top="14" right="28" bottom="14" left="28"/></padding>
-                <Label styleClass="admin-footer-text" text="© 2026 Auctra — Admin Console"/>
-                <Region HBox.hgrow="ALWAYS"/>
-                <Label styleClass="admin-footer-text" text="Điều khoản · Trợ giúp · Liên hệ"/>
-            </HBox>
-        </VBox>
-    </center>
-
-</BorderPane>
+        </center>
+    </BorderPane>
 </StackPane>

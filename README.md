@@ -1,6 +1,20 @@
 # Auctra - Hệ Thống Đấu Giá Real-time (Client - Server)
 
+[![Java CI/CD with Maven](https://github.com/anhkhoachongiuthuytien/Auctra/actions/workflows/maven.yml/badge.svg)](https://github.com/anhkhoachongiuthuytien/Auctra/actions/workflows/maven.yml)
+
 Auctra là ứng dụng đấu giá trực tuyến được thiết kế theo kiến trúc Client-Server sử dụng kết nối TCP/IP Socket thời gian thực và giao diện đồ họa JavaFX hiện đại. Bài toán giải quyết việc kết nối đồng bộ và tức thời giữa những người mua (Bidder) tham gia trả giá và những người bán (Seller) quản lý phiên đấu giá dưới sự điều phối của người quản trị (Admin).
+
+### Cập nhật giao diện
+
+Giao diện được cải thiện dựa trên [Impeccable](https://impeccable.style/), giữ nhận diện Auctra và màu xanh chủ đạo:
+
+- Thiết kế lại 8 màn hình: đăng nhập, đăng ký, khôi phục mật khẩu, danh sách phiên, chi tiết phiên, người bán, quản trị và hồ sơ.
+- Bố cục thích ứng từ 800×600, hỗ trợ theme sáng/tối; nội dung cuộn dọc và điều hướng vẫn giữ nhãn dễ đọc.
+- Màn hình chi tiết ưu tiên giá, thời gian còn lại và nút đặt giá; cấu hình Auto-Bid nằm ngay bên dưới. Lịch sử hiển thị lượt mới nhất trước.
+- Người bán mở form tạo phiên ngay trong màn hình quản lý; mô tả hỗ trợ nhiều dòng và thời lượng được kiểm tra trước khi gửi.
+- Biểu đồ quản trị lấy số lượng phiên theo trạng thái từ dữ liệu thực. Các thao tác trên thẻ có nút rõ ràng, hỗ trợ bàn phím.
+
+Xem [quy tắc giao diện và cách tạo ảnh xem trước](DESIGN.md). Bộ kiểm thử hiện có **156 test** bao gồm nghiệp vụ, SQLite, socket, nạp FXML và tương tác giao diện.
 
 ---
 
@@ -26,7 +40,7 @@ Auctra là ứng dụng đấu giá trực tuyến được thiết kế theo ki
 
 Dự án được tổ chức theo mô hình Multi-Module Maven sạch sẽ:
 ```
-D:\BaitaplonTest\Auctra
+Auctra/
 ├── auction-common         # Thư viện dùng chung (Models, DTOs, Enums, Mappers, Encryptors)
 ├── auction-server         # TCP Socket Server, SQLite Database, Services, DAOs
 ├── auction-client         # JavaFX UI Controllers, FXML layouts, TCP Socket Client Gateway
@@ -36,7 +50,26 @@ D:\BaitaplonTest\Auctra
 ---
 
 ## 3. Hướng Dẫn Chạy Chương Trình
-> Luôn khởi chạy **Server trước**, sau đó mới khởi chạy **Client**.
+> Với chế độ SOCKET, khởi chạy **Server trước**, sau đó mới khởi chạy **Client**. Chế độ LOCAL chạy độc lập.
+
+### Chạy nhanh trên Windows
+
+Đảm bảo `javac` và `mvn` có trong `PATH`, sau đó chạy tại thư mục gốc repo:
+
+```powershell
+.\build.ps1
+.\run-client.ps1 -Local
+```
+
+Để thử nhiều người dùng qua socket, chạy `.\run-server.ps1`, rồi mở các terminal khác chạy `.\run-client.ps1`.
+
+Tài khoản demo được tạo khi server hoặc LOCAL khởi động; mật khẩu chung là `demo12345`:
+
+| Vai trò | Email |
+| --- | --- |
+| Người mua | `bidder@auction.local` |
+| Người bán | `seller@auction.local` |
+| Quản trị | `admin@auction.local` |
 
 ### Bước 1: Biên dịch và đóng gói toàn bộ dự án
 Chạy lệnh sau để dọn dẹp, tải các thư viện cần thiết, biên dịch mã nguồn và chạy toàn bộ kiểm thử trước khi cài các module vào Maven local repository:
@@ -144,3 +177,34 @@ mvn -pl auction-client javafx:run '-Djavafx.args=--socket localhost 9999'
 4. Hủy cấu hình của A; bid tiếp theo của B không kích hoạt A nữa.
 5. Các test `AutoBidRegressionTest`, `SqliteConcurrentBidTest`, `RequestSecurityTest` và
    `SocketGatewayIntegrationTest` kiểm tra các hành vi trên, phân quyền, recovery và nhiều client.
+
+## 7. Kiểm thử giao diện và GitHub Actions
+
+Chạy toàn bộ kiểm thử với JDK 17:
+
+```bash
+mvn -B clean install
+```
+
+Trên Ubuntu không có màn hình, cài Xvfb và chạy cùng lệnh mà GitHub Actions sử dụng:
+
+```bash
+sudo apt-get update
+sudo apt-get install -y xvfb
+xvfb-run -a mvn -B clean install
+```
+
+- `FxmlLoadTest` nạp cả 8 màn hình để phát hiện lỗi FXML và controller.
+- `SceneNavigatorSmokeTest` kiểm tra điều hướng cho các vai trò và việc đóng cửa sổ cuối vẫn cho phép test JavaFX tiếp theo chạy.
+- `UiInteractionTest` kiểm tra bố cục ở 1180×760 và 800×600 trong cả hai theme, nút đặt giá/Auto-Bid với service thật, form người bán và số liệu biểu đồ.
+- Các test giao diện dùng chung `FxTestToolkit` với `implicitExit=false`, giữ event thread hoạt động đến khi JVM kiểm thử kết thúc. Việc này xử lý lỗi CI timeout khi test trước đóng cửa sổ cuối; không bỏ qua test hay tăng timeout để che lỗi.
+
+Workflow chạy khi push hoặc mở pull request vào `main`. Theo dõi kết quả tại [GitHub Actions](https://github.com/anhkhoachongiuthuytien/Auctra/actions).
+
+Tạo 32 ảnh xem trước bằng dữ liệu kiểm thử trong database tạm, sau khi build:
+
+```powershell
+mvn -pl auction-client javafx:run '-Djavafx.args=--screenshots'
+```
+
+Ảnh được lưu tại `auction-client/target/ui-screenshots` và không cần kết nối server đang chạy.

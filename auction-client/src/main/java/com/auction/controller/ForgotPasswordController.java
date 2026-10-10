@@ -32,6 +32,7 @@ public class ForgotPasswordController {
         this.viewModel = new LoginViewModel(appContext.getGateway());
         if (messageLabel != null) {
             messageLabel.setText("");
+            messageLabel.managedProperty().bind(messageLabel.textProperty().isNotEmpty());
         }
         // Enter ở ô cuối → submit
         confirmPasswordField.setOnKeyPressed(e -> {

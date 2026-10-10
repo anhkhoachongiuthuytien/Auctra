@@ -50,7 +50,7 @@ public class SellerController {
 
     @FXML private ComboBox<String> itemTypeComboBox;
     @FXML private TextField itemNameField;
-    @FXML private TextField itemDescriptionField;
+    @FXML private javafx.scene.control.TextArea itemDescriptionField;
     @FXML private TextField startingPriceField;
     @FXML private TextField durationField;
 
@@ -74,7 +74,7 @@ public class SellerController {
         this.navigator = navigator;
         this.currentSeller = currentSeller;
 
-        welcomeLabel.setText("Trang người bán • " + currentSeller.getUsername() + " (" + currentSeller.getEmail() + ")");
+        welcomeLabel.setText("Trang người bán");
         if (userInitialsLabel != null && currentSeller.getUsername() != null && !currentSeller.getUsername().isBlank()) {
             userInitialsLabel.setText(currentSeller.getUsername().substring(0, 1).toUpperCase(Locale.ROOT));
             com.auction.util.UserImageHelper.setupAvatar(userInitialsLabel, currentSeller.getId(), currentSeller.getAvatarPath());
@@ -90,13 +90,13 @@ public class SellerController {
         setupImageDrop();
         updateImagePreviews();
         refreshAuctions();
-        
+
         com.auction.client.ClientEventManager.addListener(() -> {
             javafx.application.Platform.runLater(() -> {
                 try { refreshAuctions(); } catch (Exception e) {}
             });
         });
-        
+
         showInfo("Tạo một vật phẩm (kèm ảnh) để mở phiên đấu giá mới.");
     }
 
@@ -130,12 +130,12 @@ public class SellerController {
         if (pendingImageFiles.isEmpty()) {
             Label placeholder = new Label("Ảnh");
             placeholder.getStyleClass().add("muted-label");
-            
+
             StackPane box = new StackPane(placeholder);
             box.getStyleClass().add("image-preview-box");
             box.setPrefSize(64, 64);
             box.setMinSize(64, 64);
-            
+
             imagePreviewContainer.getChildren().add(box);
             if (selectedImageLabel != null) {
                 selectedImageLabel.setText("Chọn nhiều ảnh hoặc kéo thả vào đây. Ảnh đầu tiên sẽ làm ảnh bìa.");
@@ -270,16 +270,16 @@ public class SellerController {
 
         try {
             double startingPrice = Double.parseDouble(startingPriceField.getText());
-            int durationMinutes = 5;
-            if (durationField != null && durationField.getText() != null && !durationField.getText().trim().isEmpty()) {
-                try {
-                    durationMinutes = Integer.parseInt(durationField.getText().trim());
-                    if (durationMinutes <= 0) {
-                        durationMinutes = 5;
-                    }
-                } catch (NumberFormatException e) {
-                    durationMinutes = 5;
-                }
+            if (!Double.isFinite(startingPrice) || startingPrice <= 0) {
+                throw new com.auction.exception.ValidationException("Giá khởi điểm phải là số hữu hạn lớn hơn 0.");
+            }
+            int durationMinutes;
+            try { durationMinutes = Integer.parseInt(durationField.getText().trim()); }
+            catch (NumberFormatException exception) {
+                throw new com.auction.exception.ValidationException("Thời lượng phải là số phút từ 1 đến 10080.");
+            }
+            if (durationMinutes < 1 || durationMinutes > 10080) {
+                throw new com.auction.exception.ValidationException("Thời lượng phải từ 1 đến 10080 phút.");
             }
             Auction auction = appContext.getGateway().createAuctionForSeller(
                     currentSeller,
@@ -396,6 +396,8 @@ public class SellerController {
         }
     }
 
+    @FXML private void goToMyAuctions() { /* Current screen. */ }
+
     private void hideAllOverlays() {
         if (sellerAuctionGrid == null) return;
         for (javafx.scene.Node node : sellerAuctionGrid.getChildren()) {
@@ -489,8 +491,8 @@ public class SellerController {
         // Action Overlay
         VBox overlay = new VBox(8);
         overlay.setAlignment(javafx.geometry.Pos.CENTER);
-        overlay.getStyleClass().add("auction-action-overlay");
-        overlay.setVisible(false);
+        overlay.getStyleClass().add("auction-card-actions");
+        overlay.setVisible(true);
 
         Label overlayTitle = new Label("Thao tác phiên");
         overlayTitle.getStyleClass().add("auction-overlay-title");
@@ -530,23 +532,16 @@ public class SellerController {
             overlay.setVisible(false);
         });
 
-        overlay.getChildren().add(overlayTitle);
+
         if (a.getStatus() == AuctionStatus.OPEN) {
             overlay.getChildren().add(startBtn);
         } else if (a.getStatus() == AuctionStatus.RUNNING) {
             overlay.getChildren().add(finishBtn);
         }
-        overlay.getChildren().addAll(detailBtn, closeBtn);
+        overlay.getChildren().add(detailBtn);
 
-        container.getChildren().addAll(card, overlay);
-
-        // Interaction
-        card.setOnMouseClicked(e -> {
-            selectedAuction = a;
-            hideAllOverlays();
-            overlay.setVisible(true);
-        });
-
+        card.getChildren().add(overlay);
+        container.getChildren().add(card);
         return container;
     }
 
