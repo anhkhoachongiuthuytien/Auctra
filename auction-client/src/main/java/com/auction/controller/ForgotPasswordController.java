@@ -17,7 +17,7 @@ import java.io.IOException;
 public class ForgotPasswordController {
     @FXML private StackPane rootPane;
     @FXML private TextField emailField;
-    @FXML private TextField usernameField;
+    @FXML private TextField recoveryCodeField;
     @FXML private PasswordField newPasswordField;
     @FXML private PasswordField confirmPasswordField;
     @FXML private Label messageLabel;
@@ -45,7 +45,7 @@ public class ForgotPasswordController {
     private void handleReset() {
         LoginViewModel.LoginResult result = viewModel.resetPassword(
                 emailField.getText(),
-                usernameField.getText(),
+                recoveryCodeField.getText(),
                 newPasswordField.getText(),
                 confirmPasswordField.getText()
         );

@@ -22,7 +22,7 @@ public class AuthService {
         validateUserInput(username, email, password);
         validateEmailNotExists(email);
         Seller seller = new Seller(IdGenerator.generateId(), username, email);
-        userDao.save(seller, PasswordHasher.hash(password));
+        saveRegistration(seller, password);
         return seller;
     }
 
@@ -30,7 +30,7 @@ public class AuthService {
         validateUserInput(username, email, password);
         validateEmailNotExists(email);
         Bidder bidder = new Bidder(IdGenerator.generateId(), username, email);
-        userDao.save(bidder, PasswordHasher.hash(password));
+        saveRegistration(bidder, password);
         return bidder;
     }
 
@@ -38,7 +38,7 @@ public class AuthService {
         validateUserInput(username, email, password);
         validateEmailNotExists(email);
         Admin admin = new Admin(IdGenerator.generateId(), username, email);
-        userDao.save(admin, PasswordHasher.hash(password));
+        saveRegistration(admin, password);
         return admin;
     }
 
@@ -72,27 +72,24 @@ public class AuthService {
         }
     }
 
-    /**
-     * Đặt lại mật khẩu cho tài khoản. Vì app local không có email service,
-     * user phải cung cấp đúng username của chính tài khoản đó để chứng minh quyền sở hữu.
-     */
-    public void resetPassword(String email, String username, String newPassword) {
-        if (email == null || email.trim().isEmpty()) {
-            throw new ValidationException("Email không được để trống");
-        }
-        if (username == null || username.trim().isEmpty()) {
-            throw new ValidationException("Tên đăng nhập không được để trống");
+    private void saveRegistration(User user, String password) {
+        String recoveryCode = java.util.UUID.randomUUID().toString().replace("-", "");
+        userDao.save(user, PasswordHasher.hash(password), PasswordHasher.hash(recoveryCode));
+        user.setRecoveryCode(recoveryCode);
+    }
+
+    /** A recovery code is secret, returned once on registration, and consumed atomically. */
+    public void resetPassword(String email, String recoveryCode, String newPassword) {
+        if (email == null || email.isBlank()) { throw new ValidationException("Email không được để trống"); }
+        if (recoveryCode == null || recoveryCode.isBlank()) {
+            throw new ValidationException("Mã khôi phục không được để trống");
         }
         validatePassword(newPassword);
-
-        User user = userDao.findByEmail(email);
-        if (user == null) {
-            throw new AuthenticationException("Email chưa được đăng ký");
+        String recoveryHash = userDao.findRecoveryCodeHashByEmail(email);
+        if (!PasswordHasher.matches(recoveryCode.trim(), recoveryHash)
+                || !userDao.resetPasswordWithRecoveryCode(email, recoveryHash, PasswordHasher.hash(newPassword))) {
+            throw new AuthenticationException("Email hoặc mã khôi phục không đúng, hoặc mã đã được sử dụng");
         }
-        if (!user.getUsername().equals(username.trim())) {
-            throw new AuthenticationException("Tên đăng nhập không khớp với email này");
-        }
-        userDao.updatePasswordHash(email, PasswordHasher.hash(newPassword));
     }
 
     public boolean hasPassword(String email) {

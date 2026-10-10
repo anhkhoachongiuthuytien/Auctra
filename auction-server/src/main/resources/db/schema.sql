@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS users (
     email TEXT NOT NULL UNIQUE,
     role TEXT NOT NULL,
     password_hash TEXT NOT NULL DEFAULT '',
+    recovery_code_hash TEXT,
     shipping_address TEXT,
     phone_number TEXT,
     store_name TEXT,
@@ -36,6 +37,7 @@ CREATE TABLE IF NOT EXISTS auctions (
     winner_id TEXT,
     end_time TEXT,
     duration_minutes INTEGER DEFAULT 5,
+    version INTEGER NOT NULL DEFAULT 0,
     FOREIGN KEY (item_id) REFERENCES items(id),
     FOREIGN KEY (seller_id) REFERENCES users(id),
     FOREIGN KEY (winner_id) REFERENCES users(id)

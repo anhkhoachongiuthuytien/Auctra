@@ -16,6 +16,10 @@ public class ServerMain {
     private static final int DEFAULT_PORT = 9999;
 
     public static void main(String[] args) {
+        if (args.length > 0 && "--recovery-code".equals(args[0])) {
+            RecoveryCodeMain.main(java.util.Arrays.copyOfRange(args, 1, args.length));
+            return;
+        }
         int port = DEFAULT_PORT;
         if (args.length > 0) {
             try {

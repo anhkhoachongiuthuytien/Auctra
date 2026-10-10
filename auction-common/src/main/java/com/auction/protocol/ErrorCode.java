@@ -1,0 +1,5 @@
+package com.auction.protocol;
+
+public enum ErrorCode {
+    AUTHENTICATION, AUTHORIZATION, VALIDATION, INVALID_BID, AUCTION_CLOSED, AUCTION, INTERNAL
+}

@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
  * Sử dụng daemon thread để JVM có thể tắt sạch khi không còn thread non-daemon.
  */
 public class AuctionExpiryScheduler {
-    private static final long CHECK_INTERVAL_SECONDS = 10;
+    private static final long CHECK_INTERVAL_SECONDS = 1;
 
     private final AuctionService auctionService;
     private final ScheduledExecutorService scheduler;
@@ -73,7 +73,7 @@ public class AuctionExpiryScheduler {
                         && auction.getEndTime() != null
                         && now.isAfter(auction.getEndTime())) {
                     try {
-                        auctionService.finishAuction(auction.getId());
+                        if (!auctionService.finishIfExpired(auction.getId(), LocalDateTime.now())) { continue; }
                         System.out.println("[Scheduler] Tự động kết thúc phiên: "
                                 + auction.getId() + " (" + auction.getItem().getName() + ")");
                         

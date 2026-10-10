@@ -20,9 +20,5 @@ jobs:
         distribution: 'temurin'
         cache: maven
 
-    - name: Build and Install Modules
-      # Install modules so they are available for each other during test phase
-      run: mvn -B clean install -DskipTests
-
-    - name: Run Unit Tests
-      run: xvfb-run mvn -B test -Dtest=!SceneNavigatorSmokeTest
+    - name: Build and run all tests including socket, SQLite and JavaFX integration tests
+      run: xvfb-run -a mvn -B clean install

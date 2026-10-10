@@ -1,42 +1,43 @@
 package com.auction.server;
 
 import com.auction.protocol.AuctionEvent;
-import java.io.ObjectOutputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.io.IOException;
+import java.net.Socket;
+import java.util.Set;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
-public class BroadcastManager {
-    // Thread-safe list of active client streams that subscribed to updates
-    private static final List<ObjectOutputStream> clients = Collections.synchronizedList(new ArrayList<>());
+/** Enqueue only: a slow subscriber never holds up bids or other subscribers. */
+public final class BroadcastManager {
+    private static final Set<Subscription> CLIENTS = ConcurrentHashMap.newKeySet();
 
-    public static void addClient(ObjectOutputStream out) {
-        clients.add(out);
-        System.out.println("[BroadcastManager] Đã thêm client mới. Tổng số client theo dõi: " + clients.size());
+    private BroadcastManager() { }
+
+    public static Subscription subscribe(Socket socket) {
+        Subscription subscription = new Subscription(socket);
+        CLIENTS.add(subscription);
+        return subscription;
     }
 
-    public static void removeClient(ObjectOutputStream out) {
-        clients.remove(out);
-        System.out.println("[BroadcastManager] Đã xóa client. Tổng số client theo dõi: " + clients.size());
-    }
-
-    /**
-     * Gửi sự kiện tới tất cả client đang kết nối.
-     * Đồng bộ hóa để đảm bảo an toàn luồng khi duyệt.
-     */
     public static void broadcast(AuctionEvent event) {
-        synchronized (clients) {
-            List<ObjectOutputStream> deadClients = new ArrayList<>();
-            for (ObjectOutputStream out : clients) {
-                try {
-                    out.writeObject(event);
-                    out.flush();
-                    out.reset();
-                } catch (Exception e) {
-                    deadClients.add(out);
-                }
-            }
-            clients.removeAll(deadClients);
+        for (Subscription subscription : CLIENTS) {
+            if (!subscription.events.offer(event)) { subscription.close(); }
+        }
+    }
+
+    public static final class Subscription implements AutoCloseable {
+        private final Socket socket;
+        private final BlockingQueue<AuctionEvent> events = new ArrayBlockingQueue<>(64);
+
+        private Subscription(Socket socket) { this.socket = socket; }
+        public AuctionEvent poll() throws InterruptedException { return events.poll(1, TimeUnit.SECONDS); }
+
+        @Override
+        public void close() {
+            CLIENTS.remove(this);
+            try { socket.close(); } catch (IOException ignored) { }
         }
     }
 }

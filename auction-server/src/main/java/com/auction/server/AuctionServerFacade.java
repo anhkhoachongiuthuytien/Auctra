@@ -27,15 +27,15 @@ public class AuctionServerFacade {
         if ("Bidder".equalsIgnoreCase(role)) {
             return serverContext.getAuthService().registerBidder(username, email, password);
         }
-        throw new IllegalArgumentException("Vai trò đăng ký không được hỗ trợ: " + role);
+        throw new com.auction.exception.ValidationException("Vai trò đăng ký không được hỗ trợ: " + role);
     }
 
     public List<String> getAvailableRegistrationRoles() {
         return REGISTRATION_ROLES;
     }
 
-    public void resetPassword(String email, String username, String newPassword) {
-        serverContext.getAuthService().resetPassword(email, username, newPassword);
+    public void resetPassword(String email, String recoveryCode, String newPassword) {
+        serverContext.getAuthService().resetPassword(email, recoveryCode, newPassword);
     }
 
     public List<Auction> listAuctions() {
@@ -92,16 +92,24 @@ public class AuctionServerFacade {
         serverContext.getSellerService().updateItemImagePath(itemId, imagePath);
     }
 
+    public User getUser(String id) { return serverContext.getUserService().getUserById(id); }
+
+    public String getPasswordHash(User user) {
+        return serverContext.getPasswordHash(user.getEmail());
+    }
+
+    public Auction getAuction(String id) { return serverContext.getAuctionService().getAuctionById(id); }
+
     public List<User> listUsers() {
         return serverContext.getUserService().getAllUsers();
     }
 
     public void registerAutoBid(String auctionId, String bidderId, double maxPrice, double increment) {
-        serverContext.getAutoBidDao().save(new com.auction.model.auction.AutoBidConfig(auctionId, bidderId, maxPrice, increment));
+        serverContext.getBidService().registerAutoBid(auctionId, bidderId, maxPrice, increment);
     }
 
     public void cancelAutoBid(String auctionId, String bidderId) {
-        serverContext.getAutoBidDao().delete(auctionId, bidderId);
+        serverContext.getBidService().cancelAutoBid(auctionId, bidderId);
     }
 
     public com.auction.model.auction.AutoBidConfig getAutoBid(String auctionId, String bidderId) {

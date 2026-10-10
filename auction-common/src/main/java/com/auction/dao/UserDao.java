@@ -17,5 +17,11 @@ public interface UserDao {
 
     void updatePasswordHash(String email, String passwordHash);
 
+    void save(User user, String passwordHash, String recoveryCodeHash);
+
+    String findRecoveryCodeHashByEmail(String email);
+
+    boolean resetPasswordWithRecoveryCode(String email, String expectedRecoveryHash, String passwordHash);
+
     List<User> findAll();
 }

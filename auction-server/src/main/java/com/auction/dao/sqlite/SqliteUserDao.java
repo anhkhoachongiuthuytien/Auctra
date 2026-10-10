@@ -82,10 +82,15 @@ public class SqliteUserDao implements UserDao {
 
     @Override
     public void save(User user, String passwordHash) {
+        save(user, passwordHash, null);
+    }
+
+    @Override
+    public void save(User user, String passwordHash, String recoveryCodeHash) {
          // Upsert user together with a password hash for register and password bootstrap flows.
          String sql = """
-                 INSERT INTO users(id, username, email, role, password_hash, shipping_address, phone_number, store_name, store_description, department, avatar_path)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                 INSERT INTO users(id, username, email, role, password_hash, shipping_address, phone_number, store_name, store_description, department, avatar_path, recovery_code_hash)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                  ON CONFLICT(id) DO UPDATE SET
                      username = excluded.username,
                      email = excluded.email,
@@ -96,7 +101,8 @@ public class SqliteUserDao implements UserDao {
                      store_name = excluded.store_name,
                      store_description = excluded.store_description,
                      department = excluded.department,
-                     avatar_path = excluded.avatar_path
+                     avatar_path = excluded.avatar_path,
+                     recovery_code_hash = excluded.recovery_code_hash
                  """;
 
          try (Connection connection = databaseManager.getConnection();
@@ -133,6 +139,7 @@ public class SqliteUserDao implements UserDao {
                  statement.setString(10, null);
              }
              statement.setString(11, user.getAvatarPath());
+             statement.setString(12, recoveryCodeHash);
 
              statement.executeUpdate();
         } catch (SQLException e) {
@@ -179,6 +186,33 @@ public class SqliteUserDao implements UserDao {
             statement.executeUpdate();
         } catch (SQLException e) {
             throw new IllegalStateException("Failed to update password hash", e);
+        }
+    }
+
+    @Override
+    public String findRecoveryCodeHashByEmail(String email) {
+        try (Connection connection = databaseManager.getConnection();
+             PreparedStatement statement = connection.prepareStatement("SELECT recovery_code_hash FROM users WHERE email = ?")) {
+            statement.setString(1, email);
+            try (ResultSet rows = statement.executeQuery()) {
+                return rows.next() ? rows.getString(1) : null;
+            }
+        } catch (SQLException exception) {
+            throw new IllegalStateException("Failed to query recovery code", exception);
+        }
+    }
+
+    @Override
+    public boolean resetPasswordWithRecoveryCode(String email, String expectedRecoveryHash, String passwordHash) {
+        String sql = "UPDATE users SET password_hash = ?, recovery_code_hash = NULL WHERE email = ? AND recovery_code_hash = ?";
+        try (Connection connection = databaseManager.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, passwordHash);
+            statement.setString(2, email);
+            statement.setString(3, expectedRecoveryHash);
+            return statement.executeUpdate() == 1;
+        } catch (SQLException exception) {
+            throw new IllegalStateException("Failed to reset password", exception);
         }
     }
 

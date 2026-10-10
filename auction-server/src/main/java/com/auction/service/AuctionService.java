@@ -7,6 +7,8 @@ import com.auction.model.auction.Auction;
 import com.auction.model.item.Item;
 import com.auction.model.user.Seller;
 import com.auction.util.IdGenerator;
+import com.auction.util.AuctionLocks;
+import java.time.LocalDateTime;
 
 import java.util.List;
 
@@ -25,29 +27,49 @@ public class AuctionService {
     }
 
     public void startAuction(String auctionId) {
-        Auction auction = getAuctionById(auctionId);
-        auction.start();
-        auctionDao.save(auction);
+        synchronized (AuctionLocks.forId(auctionId)) {
+            Auction auction = getAuctionById(auctionId);
+            auction.start();
+            auctionDao.save(auction);
+        }
     }
 
     public void finishAuction(String auctionId) {
-        Auction auction = getAuctionById(auctionId);
-        auction.finish();
-        auctionDao.save(auction);
+        synchronized (AuctionLocks.forId(auctionId)) {
+            Auction auction = getAuctionById(auctionId);
+            auction.finish();
+            auctionDao.save(auction);
+        }
     }
 
     public void cancelAuction(String auctionId) {
-        Auction auction = getAuctionById(auctionId);
-        auction.cancel();
-        auctionDao.save(auction);
-        AuctionManager.getInstance().removeActiveAuction(auction);
+        synchronized (AuctionLocks.forId(auctionId)) {
+            Auction auction = getAuctionById(auctionId);
+            auction.cancel();
+            auctionDao.save(auction);
+            AuctionManager.getInstance().removeActiveAuction(auction);
+        }
     }
 
     public void markAuctionPaid(String auctionId) {
-        Auction auction = getAuctionById(auctionId);
-        auction.markPaid();
-        auctionDao.save(auction);
-        AuctionManager.getInstance().removeActiveAuction(auction);
+        synchronized (AuctionLocks.forId(auctionId)) {
+            Auction auction = getAuctionById(auctionId);
+            auction.markPaid();
+            auctionDao.save(auction);
+            AuctionManager.getInstance().removeActiveAuction(auction);
+        }
+    }
+
+    public boolean finishIfExpired(String auctionId, LocalDateTime now) {
+        synchronized (AuctionLocks.forId(auctionId)) {
+            Auction auction = getAuctionById(auctionId);
+            if (!auction.isOpen() || auction.getEndTime() == null || now.isBefore(auction.getEndTime())) {
+                return false;
+            }
+            auction.finish();
+            auctionDao.save(auction);
+            return true;
+        }
     }
 
     public List<Auction> listAuctions() {

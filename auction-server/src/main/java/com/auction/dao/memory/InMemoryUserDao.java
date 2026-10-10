@@ -2,56 +2,66 @@ package com.auction.dao.memory;
 
 import com.auction.dao.UserDao;
 import com.auction.model.user.User;
-
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class InMemoryUserDao implements UserDao {
-    private final HashMap<String, User> database = new HashMap<>();
-    private final Map<String, String> passwordHashesByEmail = new HashMap<>();
+    private final Map<String, User> database = new ConcurrentHashMap<>();
+    private final Map<String, String> passwords = new ConcurrentHashMap<>();
+    private final Map<String, String> recoveryCodes = new ConcurrentHashMap<>();
 
     @Override
-    public void save(User user) {
-        database.put(user.getId(), user);
-    }
+    public void save(User user) { database.put(user.getId(), user); }
 
     @Override
     public void save(User user, String passwordHash) {
         save(user);
-        passwordHashesByEmail.put(user.getEmail(), passwordHash);
+        passwords.put(user.getId(), passwordHash);
     }
 
     @Override
-    public User findById(String id) {
-        return database.get(id);
+    public void save(User user, String passwordHash, String recoveryHash) {
+        save(user, passwordHash);
+        if (recoveryHash != null) { recoveryCodes.put(user.getId(), recoveryHash); }
     }
+
+    @Override
+    public User findById(String id) { return id == null ? null : database.get(id); }
 
     @Override
     public User findByEmail(String email) {
-        for (User user : database.values()) {
-            if (user.getEmail().equals(email)) {
-                return user;
-            }
-        }
-        return null;
+        return database.values().stream().filter(u -> u.getEmail().equals(email)).findFirst().orElse(null);
     }
 
     @Override
     public String findPasswordHashByEmail(String email) {
-        return passwordHashesByEmail.get(email);
+        User user = findByEmail(email);
+        return user == null ? null : passwords.get(user.getId());
     }
 
     @Override
-    public void updatePasswordHash(String email, String passwordHash) {
-        if (findByEmail(email) != null) {
-            passwordHashesByEmail.put(email, passwordHash);
-        }
+    public void updatePasswordHash(String email, String hash) {
+        User user = findByEmail(email);
+        if (user != null) { passwords.put(user.getId(), hash); }
     }
 
     @Override
-    public List<User> findAll() {
-        return new ArrayList<>(database.values());
+    public String findRecoveryCodeHashByEmail(String email) {
+        User user = findByEmail(email);
+        return user == null ? null : recoveryCodes.get(user.getId());
     }
+
+    @Override
+    public synchronized boolean resetPasswordWithRecoveryCode(String email, String expectedHash, String passwordHash) {
+        User user = findByEmail(email);
+        if (user == null || expectedHash == null || !expectedHash.equals(recoveryCodes.get(user.getId()))) { return false; }
+        passwords.put(user.getId(), passwordHash);
+        recoveryCodes.remove(user.getId());
+        return true;
+    }
+
+    @Override
+    public List<User> findAll() { return new ArrayList<>(database.values()); }
 }

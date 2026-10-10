@@ -12,19 +12,24 @@ import com.auction.model.auction.AutoBidConfig;
 import com.auction.model.auction.BidTransaction;
 import com.auction.model.user.Bidder;
 import com.auction.model.user.User;
+import com.auction.util.AuctionLocks;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.PriorityQueue;
 
 public class BidService {
+    private static final int MAX_AUTO_ROUNDS = 10000;
     private final AuctionDao auctionDao;
     private final AutoBidDao autoBidDao;
     private final UserDao userDao;
 
-    public BidService(AuctionDao auctionDao) {
-        this(auctionDao, null, null);
-    }
+    public BidService(AuctionDao auctionDao) { this(auctionDao, null, null); }
 
     public BidService(AuctionDao auctionDao, AutoBidDao autoBidDao, UserDao userDao) {
         this.auctionDao = auctionDao;
@@ -33,136 +38,139 @@ public class BidService {
     }
 
     public void placeBid(String auctionId, Bidder bidder, double amount) {
-        if (auctionId == null || auctionId.trim().isEmpty()) {
-            throw new ValidationException("Mã phiên đấu giá không được để trống");
+        if (bidder == null) { throw new ValidationException("Bidder không được để trống"); }
+        if (!Double.isFinite(amount) || amount <= 0) {
+            throw new ValidationException("Số tiền đặt giá phải hữu hạn và lớn hơn 0");
         }
-        if (bidder == null) {
-            throw new ValidationException("Bidder không được để trống");
-        }
-        if (Double.isNaN(amount) || Double.isInfinite(amount) || amount <= 0) {
-            throw new ValidationException("Số tiền đặt giá phải lớn hơn 0");
-        }
-        Auction auction = auctionDao.findById(auctionId);
-        if (auction == null) {
-            throw new AuctionException("Không tìm thấy cuộc đấu giá");
-        }
-        // Khóa theo từng object auction để hai thread không cùng kiểm tra và cập nhật
-        // currentPrice trên cùng một phiên đấu giá tại cùng thời điểm.
-        synchronized (auction) {
-            if (!auction.isOpen()) {
-                throw new AuctionClosedException("Cuộc đấu giá đã đóng");
-            }
+        synchronized (AuctionLocks.forId(auctionId)) {
+            Auction auction = requireOpenAuction(auctionId);
             if (amount <= auction.getCurrentPrice()) {
                 throw new InvalidBidException("Giá đặt phải cao hơn giá hiện tại");
             }
-            BidTransaction bid = new BidTransaction(bidder, amount);
-            auction.addBid(bid);
-
-            // Chạy động cơ tự động đấu giá (Auto-Bidding Engine)
-            if (autoBidDao != null && userDao != null) {
-                runAutoBiddingEngine(auction);
-            }
-
+            Bidder actualBidder = userDao == null ? bidder : requireBidder(bidder.getId());
+            List<BidTransaction> bids = new ArrayList<>();
+            bids.add(new BidTransaction(actualBidder, amount));
+            bids.addAll(planAutoBids(amount, actualBidder.getId(), configsFor(auctionId)));
+            auction.addBids(bids);
             auctionDao.save(auction);
         }
     }
 
-    /**
-     * Tài liệu học tập: Giải thuật Đấu giá tự động sử dụng PriorityQueue
-     * 1. Duyệt qua tất cả các cấu hình Auto-Bid đã đăng ký của phiên này.
-     * 2. Sử dụng PriorityQueue để sắp xếp các lượt đặt giá tự động tiềm năng theo mức giá tăng dần.
-     *    Người nào cần nâng giá ở mức thấp nhất tiếp theo sẽ được ưu tiên đấu giá trước.
-     * 3. Khi một bidder outbid bidder khác, bidder cũ sẽ được re-insert vào hàng đợi để tiếp tục đấu giá
-     *    cho đến khi vượt quá maxPrice của họ.
-     * 4. Vòng lặp liên tục đẩy giá lên và kích hoạt Anti-Sniping cho đến khi không còn ai đủ ngân sách.
-     */
-    private void runAutoBiddingEngine(Auction auction) {
-        List<AutoBidConfig> configs = autoBidDao.getAutoBidsForAuction(auction.getId());
-        if (configs.isEmpty()) return;
+    public void registerAutoBid(String auctionId, String bidderId, double maxPrice, double increment) {
+        requireAutoBidSupport();
+        validateConfig(maxPrice, increment);
+        synchronized (AuctionLocks.forId(auctionId)) {
+            Auction auction = requireOpenAuction(auctionId);
+            requireBidder(bidderId);
+            double minimum = nextAmount(auction.getCurrentPrice(), increment);
+            if (!Double.isFinite(minimum) || minimum <= auction.getCurrentPrice() || maxPrice < minimum) {
+                throw new ValidationException("Giá tối đa phải đủ cho giá hiện tại cộng bước nâng");
+            }
+            AutoBidConfig config = new AutoBidConfig(auctionId, bidderId, maxPrice, increment);
+            List<AutoBidConfig> configs = new ArrayList<>(configsFor(auctionId));
+            configs.removeIf(c -> c.getBidderId().equals(bidderId));
+            configs.add(config);
+            List<BidTransaction> planned = planAutoBids(auction.getCurrentPrice(), winnerId(auction), configs);
+            // Plan before storing anything so invalid/huge configurations cannot partially bid.
+            AutoBidConfig previous = autoBidDao.find(auctionId, bidderId);
+            autoBidDao.save(config);
+            try {
+                if (!planned.isEmpty()) {
+                    auction.addBids(planned);
+                    auctionDao.save(auction);
+                }
+            } catch (RuntimeException exception) {
+                if (previous == null) { autoBidDao.delete(auctionId, bidderId); }
+                else { autoBidDao.save(previous); }
+                throw exception;
+            }
+        }
+    }
 
-        PriorityQueue<PendingAutoBid> pq = new PriorityQueue<>();
-        String winnerId = auction.getWinner() != null ? auction.getWinner().getId() : "";
-        double currentPrice = auction.getCurrentPrice();
+    public void cancelAutoBid(String auctionId, String bidderId) {
+        requireAutoBidSupport();
+        synchronized (AuctionLocks.forId(auctionId)) {
+            requireBidder(bidderId);
+            autoBidDao.delete(auctionId, bidderId);
+        }
+    }
 
-        // 1. Khởi động PQ với tất cả các cấu hình Auto-Bid (trừ người thắng hiện tại)
+    private Auction requireOpenAuction(String id) {
+        Auction auction = auctionDao.findById(id);
+        if (auction == null) { throw new AuctionException("Không tìm thấy cuộc đấu giá"); }
+        if (!auction.isOpen() || auction.getEndTime() == null
+                || !LocalDateTime.now().isBefore(auction.getEndTime())) {
+            throw new AuctionClosedException("Cuộc đấu giá chưa mở hoặc đã hết thời gian");
+        }
+        return auction;
+    }
+
+    private Bidder requireBidder(String id) {
+        User user = id == null ? null : userDao.findById(id);
+        if (!(user instanceof Bidder bidder)) {
+            throw new ValidationException("Không tìm thấy tài khoản người mua hợp lệ");
+        }
+        return bidder;
+    }
+
+    private void requireAutoBidSupport() {
+        if (autoBidDao == null || userDao == null) { throw new AuctionException("Auto-bid không khả dụng"); }
+    }
+
+    private List<AutoBidConfig> configsFor(String id) {
+        return autoBidDao == null || userDao == null ? List.of() : autoBidDao.getAutoBidsForAuction(id);
+    }
+
+    private static void validateConfig(double max, double step) {
+        if (!Double.isFinite(max) || max <= 0 || !Double.isFinite(step) || step <= 0) {
+            throw new ValidationException("Giá tối đa và bước nâng phải hữu hạn và lớn hơn 0");
+        }
+    }
+
+    private static double nextAmount(double price, double step) {
+        return BigDecimal.valueOf(price).add(BigDecimal.valueOf(step)).doubleValue();
+    }
+
+    private static String winnerId(Auction auction) {
+        return auction.getWinner() == null ? "" : auction.getWinner().getId();
+    }
+
+    /** Preserve increment-based bidding, with deterministic ties and no mutation while planning. */
+    private List<BidTransaction> planAutoBids(double price, String winner, List<AutoBidConfig> configs) {
+        Map<String, AutoBidConfig> eligible = new HashMap<>();
+        Map<String, Bidder> bidders = new HashMap<>();
         for (AutoBidConfig config : configs) {
-            if (!config.getBidderId().equals(winnerId)) {
-                double nextBid = currentPrice + config.getIncrement();
-                if (config.getMaxPrice() >= nextBid) {
-                    pq.add(new PendingAutoBid(config.getBidderId(), config.getMaxPrice(), config.getIncrement(), nextBid));
-                }
+            // Old databases may contain invalid configurations; they must not poison manual bids.
+            if (!Double.isFinite(config.getMaxPrice()) || config.getMaxPrice() <= 0
+                    || !Double.isFinite(config.getIncrement()) || config.getIncrement() <= 0) { continue; }
+            User user = userDao.findById(config.getBidderId());
+            if (user instanceof Bidder bidder) {
+                eligible.put(config.getBidderId(), config);
+                bidders.put(config.getBidderId(), bidder);
             }
         }
-
-        while (!pq.isEmpty()) {
-            PendingAutoBid bidder = pq.poll();
-            currentPrice = auction.getCurrentPrice();
-            winnerId = auction.getWinner() != null ? auction.getWinner().getId() : "";
-
-            if (!bidder.bidderId.equals(winnerId)) {
-                double bidAmount = Math.max(bidder.nextBidAmount, currentPrice + bidder.increment);
-                if (bidder.maxBid >= bidAmount) {
-                    User user = userDao.findById(bidder.bidderId);
-                    if (user instanceof Bidder) {
-                        String oldWinnerId = winnerId;
-                        
-                        // Đặt giá mới
-                        BidTransaction autoBid = new BidTransaction((Bidder) user, bidAmount);
-                        auction.addBid(autoBid);
-
-                        // Khi người thắng cũ bị outbid, ta phải thêm họ lại vào PQ (nếu họ có cấu hình Auto-Bid)
-                        if (oldWinnerId != null && !oldWinnerId.isEmpty()) {
-                            AutoBidConfig oldWinnerConfig = null;
-                            for (AutoBidConfig c : configs) {
-                                if (c.getBidderId().equals(oldWinnerId)) {
-                                    oldWinnerConfig = c;
-                                    break;
-                                }
-                            }
-                            if (oldWinnerConfig != null) {
-                                double nextBidForOldWinner = auction.getCurrentPrice() + oldWinnerConfig.getIncrement();
-                                if (oldWinnerConfig.getMaxPrice() >= nextBidForOldWinner) {
-                                    pq.add(new PendingAutoBid(oldWinnerConfig.getBidderId(), 
-                                            oldWinnerConfig.getMaxPrice(), 
-                                            oldWinnerConfig.getIncrement(), 
-                                            nextBidForOldWinner));
-                                }
-                            }
-                        }
-
-                        // Đồng bộ lại tất cả giá trị tiếp theo của các đối thủ khác đang chờ trong hàng đợi
-                        List<PendingAutoBid> temp = new ArrayList<>();
-                        while (!pq.isEmpty()) {
-                            PendingAutoBid p = pq.poll();
-                            double adjustedNextBid = Math.max(p.nextBidAmount, auction.getCurrentPrice() + p.increment);
-                            if (p.maxBid >= adjustedNextBid) {
-                                p.nextBidAmount = adjustedNextBid;
-                                temp.add(p);
-                            }
-                        }
-                        pq.addAll(temp);
-                    }
+        List<BidTransaction> planned = new ArrayList<>();
+        PriorityQueue<PendingBid> queue = new PriorityQueue<>(Comparator.comparingDouble(PendingBid::amount)
+                .thenComparing(PendingBid::bidderId));
+        while (true) {
+            queue.clear();
+            for (AutoBidConfig config : eligible.values()) {
+                if (config.getBidderId().equals(winner)) { continue; }
+                double next = nextAmount(price, config.getIncrement());
+                if (Double.isFinite(next) && next > price && next <= config.getMaxPrice()) {
+                    queue.add(new PendingBid(config.getBidderId(), next));
                 }
             }
+            if (queue.isEmpty()) { return planned; }
+            if (planned.size() >= MAX_AUTO_ROUNDS) {
+                throw new ValidationException("Auto-bid cần quá nhiều lượt; hãy tăng bước nâng giá");
+            }
+            PendingBid next = queue.remove();
+            planned.add(new BidTransaction(bidders.get(next.bidderId()), next.amount()));
+            winner = next.bidderId();
+            price = next.amount();
         }
     }
 
-    private static class PendingAutoBid implements Comparable<PendingAutoBid> {
-        final String bidderId;
-        final double maxBid;
-        final double increment;
-        double nextBidAmount;
-
-        PendingAutoBid(String bidderId, double maxBid, double increment, double nextBidAmount) {
-            this.bidderId = bidderId;
-            this.maxBid = maxBid;
-            this.increment = increment;
-            this.nextBidAmount = nextBidAmount;
-        }
-
-        @Override
-        public int compareTo(PendingAutoBid o) {
-            return Double.compare(this.nextBidAmount, o.nextBidAmount);
-        }
-    }
+    private record PendingBid(String bidderId, double amount) { }
 }

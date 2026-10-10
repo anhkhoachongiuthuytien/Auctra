@@ -24,6 +24,7 @@ public class DatabaseManager {
         try (Statement statement = connection.createStatement()) {
             // Bật foreign key trên từng connection để SQLite thật sự kiểm tra quan hệ giữa các bảng.
             statement.execute("PRAGMA foreign_keys = ON");
+            statement.execute("PRAGMA busy_timeout = 5000");
         }
         return connection;
     }
@@ -47,8 +48,22 @@ public class DatabaseManager {
             ensureItemsImagePathColumn(connection);
             ensureAuctionsEndTimeColumn(connection);
             ensureAuctionsDurationMinutesColumn(connection);
+            ensureColumn(connection, "auctions", "version", "INTEGER NOT NULL DEFAULT 0");
+            ensureUsersColumn(connection, "recovery_code_hash", "TEXT");
         } catch (SQLException e) {
             throw new IllegalStateException("Failed to initialize database schema", e);
+        }
+    }
+
+    private void ensureColumn(Connection connection, String table, String column, String definition) throws SQLException {
+        try (Statement statement = connection.createStatement();
+             ResultSet columns = statement.executeQuery("PRAGMA table_info(" + table + ")")) {
+            while (columns.next()) {
+                if (column.equalsIgnoreCase(columns.getString("name"))) { return; }
+            }
+        }
+        try (Statement statement = connection.createStatement()) {
+            statement.execute("ALTER TABLE " + table + " ADD COLUMN " + column + " " + definition);
         }
     }
 

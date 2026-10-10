@@ -1,361 +1,161 @@
 package com.auction.client;
 
-import com.auction.model.auction.Auction;
-import com.auction.model.user.Bidder;
-import com.auction.model.user.Seller;
-import com.auction.model.user.User;
-import com.auction.protocol.AuctionDto;
+import com.auction.exception.CommunicationException;
+import com.auction.protocol.AuctionEvent;
 import com.auction.protocol.AuctionRequest;
 import com.auction.protocol.AuctionResponse;
-import com.auction.protocol.DtoMapper;
+import com.auction.protocol.ProtocolFilter;
+import com.auction.protocol.ProtocolErrors;
 import com.auction.protocol.RequestType;
-import com.auction.protocol.UserDto;
-import com.auction.util.ItemImageMigrationHelper;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
 
-/**
- * Gateway phía client giao tiếp với server qua Java Socket.
- * Thay thế LocalAuctionClientGateway khi chạy ở chế độ mạng.
- *
- * Duy trì một persistent connection tới server.
- * Nếu kết nối bị mất, tự động reconnect.
- */
-public class SocketAuctionClientGateway implements AuctionClientGateway {
-    private static final int DEFAULT_PORT = 9999;
-    private static final String DEFAULT_HOST = "localhost";
-
+public class SocketAuctionClientGateway extends AbstractAuctionClientGateway {
     private final String host;
     private final int port;
     private Socket socket;
     private ObjectOutputStream out;
     private ObjectInputStream in;
-    private Thread listenerThread;
+    private volatile Socket eventSocket;
+    private volatile Thread listener;
+    private volatile long listenerGeneration;
 
-    public SocketAuctionClientGateway() {
-        this(DEFAULT_HOST, DEFAULT_PORT);
-    }
+    public SocketAuctionClientGateway() { this("localhost", 9999); }
+    public SocketAuctionClientGateway(String host, int port) { this.host = host; this.port = port; }
 
-    public SocketAuctionClientGateway(String host, int port) {
-        this.host = host;
-        this.port = port;
-    }
-
-    /**
-     * Kết nối tới server. Nếu đã kết nối rồi thì bỏ qua.
-     */
-    public void connect() {
-        if (socket != null && !socket.isClosed()) {
-            return;
-        }
+    private Socket openSocket() throws IOException {
+        Socket connection = new Socket();
         try {
-            socket = new Socket(host, port);
+            connection.connect(new InetSocketAddress(host, port), 5000);
+            connection.setSoTimeout(15000);
+            return connection;
+        } catch (IOException exception) { close(connection); throw exception; }
+    }
+
+    public synchronized void connect() {
+        if (socket != null && !socket.isClosed()) { return; }
+        try {
+            socket = openSocket();
             out = new ObjectOutputStream(socket.getOutputStream());
             out.flush();
             in = new ObjectInputStream(socket.getInputStream());
-            System.out.println("[Client] Đã kết nối tới server " + host + ":" + port);
-            
-            // Khởi động luồng lắng nghe Real-time nếu chưa chạy
-            if (listenerThread == null || !listenerThread.isAlive()) {
-                startListeningForUpdates();
-            }
-        } catch (IOException e) {
-            throw new RuntimeException("Không thể kết nối tới server: " + e.getMessage(), e);
+            in.setObjectInputFilter(ProtocolFilter.create());
+        } catch (IOException exception) {
+            closeRequestConnection();
+            throw new CommunicationException("Không thể kết nối tới server", exception);
         }
     }
 
-    private void startListeningForUpdates() {
-        listenerThread = new Thread(() -> {
-            try {
-                Socket eventSocket = new Socket(host, port);
-                ObjectOutputStream eventOut = new ObjectOutputStream(eventSocket.getOutputStream());
+    @Override
+    protected AuctionResponse exchange(AuctionRequest request) {
+        connect();
+        try { return exchangeOnce(request); }
+        catch (IOException | ClassNotFoundException exception) {
+            closeRequestConnection();
+            // A lost response must never replay a bid, registration or auction creation.
+            if (isReadOnly(request.getType())) {
+                connect();
+                try { return exchangeOnce(request); }
+                catch (IOException | ClassNotFoundException retryFailure) {
+                    closeRequestConnection();
+                    throw new CommunicationException("Mất kết nối tới server; vui lòng thử lại", retryFailure);
+                }
+            }
+            throw new CommunicationException("Chưa xác nhận được kết quả; hãy tải lại trước khi thực hiện lại thao tác", exception);
+        }
+    }
+
+    private AuctionResponse exchangeOnce(AuctionRequest request) throws IOException, ClassNotFoundException {
+        out.writeObject(request);
+        out.flush();
+        out.reset();
+        Object value = in.readObject();
+        if (!(value instanceof AuctionResponse response)) { throw new IOException("Invalid server response"); }
+        return response;
+    }
+
+    private static boolean isReadOnly(RequestType type) {
+        return switch (type) {
+            case LIST_AUCTIONS, LIST_AUCTIONS_FOR_SELLER, LIST_USERS, GET_REGISTRATION_ROLES, GET_AUTO_BID_STATUS -> true;
+            default -> false;
+        };
+    }
+
+    @Override
+    protected void sessionChanged() {
+        stopListener();
+        if (sessionToken == null) { return; }
+        long generation = listenerGeneration;
+        String token = sessionToken;
+        Thread thread = new Thread(() -> listen(generation, token), "auction-events");
+        thread.setDaemon(true);
+        listener = thread;
+        thread.start();
+    }
+
+    private void listen(long generation, String token) {
+        while (generation == listenerGeneration && !Thread.currentThread().isInterrupted()) {
+            try (Socket connection = openSocket();
+                 ObjectOutputStream eventOut = new ObjectOutputStream(connection.getOutputStream())) {
                 eventOut.flush();
-                ObjectInputStream eventIn = new ObjectInputStream(eventSocket.getInputStream());
-                
-                eventOut.writeObject(new AuctionRequest(RequestType.SUBSCRIBE_UPDATES));
-                eventOut.flush();
-                
-                System.out.println("[Client] Đã kết nối luồng Real-time update (Push Notifications).");
-                while (true) {
-                    Object obj = eventIn.readObject();
-                    if (obj instanceof com.auction.protocol.AuctionEvent) {
-                        System.out.println("[Client] Bắt được sự kiện: " + ((com.auction.protocol.AuctionEvent)obj).getEventType());
-                        javafx.application.Platform.runLater(ClientEventManager::fireUpdate);
+                synchronized (this) {
+                    if (generation != listenerGeneration) { return; }
+                    eventSocket = connection;
+                }
+                try (ObjectInputStream eventIn = new ObjectInputStream(connection.getInputStream())) {
+                    eventIn.setObjectInputFilter(ProtocolFilter.create());
+                    eventOut.writeObject(new AuctionRequest(RequestType.SUBSCRIBE_UPDATES).put("sessionToken", token));
+                    eventOut.flush();
+                    Object acknowledgement = eventIn.readObject();
+                    if (!(acknowledgement instanceof AuctionResponse response)) { throw new IOException("Invalid subscription"); }
+                    if (!response.isSuccess()) { throw ProtocolErrors.toException(response); }
+                    connection.setSoTimeout(0);
+                    fireUpdate(); // Refresh anything missed while the event socket was disconnected.
+                    while (generation == listenerGeneration) {
+                        Object value = eventIn.readObject();
+                        if (value instanceof AuctionEvent) { fireUpdate(); }
                     }
                 }
-            } catch (Exception e) {
-                System.err.println("[Client] Mất kết nối luồng Real-time: " + e.getMessage());
+            } catch (com.auction.exception.AuthenticationException exception) {
+                return;
+            } catch (IOException | ClassNotFoundException exception) {
+                if (generation != listenerGeneration) { return; }
+                try { Thread.sleep(1000); }
+                catch (InterruptedException interrupted) { Thread.currentThread().interrupt(); return; }
             }
-        });
-        listenerThread.setDaemon(true);
-        listenerThread.start();
+        }
     }
 
-    /**
-     * Ngắt kết nối.
-     */
-    public void disconnect() {
-        try {
-            if (socket != null && !socket.isClosed()) {
-                socket.close();
-            }
-        } catch (IOException e) {
-            // ignore
-        }
+    private static void fireUpdate() {
+        try { javafx.application.Platform.runLater(ClientEventManager::fireUpdate); }
+        catch (IllegalStateException exception) { ClientEventManager.fireUpdate(); }
+    }
+
+    private void stopListener() {
+        listenerGeneration++;
+        Thread current = listener;
+        if (current != null) { current.interrupt(); }
+        close(eventSocket);
+        eventSocket = null;
+        listener = null;
+    }
+
+    private void closeRequestConnection() {
+        close(socket);
         socket = null;
-        out = null;
         in = null;
+        out = null;
     }
 
-    /**
-     * Gửi request và nhận response từ server.
-     */
-    private AuctionResponse send(AuctionRequest request) {
-        connect();
-        try {
-            out.writeObject(request);
-            out.flush();
-            out.reset();
-            AuctionResponse response = (AuctionResponse) in.readObject();
-            if (!response.isSuccess()) {
-                throw new RuntimeException(response.getMessage());
-            }
-            return response;
-        } catch (IOException | ClassNotFoundException e) {
-            // Kết nối bị mất — reset và retry 1 lần
-            disconnect();
-            connect();
-            try {
-                out.writeObject(request);
-                out.flush();
-                out.reset();
-                AuctionResponse response = (AuctionResponse) in.readObject();
-                if (!response.isSuccess()) {
-                    throw new RuntimeException(response.getMessage());
-                }
-                return response;
-            } catch (IOException | ClassNotFoundException e2) {
-                throw new RuntimeException("Lỗi giao tiếp với server: " + e2.getMessage(), e2);
-            }
-        }
-    }
+    public synchronized void disconnect() { stopListener(); closeRequestConnection(); }
 
     @Override
-    public User login(String email, String password) {
-        AuctionRequest req = new AuctionRequest(RequestType.LOGIN)
-                .put("email", email)
-                .put("password", password);
-        AuctionResponse resp = send(req);
-        return DtoMapper.toUser((UserDto) resp.getData());
-    }
+    public synchronized void close() { disconnect(); sessionToken = null; }
 
-    @Override
-    public User register(String username, String email, String password, String role) {
-        AuctionRequest req = new AuctionRequest(RequestType.REGISTER)
-                .put("username", username)
-                .put("email", email)
-                .put("password", password)
-                .put("role", role);
-        AuctionResponse resp = send(req);
-        return DtoMapper.toUser((UserDto) resp.getData());
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public List<String> getAvailableRegistrationRoles() {
-        AuctionRequest req = new AuctionRequest(RequestType.GET_REGISTRATION_ROLES);
-        AuctionResponse resp = send(req);
-        return (List<String>) resp.getData();
-    }
-
-    @Override
-    public void resetPassword(String email, String username, String newPassword) {
-        AuctionRequest req = new AuctionRequest(RequestType.RESET_PASSWORD)
-                .put("email", email)
-                .put("username", username)
-                .put("newPassword", newPassword);
-        send(req);
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public List<Auction> listAuctions() {
-        AuctionRequest req = new AuctionRequest(RequestType.LIST_AUCTIONS);
-        AuctionResponse resp = send(req);
-        List<AuctionDto> dtos = (List<AuctionDto>) resp.getData();
-        List<Auction> auctions = new ArrayList<>();
-        for (AuctionDto dto : dtos) {
-            auctions.add(DtoMapper.toAuction(dto));
-        }
-        ItemImageMigrationHelper.migrateLocalImagePaths(auctions, this);
-        return auctions;
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public List<Auction> listAuctionsForSeller(String sellerId) {
-        AuctionRequest req = new AuctionRequest(RequestType.LIST_AUCTIONS_FOR_SELLER)
-                .put("sellerId", sellerId);
-        AuctionResponse resp = send(req);
-        List<AuctionDto> dtos = (List<AuctionDto>) resp.getData();
-        List<Auction> auctions = new ArrayList<>();
-        for (AuctionDto dto : dtos) {
-            auctions.add(DtoMapper.toAuction(dto));
-        }
-        ItemImageMigrationHelper.migrateLocalImagePaths(auctions, this);
-        return auctions;
-    }
-
-    @Override
-    public Auction createAuctionForSeller(Seller seller, String itemType, String name,
-                                          String description, double startingPrice) {
-        return createAuctionForSeller(seller, itemType, name, description, startingPrice, null);
-    }
-
-    @Override
-    public Auction createAuctionForSeller(Seller seller, String itemType, String name,
-                                          String description, double startingPrice, String imagePath) {
-        return createAuctionForSeller(seller, itemType, name, description, startingPrice, imagePath, 5);
-    }
-
-    @Override
-    public Auction createAuctionForSeller(Seller seller, String itemType, String name,
-                                          String description, double startingPrice, String imagePath, int durationMinutes) {
-        AuctionRequest req = new AuctionRequest(RequestType.CREATE_AUCTION)
-                .put("sellerId", seller.getId())
-                .put("sellerName", seller.getUsername())
-                .put("sellerEmail", seller.getEmail())
-                .put("itemType", itemType)
-                .put("itemName", name)
-                .put("itemDescription", description)
-                .put("startingPrice", String.valueOf(startingPrice))
-                .put("imagePath", imagePath)
-                .put("durationMinutes", String.valueOf(durationMinutes));
-        AuctionResponse resp = send(req);
-        return DtoMapper.toAuction((AuctionDto) resp.getData());
-    }
-
-    @Override
-    public void updateItemImagePath(String itemId, String imagePath) {
-        AuctionRequest req = new AuctionRequest(RequestType.UPDATE_ITEM_IMAGE)
-                .put("itemId", itemId)
-                .put("imagePath", imagePath);
-        send(req);
-    }
-
-    @Override
-    public void startAuction(String auctionId) {
-        AuctionRequest req = new AuctionRequest(RequestType.START_AUCTION)
-                .put("auctionId", auctionId);
-        send(req);
-    }
-
-    @Override
-    public void finishAuction(String auctionId) {
-        AuctionRequest req = new AuctionRequest(RequestType.FINISH_AUCTION)
-                .put("auctionId", auctionId);
-        send(req);
-    }
-
-    @Override
-    public void cancelAuction(String auctionId) {
-        AuctionRequest req = new AuctionRequest(RequestType.CANCEL_AUCTION)
-                .put("auctionId", auctionId);
-        send(req);
-    }
-
-    @Override
-    public void markAuctionPaid(String auctionId) {
-        AuctionRequest req = new AuctionRequest(RequestType.MARK_AUCTION_PAID)
-                .put("auctionId", auctionId);
-        send(req);
-    }
-
-    @Override
-    public void placeBid(String auctionId, Bidder bidder, double amount) {
-        AuctionRequest req = new AuctionRequest(RequestType.PLACE_BID)
-                .put("auctionId", auctionId)
-                .put("bidderId", bidder.getId())
-                .put("bidderName", bidder.getUsername())
-                .put("bidderEmail", bidder.getEmail())
-                .put("amount", String.valueOf(amount));
-        send(req);
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public List<User> listUsers() {
-        AuctionRequest req = new AuctionRequest(RequestType.LIST_USERS);
-        AuctionResponse resp = send(req);
-        List<UserDto> dtos = (List<UserDto>) resp.getData();
-        List<User> users = new ArrayList<>();
-        for (UserDto dto : dtos) {
-            users.add(DtoMapper.toUser(dto));
-        }
-        return users;
-    }
-
-    @Override
-    public void registerAutoBid(String auctionId, String bidderId, double maxPrice, double increment) {
-        AuctionRequest req = new AuctionRequest(RequestType.REGISTER_AUTO_BID)
-                .put("auctionId", auctionId)
-                .put("bidderId", bidderId)
-                .put("maxPrice", String.valueOf(maxPrice))
-                .put("increment", String.valueOf(increment));
-        send(req);
-    }
-
-    @Override
-    public void cancelAutoBid(String auctionId, String bidderId) {
-        AuctionRequest req = new AuctionRequest(RequestType.CANCEL_AUTO_BID)
-                .put("auctionId", auctionId)
-                .put("bidderId", bidderId);
-        send(req);
-    }
-
-    @Override
-    public com.auction.model.auction.AutoBidConfig getAutoBid(String auctionId, String bidderId) {
-        AuctionRequest req = new AuctionRequest(RequestType.GET_AUTO_BID_STATUS)
-                .put("auctionId", auctionId)
-                .put("bidderId", bidderId);
-        AuctionResponse resp = send(req);
-        return (com.auction.model.auction.AutoBidConfig) resp.getData();
-    }
-
-    @Override
-    public User updateUser(String userId, String username, String email) {
-        return updateUser(userId, username, email, null, null, null, null, null, null);
-    }
-
-    @Override
-    public User updateUser(String userId, String username, String email,
-                           String shippingAddress, String phoneNumber,
-                           String storeName, String storeDescription,
-                           String department) {
-        return updateUser(userId, username, email, shippingAddress, phoneNumber, storeName, storeDescription, department, null);
-    }
-
-    @Override
-    public User updateUser(String userId, String username, String email,
-                           String shippingAddress, String phoneNumber,
-                           String storeName, String storeDescription,
-                           String department, String avatarPath) {
-        AuctionRequest req = new AuctionRequest(RequestType.UPDATE_USER)
-                .put("userId", userId)
-                .put("username", username)
-                .put("email", email)
-                .put("shippingAddress", shippingAddress)
-                .put("phoneNumber", phoneNumber)
-                .put("storeName", storeName)
-                .put("storeDescription", storeDescription)
-                .put("department", department)
-                .put("avatarPath", avatarPath);
-        AuctionResponse resp = send(req);
-        return DtoMapper.toUser((UserDto) resp.getData());
+    private static void close(Socket connection) {
+        if (connection != null) { try { connection.close(); } catch (IOException ignored) { } }
     }
 }

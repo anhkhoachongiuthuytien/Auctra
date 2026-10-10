@@ -26,7 +26,7 @@ Auctra là ứng dụng đấu giá trực tuyến được thiết kế theo ki
 
 Dự án được tổ chức theo mô hình Multi-Module Maven sạch sẽ:
 ```
-d:\BaitaplonTest
+D:\BaitaplonTest\Auctra
 ├── auction-common         # Thư viện dùng chung (Models, DTOs, Enums, Mappers, Encryptors)
 ├── auction-server         # TCP Socket Server, SQLite Database, Services, DAOs
 ├── auction-client         # JavaFX UI Controllers, FXML layouts, TCP Socket Client Gateway
@@ -39,9 +39,9 @@ d:\BaitaplonTest
 > Luôn khởi chạy **Server trước**, sau đó mới khởi chạy **Client**.
 
 ### Bước 1: Biên dịch và đóng gói toàn bộ dự án
-Chạy lệnh sau để dọn dẹp, tải các thư viện cần thiết, biên dịch mã nguồn và bỏ qua các bài test để tăng tốc:
+Chạy lệnh sau để dọn dẹp, tải các thư viện cần thiết, biên dịch mã nguồn và chạy toàn bộ kiểm thử trước khi cài các module vào Maven local repository:
 ```bash
-mvn clean package -DskipTests
+mvn clean install
 ```
 *Lưu ý: Lệnh này sẽ tạo ra file đóng gói `auction-server.jar` tại đường dẫn `auction-server/target/auction-server.jar`.*
 
@@ -96,3 +96,51 @@ Mở một cửa sổ terminal mới (vẫn đứng tại thư mục gốc dự 
 ## 5. Tài Nguyên Đi Kèm
 - **Báo cáo chi tiết (PDF)**: https://drive.google.com/file/d/1tyttMCH6bK7X140k84u1ZG6bczcYUWMZ/view?usp=sharing
 - **Video Demo sản phẩm**: https://youtu.be/cOjOeHgrtVg
+
+## 6. Bản sửa lỗi đấu giá và hướng dẫn kiểm chứng
+
+Trên Windows, nếu `mvn` đang dùng JRE và báo thiếu compiler, chạy `./build.ps1`.
+Script chọn JDK từ lệnh `javac`, chạy test và install các module, rồi khôi phục biến môi trường của terminal.
+Sau khi build, chạy `./run-server.ps1` và ở terminal khác chạy `./run-client.ps1`.
+Để chạy client trên máy khác dùng `./run-client.ps1 -ServerHost 192.168.1.10 -Port 9999`;
+để chạy LOCAL dùng `./run-client.ps1 -Local`. Các script chạy từ thư mục gốc và chọn JDK để tránh lỗi JRE thiếu compiler.
+
+- Auto-bid chạy ngay khi kích hoạt. Khi đang dẫn đầu, người mua không tự nâng giá của mình.
+- Auto-bid phản hồi khi bị vượt giá, tuân thủ max/bước giá, và ngừng sau khi hủy hoặc phiên hết hạn.
+- Server từ chối bước giá không dương, NaN/Infinity, max không đủ cho bước tiếp theo, tài khoản sai vai trò và phiên đã đóng.
+- Các cấu hình cũ không hợp lệ được bỏ qua để không làm hỏng bid thủ công. Vòng đấu tự động vượt 10.000 lượt bị từ chối
+  trước khi thay đổi dữ liệu; cần chọn bước nâng lớn hơn.
+- Thao tác đọc–kiểm tra–ghi dùng khóa ổn định theo mã phiên; SQLite kiểm tra version để chặn snapshot cũ ghi đè.
+  Lịch sử chỉ thêm bid mới, không xóa rồi ghi lại.
+- LOCAL và SOCKET dùng chung request handler, session và các exception nghiệp vụ có kiểu rõ ràng.
+- Session hết hạn sau 30 phút, bị hủy khi đăng xuất hoặc đổi mật khẩu. Server kiểm tra vai trò và quyền sở hữu.
+- Socket hỗ trợ tối đa 128 connection đồng thời (mỗi client thường dùng 2), có timeout và hàng đợi realtime riêng.
+  Subscriber chậm bị ngắt thay vì làm chặn các thao tác đặt giá. Không tự gửi lại thao tác ghi khi mất response.
+- Client/server của bản sửa phải được build và khởi động lại cùng nhau vì protocol có thêm session và mã lỗi.
+
+### Khôi phục mật khẩu
+
+Khi đăng ký, ứng dụng hiển thị mã khôi phục bí mật một lần; hãy sao chép và cất giữ. Màn hình Quên mật khẩu cần
+email và mã này, không dùng username để chứng minh quyền sở hữu. Database chỉ lưu hash, mã chỉ dùng được một lần.
+
+Với tài khoản cũ hoặc đã dùng hết mã, người quản lý có quyền truy cập database server có thể cấp mã mới:
+
+```powershell
+java -jar auction-server/target/auction-server.jar --recovery-code email@example.com auction-system.db
+```
+
+### Chạy kiểm thử và demo auto-bid
+
+```powershell
+mvn clean install
+java -jar auction-server/target/auction-server.jar
+# Ở terminal khác, cùng thư mục gốc:
+mvn -pl auction-client javafx:run '-Djavafx.args=--socket localhost 9999'
+```
+
+1. Mở phiên đang RUNNING bằng tài khoản Bidder A; bật Auto-Bid với max cao hơn giá hiện tại cộng bước nâng.
+2. Giá tăng ngay một bước. Bật/đổi cấu hình khi A đang dẫn đầu không làm A tự trả thêm.
+3. Dùng Bidder B ở client thứ hai trả giá; A phản hồi nếu bước tiếp theo vẫn nằm trong max.
+4. Hủy cấu hình của A; bid tiếp theo của B không kích hoạt A nữa.
+5. Các test `AutoBidRegressionTest`, `SqliteConcurrentBidTest`, `RequestSecurityTest` và
+   `SocketGatewayIntegrationTest` kiểm tra các hành vi trên, phân quyền, recovery và nhiều client.

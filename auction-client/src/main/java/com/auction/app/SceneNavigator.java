@@ -36,6 +36,7 @@ public class SceneNavigator {
     }
 
     public void showLogin() throws IOException {
+        appContext.getGateway().logout();
         FXMLLoader loader = createLoader("/fxml/login-view.fxml");
         Parent root = loader.load();
         AuthController controller = loader.getController();

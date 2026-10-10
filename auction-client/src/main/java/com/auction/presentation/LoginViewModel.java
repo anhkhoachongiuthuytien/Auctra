@@ -46,12 +46,12 @@ public class LoginViewModel {
         return "Bạn có thể đăng ký tài khoản Bidder/Seller, hoặc dùng mật khẩu demo: demo12345";
     }
 
-    public LoginResult resetPassword(String email, String username, String newPassword, String confirmPassword) {
+    public LoginResult resetPassword(String email, String recoveryCode, String newPassword, String confirmPassword) {
         if (confirmPassword == null || !confirmPassword.equals(newPassword)) {
             return LoginResult.failure("Mật khẩu xác nhận không khớp.");
         }
         try {
-            gateway.resetPassword(email, username, newPassword);
+            gateway.resetPassword(email, recoveryCode, newPassword);
             return LoginResult.success(null, "Đặt lại mật khẩu thành công. Vui lòng đăng nhập lại.");
         } catch (AuctionException ex) {
             return LoginResult.failure(ex.getMessage());

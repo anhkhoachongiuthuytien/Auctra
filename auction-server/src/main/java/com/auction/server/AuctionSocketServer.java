@@ -1,295 +1,127 @@
 package com.auction.server;
 
-import com.auction.model.auction.Auction;
-import com.auction.model.user.Bidder;
-import com.auction.model.user.Seller;
-import com.auction.model.user.User;
-import com.auction.protocol.AuctionDto;
 import com.auction.protocol.AuctionEvent;
 import com.auction.protocol.AuctionRequest;
 import com.auction.protocol.AuctionResponse;
-import com.auction.protocol.DtoMapper;
+import com.auction.protocol.ProtocolFilter;
 import com.auction.protocol.RequestType;
-import com.auction.protocol.UserDto;
-
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
+import java.net.SocketException;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
-/**
- * Server TCP lắng nghe các AuctionRequest từ client,
- * xử lý qua AuctionServerFacade, và trả AuctionResponse.
- *
- * Mỗi client connection được xử lý trong thread pool riêng.
- */
 public class AuctionSocketServer {
-    private static final int DEFAULT_PORT = 9999;
-    private static final int THREAD_POOL_SIZE = 10;
-
     private final int port;
-    private final AuctionServerFacade facade;
-    private final ExecutorService threadPool;
+    private final AuctionRequestHandler handler;
+    private final Set<Socket> clients = ConcurrentHashMap.newKeySet();
+    // Persistent sockets need one worker each; no unbounded queue of unhandled sockets.
+    private final ThreadPoolExecutor workers = new ThreadPoolExecutor(0, 128, 30, TimeUnit.SECONDS,
+            new SynchronousQueue<>(), runnable -> {
+                Thread thread = new Thread(runnable, "auction-connection");
+                thread.setDaemon(true);
+                return thread;
+            });
+    private final ScheduledExecutorService writeTimeouts = Executors.newSingleThreadScheduledExecutor(runnable -> {
+        Thread thread = new Thread(runnable, "auction-write-timeouts");
+        thread.setDaemon(true);
+        return thread;
+    });
     private volatile boolean running;
-    private ServerSocket serverSocket;
+    private volatile ServerSocket serverSocket;
 
-    public AuctionSocketServer(AuctionServerFacade facade) {
-        this(facade, DEFAULT_PORT);
-    }
-
+    public AuctionSocketServer(AuctionServerFacade facade) { this(facade, 9999); }
     public AuctionSocketServer(AuctionServerFacade facade, int port) {
-        this.facade = facade;
         this.port = port;
-        this.threadPool = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
+        this.handler = new AuctionRequestHandler(facade);
     }
 
-    /**
-     * Bắt đầu lắng nghe kết nối. Phương thức này block thread hiện tại.
-     */
+    public int getPort() { return serverSocket == null ? -1 : serverSocket.getLocalPort(); }
+
     public void start() throws IOException {
         serverSocket = new ServerSocket(port);
         running = true;
-        System.out.println("[Server] Đang chạy tại cổng " + port);
-
         while (running) {
             try {
-                Socket clientSocket = serverSocket.accept();
-                System.out.println("[Server] Client kết nối: " + clientSocket.getRemoteSocketAddress());
-                threadPool.submit(() -> handleClient(clientSocket));
-            } catch (IOException e) {
-                if (running) {
-                    System.err.println("[Server] Lỗi accept: " + e.getMessage());
-                }
+                Socket socket = serverSocket.accept();
+                socket.setSoTimeout(5000);
+                clients.add(socket);
+                try { workers.execute(() -> handleClient(socket)); }
+                catch (RejectedExecutionException exception) { clients.remove(socket); close(socket); }
+            } catch (SocketException exception) {
+                if (running) { throw exception; }
             }
         }
     }
 
     public void stop() {
         running = false;
-        threadPool.shutdown();
-        try {
-            if (serverSocket != null && !serverSocket.isClosed()) {
-                serverSocket.close();
-            }
-        } catch (IOException e) {
-            System.err.println("[Server] Lỗi khi đóng: " + e.getMessage());
+        if (serverSocket != null) {
+            try { serverSocket.close(); } catch (IOException ignored) { }
         }
-        System.out.println("[Server] Đã dừng.");
+        clients.forEach(AuctionSocketServer::close);
+        workers.shutdownNow();
+        writeTimeouts.shutdownNow();
     }
 
-    /**
-     * Xử lý một client connection. Hỗ trợ nhiều request liên tiếp trên cùng connection.
-     */
     private void handleClient(Socket socket) {
-        try (ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
+        try (socket;
              ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream())) {
-
-            boolean isSubscriber = false;
-            while (true) {
-                AuctionRequest request;
-                try {
-                    request = (AuctionRequest) in.readObject();
-                } catch (Exception e) {
-                    // Client đã ngắt kết nối
-                    if (isSubscriber) {
-                        BroadcastManager.removeClient(out);
+            out.flush();
+            try (ObjectInputStream in = new ObjectInputStream(socket.getInputStream())) {
+                in.setObjectInputFilter(ProtocolFilter.create());
+                while (running && !socket.isClosed()) {
+                    Object value = in.readObject();
+                    if (!(value instanceof AuctionRequest request)) { break; }
+                    AuctionResponse response = handler.process(request);
+                    if (request.getType() == RequestType.SUBSCRIBE_UPDATES && response.isSuccess()) {
+                        try (BroadcastManager.Subscription subscription = BroadcastManager.subscribe(socket)) {
+                            write(socket, out, response);
+                            while (running && !socket.isClosed()) {
+                                handler.requireUser(request.get("sessionToken"));
+                                AuctionEvent event = subscription.poll();
+                                if (event != null) { write(socket, out, event); }
+                            }
+                        }
+                        break;
                     }
-                    break;
+                    write(socket, out, response);
+                    socket.setSoTimeout(60000);
                 }
-
-                if (request.getType() == RequestType.SUBSCRIBE_UPDATES) {
-                    BroadcastManager.addClient(out);
-                    isSubscriber = true;
-                    // Keep listening on this socket for nothing (it just blocks)
-                    continue;
-                }
-
-                System.out.println("[Server] Nhận request: " + request.getType());
-                AuctionResponse response = processRequest(request);
-                out.writeObject(response);
-                out.flush();
-                out.reset();
             }
-        } catch (IOException e) {
-            System.err.println("[Server] Lỗi xử lý client: " + e.getMessage());
+        } catch (EOFException | SocketException ignored) {
+            // Normal disconnect, idle timeout or shutdown.
+        } catch (InterruptedException exception) {
+            Thread.currentThread().interrupt();
+        } catch (IOException | ClassNotFoundException | RuntimeException exception) {
+            System.err.println("[Server] Connection closed: " + exception.getClass().getSimpleName());
         } finally {
-            try {
-                socket.close();
-            } catch (IOException e) {
-                // ignore
-            }
-            System.out.println("[Server] Client đã ngắt kết nối.");
+            clients.remove(socket);
+            close(socket);
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private AuctionResponse processRequest(AuctionRequest request) {
+    private void write(Socket socket, ObjectOutputStream out, Object value) throws IOException {
+        ScheduledFuture<?> timeout = writeTimeouts.schedule(() -> close(socket), 10, TimeUnit.SECONDS);
         try {
-            switch (request.getType()) {
-                case LOGIN: {
-                    User user = facade.login(request.get("email"), request.get("password"));
-                    return AuctionResponse.ok(DtoMapper.toDto(user));
-                }
-                case REGISTER: {
-                    User user = facade.register(
-                            request.get("username"),
-                            request.get("email"),
-                            request.get("password"),
-                            request.get("role")
-                    );
-                    // Bắn thông báo cho các Client khác biết có người mới đăng ký (dành cho Admin update)
-                    BroadcastManager.broadcast(new AuctionEvent("USER_REGISTERED"));
-                    return AuctionResponse.ok(DtoMapper.toDto(user));
-                }
-                case GET_REGISTRATION_ROLES: {
-                    List<String> roles = facade.getAvailableRegistrationRoles();
-                    return AuctionResponse.ok(new java.util.ArrayList<>(roles));
-                }
-                case RESET_PASSWORD: {
-                    facade.resetPassword(
-                            request.get("email"),
-                            request.get("username"),
-                            request.get("newPassword")
-                    );
-                    return AuctionResponse.ok();
-                }
-                case LIST_AUCTIONS: {
-                    List<Auction> auctions = facade.listAuctions();
-                    List<AuctionDto> dtos = new java.util.ArrayList<>();
-                    for (Auction a : auctions) {
-                        dtos.add(DtoMapper.toDto(a));
-                    }
-                    return AuctionResponse.ok(dtos);
-                }
-                case LIST_AUCTIONS_FOR_SELLER: {
-                    List<Auction> auctions = facade.listAuctionsForSeller(request.get("sellerId"));
-                    List<AuctionDto> dtos = new java.util.ArrayList<>();
-                    for (Auction a : auctions) {
-                        dtos.add(DtoMapper.toDto(a));
-                    }
-                    return AuctionResponse.ok(dtos);
-                }
-                case CREATE_AUCTION: {
-                    Seller seller = new Seller(
-                            request.get("sellerId"),
-                            request.get("sellerName"),
-                            request.get("sellerEmail")
-                    );
-                    int durationMinutes = 5;
-                    if (request.get("durationMinutes") != null) {
-                        try {
-                            durationMinutes = Integer.parseInt(request.get("durationMinutes"));
-                        } catch (NumberFormatException e) {
-                            durationMinutes = 5;
-                        }
-                    }
-                    Auction created = facade.createAuctionForSeller(
-                            seller,
-                            request.get("itemType"),
-                            request.get("itemName"),
-                            request.get("itemDescription"),
-                            request.getDouble("startingPrice"),
-                            request.get("imagePath"),
-                            durationMinutes
-                    );
-                    BroadcastManager.broadcast(new AuctionEvent("AUCTION_CREATED"));
-                    return AuctionResponse.ok(DtoMapper.toDto(created));
-                }
-                case UPDATE_ITEM_IMAGE: {
-                    facade.updateItemImagePath(
-                            request.get("itemId"),
-                            request.get("imagePath")
-                    );
-                    BroadcastManager.broadcast(new AuctionEvent("AUCTION_IMAGE_UPDATED"));
-                    return AuctionResponse.ok();
-                }
-                case START_AUCTION: {
-                    facade.startAuction(request.get("auctionId"));
-                    BroadcastManager.broadcast(new AuctionEvent("AUCTION_STARTED"));
-                    return AuctionResponse.ok();
-                }
-                case FINISH_AUCTION: {
-                    facade.finishAuction(request.get("auctionId"));
-                    BroadcastManager.broadcast(new AuctionEvent("AUCTION_FINISHED"));
-                    return AuctionResponse.ok();
-                }
-                case CANCEL_AUCTION: {
-                    facade.cancelAuction(request.get("auctionId"));
-                    BroadcastManager.broadcast(new AuctionEvent("AUCTION_CANCELED"));
-                    return AuctionResponse.ok();
-                }
-                case MARK_AUCTION_PAID: {
-                    facade.markAuctionPaid(request.get("auctionId"));
-                    BroadcastManager.broadcast(new AuctionEvent("AUCTION_PAID"));
-                    return AuctionResponse.ok();
-                }
-                case PLACE_BID: {
-                    Bidder bidder = new Bidder(
-                            request.get("bidderId"),
-                            request.get("bidderName"),
-                            request.get("bidderEmail")
-                    );
-                    facade.placeBid(request.get("auctionId"), bidder, request.getDouble("amount"));
-                    BroadcastManager.broadcast(new AuctionEvent("NEW_BID", request.get("auctionId")));
-                    return AuctionResponse.ok();
-                }
-                case LIST_USERS: {
-                    List<User> users = facade.listUsers();
-                    List<UserDto> dtos = new java.util.ArrayList<>();
-                    for (User u : users) {
-                        dtos.add(DtoMapper.toDto(u));
-                    }
-                    return AuctionResponse.ok(dtos);
-                }
-                case REGISTER_AUTO_BID: {
-                    facade.registerAutoBid(
-                            request.get("auctionId"),
-                            request.get("bidderId"),
-                            request.getDouble("maxPrice"),
-                            request.getDouble("increment")
-                    );
-                    BroadcastManager.broadcast(new AuctionEvent("NEW_BID", request.get("auctionId")));
-                    return AuctionResponse.ok();
-                }
-                case CANCEL_AUTO_BID: {
-                    facade.cancelAutoBid(
-                            request.get("auctionId"),
-                            request.get("bidderId")
-                    );
-                    BroadcastManager.broadcast(new AuctionEvent("NEW_BID", request.get("auctionId")));
-                    return AuctionResponse.ok();
-                }
-                case GET_AUTO_BID_STATUS: {
-                    com.auction.model.auction.AutoBidConfig config = facade.getAutoBid(
-                            request.get("auctionId"),
-                            request.get("bidderId")
-                    );
-                    return AuctionResponse.ok(config);
-                }
-                case UPDATE_USER: {
-                    User user = facade.updateUser(
-                            request.get("userId"),
-                            request.get("username"),
-                            request.get("email"),
-                            request.get("shippingAddress"),
-                            request.get("phoneNumber"),
-                            request.get("storeName"),
-                            request.get("storeDescription"),
-                            request.get("department"),
-                            request.get("avatarPath")
-                    );
-                    BroadcastManager.broadcast(new com.auction.protocol.AuctionEvent("USER_UPDATED"));
-                    return AuctionResponse.ok(DtoMapper.toDto(user));
-                }
-                default:
-                    return AuctionResponse.error("Loại request không được hỗ trợ: " + request.getType());
-            }
-        } catch (Exception e) {
-            return AuctionResponse.error(e.getMessage());
-        }
+            out.writeObject(value);
+            out.flush();
+            out.reset();
+        } finally { timeout.cancel(false); }
+    }
+
+    private static void close(Socket socket) {
+        try { socket.close(); } catch (IOException ignored) { }
     }
 }

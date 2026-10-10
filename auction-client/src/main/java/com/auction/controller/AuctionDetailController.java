@@ -233,6 +233,7 @@ public class AuctionDetailController {
 
         // Bật/tắt form đặt giá
         boolean canBid = auction.getStatus() == AuctionStatus.RUNNING
+                && auction.getEndTime() != null && LocalDateTime.now().isBefore(auction.getEndTime())
                 && "Bidder".equals(currentUser.getClass().getSimpleName());
         bidFormPanel.setVisible(canBid);
         bidFormPanel.setManaged(canBid);
@@ -259,16 +260,25 @@ public class AuctionDetailController {
                     toggleAutoBidButton.getStyleClass().add("button-danger");
                     autoBidMaxField.setDisable(true);
                     autoBidIncrementField.setDisable(true);
+                    boolean isWinner = auction.getWinner() != null && auction.getWinner().getId().equals(currentUser.getId());
+                    if (!canBid) {
+                        autoBidStatusLabel.setText("Trạng thái: Phiên đã kết thúc; Auto-Bid không còn trả giá");
+                    } else if (!isWinner && config.getMaxPrice() < auction.getCurrentPrice() + config.getIncrement()) {
+                        autoBidStatusLabel.setText("Trạng thái: Đã đạt giới hạn giá; có thể hủy để đặt lại cấu hình");
+                    }
                 } else {
                     currentAutoBid = null;
                     autoBidStatusLabel.setText("Trạng thái: Chưa kích hoạt");
                     toggleAutoBidButton.setText("Kích hoạt Auto-Bid");
                     toggleAutoBidButton.getStyleClass().removeAll("button-success", "button-danger");
                     toggleAutoBidButton.getStyleClass().add("button-success");
-                    autoBidMaxField.setDisable(false);
-                    autoBidIncrementField.setDisable(false);
+                    autoBidMaxField.setDisable(!canBid);
+                    autoBidIncrementField.setDisable(!canBid);
+                    if (!canBid) { autoBidStatusLabel.setText("Trạng thái: Phiên chưa mở hoặc đã kết thúc"); }
                 }
+                toggleAutoBidButton.setDisable(!canBid && currentAutoBid == null);
             } catch (Exception e) {
+                toggleAutoBidButton.setDisable(true);
                 autoBidStatusLabel.setText("Lỗi kiểm tra Auto-Bid: " + e.getMessage());
             }
         } else {
@@ -370,7 +380,7 @@ public class AuctionDetailController {
                     }
                     
                     // Giả định tiến trình: lấy tỉ lệ theo 5 phút (300 giây) hoặc 1.0 nếu lớn hơn
-                    double progress = seconds > 300 ? 1.0 : (double) seconds / 300.0;
+                    double progress = Math.min(1.0, (double) seconds / (a.getDurationMinutes() * 60.0));
                     progressBar.setProgress(progress);
                 }
             })
@@ -425,14 +435,14 @@ public class AuctionDetailController {
                 }
             }
 
-            if (increment <= 0) {
+            if (!Double.isFinite(increment) || increment <= 0) {
                 UIAnimations.shakeField(autoBidIncrementField);
                 UiEffects.showToast(rootPane, "Bước nâng phải lớn hơn 0", UiEffects.ToastType.ERROR, 2000);
                 return;
             }
 
             double minBid = auction.getCurrentPrice() + increment;
-            if (maxPrice < minBid) {
+            if (!Double.isFinite(maxPrice) || !Double.isFinite(minBid) || maxPrice < minBid) {
                 UIAnimations.shakeField(autoBidMaxField);
                 UiEffects.showToast(rootPane, String.format(Locale.US, "Giá tối đa phải lớn hơn hoặc bằng $%,.2f", minBid), UiEffects.ToastType.ERROR, 2400);
                 return;
@@ -513,14 +523,24 @@ public class AuctionDetailController {
 
     private void reloadAuction() {
         Auction a = findAuction();
-        if (a != null) renderAuction(a);
+        if (a != null) {
+            renderAuction(a);
+            if (a.isOpen() && a.getEndTime() != null && LocalDateTime.now().isBefore(a.getEndTime())
+                    && countdownTimeline.getStatus() != javafx.animation.Animation.Status.RUNNING) {
+                startCountdown();
+            }
+        }
     }
 
     private Auction findAuction() {
-        return appContext.getGateway().listAuctions().stream()
-                .filter(x -> x.getId().equals(auctionId))
-                .findFirst()
-                .orElse(null);
+        try {
+            return appContext.getGateway().listAuctions().stream()
+                    .filter(x -> x.getId().equals(auctionId))
+                    .findFirst().orElse(null);
+        } catch (com.auction.exception.AuctionException exception) {
+            UiEffects.showToast(rootPane, exception.getMessage(), UiEffects.ToastType.ERROR, 2400);
+            return null;
+        }
     }
 
     private void setMainImage(String path) {

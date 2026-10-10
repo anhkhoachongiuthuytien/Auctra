@@ -5,6 +5,8 @@ public abstract class User extends Entity {
     private String username;
     private String email;
     private String avatarPath;
+    // Returned once on registration; never included in ordinary user DTOs.
+    private transient String recoveryCode;
 
     public User() {}
 
@@ -36,4 +38,7 @@ public abstract class User extends Entity {
     public void setAvatarPath(String avatarPath) {
         this.avatarPath = avatarPath;
     }
+
+    public String getRecoveryCode() { return recoveryCode; }
+    public void setRecoveryCode(String recoveryCode) { this.recoveryCode = recoveryCode; }
 }

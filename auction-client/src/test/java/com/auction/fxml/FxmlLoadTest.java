@@ -34,6 +34,10 @@ class FxmlLoadTest {
         load("/fxml/auction-list-view.fxml");
         load("/fxml/seller-view.fxml");
         load("/fxml/profile-view.fxml");
+        load("/fxml/login-view.fxml");
+        load("/fxml/register-view.fxml");
+        load("/fxml/forgot-password-view.fxml");
+        load("/fxml/auction-detail-view.fxml");
     }
 
     private static void load(String path) throws Exception {

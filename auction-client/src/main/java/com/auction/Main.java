@@ -30,6 +30,7 @@ public class Main extends Application {
         AppContext appContext = createAppContext();
         SceneNavigator navigator = new SceneNavigator(primaryStage, appContext);
         navigator.showLogin();
+        primaryStage.setOnCloseRequest(event -> appContext.getGateway().close());
     }
 
     private AppContext createAppContext() {

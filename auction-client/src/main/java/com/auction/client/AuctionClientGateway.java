@@ -8,13 +8,17 @@ import com.auction.model.user.User;
 import java.util.List;
 
 public interface AuctionClientGateway {
+    default void logout() { }
+
+    default void close() { }
+
     User login(String email, String password);
 
     User register(String username, String email, String password, String role);
 
     List<String> getAvailableRegistrationRoles();
 
-    void resetPassword(String email, String username, String newPassword);
+    void resetPassword(String email, String recoveryCode, String newPassword);
 
     List<Auction> listAuctions();
 

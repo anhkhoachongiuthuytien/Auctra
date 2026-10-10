@@ -22,14 +22,15 @@ public class Auction extends Entity {
     private static final List<BidObserver> globalBidObservers = new CopyOnWriteArrayList<>();
     private final Item item;
     private final Seller seller;
-    private double currentPrice;
-    private AuctionStatus status;
+    private volatile double currentPrice;
+    private volatile AuctionStatus status;
     private final List<BidTransaction> bids;
-    private Bidder winner;
+    private volatile Bidder winner;
     private final List<BidObserver> bidObservers;
     private final ReentrantLock stateLock;
-    private java.time.LocalDateTime endTime;
+    private volatile java.time.LocalDateTime endTime;
     private int durationMinutes = 5;
+    private long version;
 
     public Auction() {
         this(null, null, null);
@@ -119,28 +120,40 @@ public class Auction extends Entity {
     }
 
     public void addBid(BidTransaction bid) {
+        if (bid == null) {
+            throw new InvalidBidException("Lượt đặt giá không được để trống");
+        }
+        addBids(List.of(bid));
+    }
+
+    /** Validate the whole manual/automatic sequence before changing the aggregate. */
+    public void addBids(List<BidTransaction> sequence) {
         stateLock.lock();
         try {
-            if (status != AuctionStatus.RUNNING) {
-                throw new AuctionClosedException("Phiên đấu giá chưa mở để đặt giá");
+            if (status != AuctionStatus.RUNNING || endTime == null
+                    || !java.time.LocalDateTime.now().isBefore(endTime)) {
+                throw new AuctionClosedException("Phiên đấu giá chưa mở hoặc đã hết thời gian");
             }
-            if (bid == null) {
-                throw new InvalidBidException("Lượt đặt giá không được để trống");
+            double price = currentPrice;
+            for (BidTransaction bid : sequence) {
+                if (bid == null || bid.getBidder() == null || !Double.isFinite(bid.getAmount())
+                        || bid.getAmount() <= price) {
+                    throw new InvalidBidException("Số tiền đặt giá phải hữu hạn và cao hơn giá hiện tại");
+                }
+                price = bid.getAmount();
             }
-            if (bid.getAmount() <= currentPrice) {
-                throw new InvalidBidException("Số tiền đặt giá phải cao hơn giá hiện tại");
+            for (BidTransaction bid : sequence) {
+                bids.add(bid);
+                currentPrice = bid.getAmount();
+                winner = bid.getBidder();
+                checkAndApplyAntiSniping();
             }
-
-            bids.add(bid);
-            currentPrice = bid.getAmount();
-            winner = bid.getBidder();
-            checkAndApplyAntiSniping();
         } finally {
             stateLock.unlock();
         }
-
-        // Notify được đặt ngoài vùng lock để tránh giữ khóa trong lúc observer chạy code riêng.
-        notifyBidPlaced(bid);
+        for (BidTransaction bid : sequence) {
+            notifyBidPlaced(bid);
+        }
     }
 
     public Item getItem() {
@@ -164,7 +177,9 @@ public class Auction extends Entity {
     }
 
     public List<BidTransaction> getBids() {
-        return bids;
+        stateLock.lock();
+        try { return List.copyOf(bids); }
+        finally { stateLock.unlock(); }
     }
 
     public Bidder getWinner() {
@@ -188,6 +203,9 @@ public class Auction extends Entity {
     }
 
     public void setDurationMinutes(int durationMinutes) {
+        if (durationMinutes < 1 || durationMinutes > 10080) {
+            throw new com.auction.exception.ValidationException("Thời lượng phải từ 1 đến 10080 phút");
+        }
         this.durationMinutes = durationMinutes;
     }
 
@@ -207,6 +225,9 @@ public class Auction extends Entity {
         }
     }
 
+    public long getVersion() { return version; }
+    public void setVersion(long version) { this.version = version; }
+
     public void restoreState(AuctionStatus status, double currentPrice, Bidder winner, List<BidTransaction> restoredBids) {
         restoreState(status, currentPrice, winner, restoredBids, java.time.LocalDateTime.now().plusMinutes(5));
     }
@@ -224,10 +245,18 @@ public class Auction extends Entity {
     private void notifyBidPlaced(BidTransaction bid) {
         BidEvent event = new BidEvent(this, bid, currentPrice, winner);
         for (BidObserver observer : bidObservers) {
-            observer.onBidPlaced(event);
+            try {
+                observer.onBidPlaced(event);
+            } catch (RuntimeException exception) {
+                System.err.println("Bid observer failed: " + exception.getClass().getSimpleName());
+            }
         }
         for (BidObserver observer : globalBidObservers) {
-            observer.onBidPlaced(event);
+            try {
+                observer.onBidPlaced(event);
+            } catch (RuntimeException exception) {
+                System.err.println("Bid observer failed: " + exception.getClass().getSimpleName());
+            }
         }
     }
 

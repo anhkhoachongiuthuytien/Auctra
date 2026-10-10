@@ -31,6 +31,10 @@ public class ServerContext {
     private final UserService userService;
 
     public ServerContext(String jdbcUrl) {
+        this(jdbcUrl, true);
+    }
+
+    public ServerContext(String jdbcUrl, boolean seedDemoData) {
         this.databaseManager = new DatabaseManager(jdbcUrl);
         this.databaseManager.initializeSchema();
 
@@ -44,8 +48,10 @@ public class ServerContext {
         this.bidService = new BidService(auctionDao, autoBidDao, userDao);
         this.userService = new UserService(userDao);
 
-        seedData();
+        if (seedDemoData) { seedData(); }
     }
+
+    public String getPasswordHash(String email) { return userDao.findPasswordHashByEmail(email); }
 
     public AuthService getAuthService() {
         return authService;

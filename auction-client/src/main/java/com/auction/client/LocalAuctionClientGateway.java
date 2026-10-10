@@ -1,175 +1,32 @@
 package com.auction.client;
 
-import com.auction.model.auction.Auction;
-import com.auction.model.user.Bidder;
-import com.auction.model.user.Seller;
-import com.auction.model.user.User;
+import com.auction.protocol.AuctionRequest;
+import com.auction.protocol.AuctionResponse;
+import com.auction.protocol.RequestType;
+import com.auction.server.AuctionRequestHandler;
 import com.auction.server.AuctionServerFacade;
-import com.auction.util.ItemImageMigrationHelper;
 import javafx.application.Platform;
 
-import java.util.List;
+public class LocalAuctionClientGateway extends AbstractAuctionClientGateway {
+    private final AuctionRequestHandler handler;
 
-public class LocalAuctionClientGateway implements AuctionClientGateway {
-    private final AuctionServerFacade serverFacade;
-
-    public LocalAuctionClientGateway(AuctionServerFacade serverFacade) {
-        this.serverFacade = serverFacade;
-    }
+    public LocalAuctionClientGateway(AuctionServerFacade facade) { handler = new AuctionRequestHandler(facade); }
 
     @Override
-    public User login(String email, String password) {
-        return serverFacade.login(email, password);
-    }
-
-    @Override
-    public User register(String username, String email, String password, String role) {
-        return serverFacade.register(username, email, password, role);
-    }
-
-    @Override
-    public List<String> getAvailableRegistrationRoles() {
-        return serverFacade.getAvailableRegistrationRoles();
-    }
-
-    @Override
-    public void resetPassword(String email, String username, String newPassword) {
-        serverFacade.resetPassword(email, username, newPassword);
-    }
-
-    @Override
-    public List<Auction> listAuctions() {
-        List<Auction> auctions = serverFacade.listAuctions();
-        ItemImageMigrationHelper.migrateLocalImagePaths(auctions, this);
-        return auctions;
-    }
-
-    @Override
-    public List<Auction> listAuctionsForSeller(String sellerId) {
-        List<Auction> auctions = serverFacade.listAuctionsForSeller(sellerId);
-        ItemImageMigrationHelper.migrateLocalImagePaths(auctions, this);
-        return auctions;
-    }
-
-    @Override
-    public Auction createAuctionForSeller(Seller seller, String itemType, String name, String description, double startingPrice) {
-        Auction auction = serverFacade.createAuctionForSeller(seller, itemType, name, description, startingPrice);
-        fireLocalUpdate();
-        return auction;
-    }
-
-    @Override
-    public Auction createAuctionForSeller(Seller seller, String itemType, String name, String description,
-                                          double startingPrice, String imagePath) {
-        Auction auction = serverFacade.createAuctionForSeller(seller, itemType, name, description, startingPrice, imagePath);
-        fireLocalUpdate();
-        return auction;
-    }
-
-    @Override
-    public Auction createAuctionForSeller(Seller seller, String itemType, String name, String description,
-                                          double startingPrice, String imagePath, int durationMinutes) {
-        Auction auction = serverFacade.createAuctionForSeller(seller, itemType, name, description, startingPrice, imagePath, durationMinutes);
-        fireLocalUpdate();
-        return auction;
-    }
-
-    @Override
-    public void updateItemImagePath(String itemId, String imagePath) {
-        serverFacade.updateItemImagePath(itemId, imagePath);
-        fireLocalUpdate();
-    }
-
-    @Override
-    public void startAuction(String auctionId) {
-        serverFacade.startAuction(auctionId);
-        fireLocalUpdate();
-    }
-
-    @Override
-    public void finishAuction(String auctionId) {
-        serverFacade.finishAuction(auctionId);
-        fireLocalUpdate();
-    }
-
-    @Override
-    public void cancelAuction(String auctionId) {
-        serverFacade.cancelAuction(auctionId);
-        fireLocalUpdate();
-    }
-
-    @Override
-    public void markAuctionPaid(String auctionId) {
-        serverFacade.markAuctionPaid(auctionId);
-        fireLocalUpdate();
-    }
-
-    @Override
-    public void placeBid(String auctionId, Bidder bidder, double amount) {
-        serverFacade.placeBid(auctionId, bidder, amount);
-        fireLocalUpdate();
-    }
-
-    @Override
-    public List<User> listUsers() {
-        return serverFacade.listUsers();
-    }
-
-    @Override
-    public void registerAutoBid(String auctionId, String bidderId, double maxPrice, double increment) {
-        serverFacade.registerAutoBid(auctionId, bidderId, maxPrice, increment);
-        fireLocalUpdate();
-    }
-
-    @Override
-    public void cancelAutoBid(String auctionId, String bidderId) {
-        serverFacade.cancelAutoBid(auctionId, bidderId);
-        fireLocalUpdate();
-    }
-
-    @Override
-    public com.auction.model.auction.AutoBidConfig getAutoBid(String auctionId, String bidderId) {
-        return serverFacade.getAutoBid(auctionId, bidderId);
-    }
-
-    @Override
-    public User updateUser(String userId, String username, String email) {
-        User user = serverFacade.updateUser(userId, username, email);
-        fireLocalUpdate();
-        return user;
-    }
-
-    @Override
-    public User updateUser(String userId, String username, String email,
-                           String shippingAddress, String phoneNumber,
-                           String storeName, String storeDescription,
-                           String department) {
-        User user = serverFacade.updateUser(userId, username, email,
-                shippingAddress, phoneNumber, storeName, storeDescription, department);
-        fireLocalUpdate();
-        return user;
-    }
-
-    @Override
-    public User updateUser(String userId, String username, String email,
-                           String shippingAddress, String phoneNumber,
-                           String storeName, String storeDescription,
-                           String department, String avatarPath) {
-        User user = serverFacade.updateUser(userId, username, email,
-                shippingAddress, phoneNumber, storeName, storeDescription, department, avatarPath);
-        fireLocalUpdate();
-        return user;
-    }
-
-    private void fireLocalUpdate() {
-        try {
-            if (Platform.isFxApplicationThread()) {
-                ClientEventManager.fireUpdate();
-            } else {
-                Platform.runLater(ClientEventManager::fireUpdate);
-            }
-        } catch (IllegalStateException ex) {
-            ClientEventManager.fireUpdate();
+    protected AuctionResponse exchange(AuctionRequest request) {
+        AuctionResponse response = handler.process(request);
+        if (response.isSuccess() && isMutation(request.getType())) {
+            try { Platform.runLater(ClientEventManager::fireUpdate); }
+            catch (IllegalStateException exception) { ClientEventManager.fireUpdate(); }
         }
+        return response;
+    }
+
+    private static boolean isMutation(RequestType type) {
+        return switch (type) {
+            case CREATE_AUCTION, START_AUCTION, FINISH_AUCTION, CANCEL_AUCTION, MARK_AUCTION_PAID,
+                    PLACE_BID, REGISTER_AUTO_BID, CANCEL_AUTO_BID, UPDATE_USER, UPDATE_ITEM_IMAGE -> true;
+            default -> false;
+        };
     }
 }

@@ -1,6 +1,7 @@
 package com.auction.dao.sqlite;
 
 import com.auction.dao.AuctionDao;
+import com.auction.exception.AuctionException;
 import com.auction.db.DatabaseManager;
 import com.auction.enums.AuctionStatus;
 import com.auction.model.auction.Auction;
@@ -33,8 +34,8 @@ public class SqliteAuctionDao implements AuctionDao {
     public void save(Auction auction) {
         // Upsert auction để lưu trạng thái phiên đấu giá hiện tại vào bảng auctions.
         String sql = """
-                INSERT INTO auctions(id, item_id, seller_id, current_price, status, winner_id, end_time, duration_minutes)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO auctions(id, item_id, seller_id, current_price, status, winner_id, end_time, duration_minutes, version)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(id) DO UPDATE SET
                     item_id = excluded.item_id,
                     seller_id = excluded.seller_id,
@@ -42,7 +43,9 @@ public class SqliteAuctionDao implements AuctionDao {
                     status = excluded.status,
                     winner_id = excluded.winner_id,
                     end_time = excluded.end_time,
-                    duration_minutes = excluded.duration_minutes
+                    duration_minutes = excluded.duration_minutes,
+                    version = excluded.version
+                WHERE auctions.version = excluded.version - 1
                 """;
 
         try (Connection connection = databaseManager.getConnection()) {
@@ -57,19 +60,31 @@ public class SqliteAuctionDao implements AuctionDao {
                 statement.setString(6, auction.getWinner() == null ? null : auction.getWinner().getId());
                 statement.setString(7, auction.getEndTime() == null ? null : auction.getEndTime().toString());
                 statement.setInt(8, auction.getDurationMinutes());
-                statement.executeUpdate();
+                statement.setLong(9, auction.getVersion() + 1);
+                if (statement.executeUpdate() != 1) {
+                    connection.rollback();
+                    throw new AuctionException("Phiên đấu giá vừa thay đổi; vui lòng tải lại và thử lại");
+                }
             }
 
-            // Xóa snapshot bid cũ của auction trước khi ghi lại trạng thái bids mới nhất.
-            try (PreparedStatement deleteBids = connection.prepareStatement("DELETE FROM bids WHERE auction_id = ?")) {
-                deleteBids.setString(1, auction.getId());
-                deleteBids.executeUpdate();
+            int persistedCount;
+            try (PreparedStatement count = connection.prepareStatement("SELECT COUNT(*) FROM bids WHERE auction_id = ?")) {
+                count.setString(1, auction.getId());
+                try (ResultSet rows = count.executeQuery()) {
+                    rows.next();
+                    persistedCount = rows.getInt(1);
+                }
+            }
+            List<BidTransaction> history = auction.getBids();
+            if (persistedCount > history.size()) {
+                connection.rollback();
+                throw new AuctionException("Lịch sử đấu giá không đồng bộ; vui lòng tải lại");
             }
 
-            // Ghi lại toàn bộ lịch sử bid hiện có của auction theo batch để giảm số lần execute.
+            // Append only the new bids; existing history and row ids remain intact.
             String insertBidSql = "INSERT INTO bids(auction_id, bidder_id, amount, bid_time) VALUES (?, ?, ?, ?)";
             try (PreparedStatement insertBid = connection.prepareStatement(insertBidSql)) {
-                for (BidTransaction bid : auction.getBids()) {
+                for (BidTransaction bid : history.subList(persistedCount, history.size())) {
                     insertBid.setString(1, auction.getId());
                     insertBid.setString(2, bid.getBidder().getId());
                     insertBid.setDouble(3, bid.getAmount());
@@ -80,6 +95,7 @@ public class SqliteAuctionDao implements AuctionDao {
             }
 
             connection.commit();
+            auction.setVersion(auction.getVersion() + 1);
         } catch (SQLException e) {
             throw new IllegalStateException("Failed to save auction", e);
         }
@@ -88,7 +104,7 @@ public class SqliteAuctionDao implements AuctionDao {
     @Override
     public Auction findById(String id) {
         // Tìm một auction theo id, sau đó map thêm item, seller, winner và bid history liên quan.
-        String sql = "SELECT id, item_id, seller_id, current_price, status, winner_id, end_time, duration_minutes FROM auctions WHERE id = ?";
+        String sql = "SELECT id, item_id, seller_id, current_price, status, winner_id, end_time, duration_minutes, version FROM auctions WHERE id = ?";
 
         try (Connection connection = databaseManager.getConnection();
             PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -97,7 +113,7 @@ public class SqliteAuctionDao implements AuctionDao {
                 if (!resultSet.next()) {
                     return null;
                 }
-                return mapAuction(resultSet);
+                return mapAuction(resultSet, connection);
             }
         } catch (SQLException e) {
             throw new IllegalStateException("Failed to find auction", e);
@@ -107,14 +123,14 @@ public class SqliteAuctionDao implements AuctionDao {
     @Override
     public List<Auction> findAll() {
         // Lấy toàn bộ auction để phục vụ danh sách phiên đấu giá trên giao diện.
-        String sql = "SELECT id, item_id, seller_id, current_price, status, winner_id, end_time, duration_minutes FROM auctions ORDER BY id";
+        String sql = "SELECT id, item_id, seller_id, current_price, status, winner_id, end_time, duration_minutes, version FROM auctions ORDER BY id";
         List<Auction> auctions = new ArrayList<>();
 
         try (Connection connection = databaseManager.getConnection();
             PreparedStatement statement = connection.prepareStatement(sql);
             ResultSet resultSet = statement.executeQuery()) {
             while (resultSet.next()) {
-                auctions.add(mapAuction(resultSet));
+                auctions.add(mapAuction(resultSet, connection));
             }
         } catch (SQLException e) {
             throw new IllegalStateException("Failed to list auctions", e);
@@ -137,7 +153,7 @@ public class SqliteAuctionDao implements AuctionDao {
         }
     }
 
-    private Auction mapAuction(ResultSet resultSet) throws SQLException {
+    private Auction mapAuction(ResultSet resultSet, Connection connection) throws SQLException {
         // Dựng lại aggregate Auction từ nhiều bảng: auctions, items, users và bids.
         Item item = itemDao.findById(resultSet.getString("item_id"));
         User sellerUser = userDao.findById(resultSet.getString("seller_id"));
@@ -150,15 +166,15 @@ public class SqliteAuctionDao implements AuctionDao {
             winner = (Bidder) userDao.findById(winnerId);
         }
 
-        List<BidTransaction> bids = loadBids(auction.getId());
+        List<BidTransaction> bids = loadBids(auction.getId(), connection);
         
         String endTimeStr = resultSet.getString("end_time");
         LocalDateTime endTime = endTimeStr == null 
-                ? LocalDateTime.now().plusMinutes(5) 
+                ? LocalDateTime.MIN
                 : LocalDateTime.parse(endTimeStr);
 
         int durationMinutes = resultSet.getInt("duration_minutes");
-        auction.setDurationMinutes(durationMinutes != 0 ? durationMinutes : 5);
+        auction.setDurationMinutes(durationMinutes >= 1 && durationMinutes <= 10080 ? durationMinutes : 5);
 
         auction.restoreState(
                 AuctionStatus.valueOf(resultSet.getString("status")),
@@ -167,16 +183,16 @@ public class SqliteAuctionDao implements AuctionDao {
                 bids,
                 endTime
         );
+        auction.setVersion(resultSet.getLong("version"));
         return auction;
     }
 
-    private List<BidTransaction> loadBids(String auctionId) {
+    private List<BidTransaction> loadBids(String auctionId, Connection connection) {
         // Đọc toàn bộ bid của một auction, sắp xếp theo thời gian để khôi phục đúng thứ tự lịch sử.
-        String sql = "SELECT bidder_id, amount, bid_time FROM bids WHERE auction_id = ? ORDER BY bid_time";
+        String sql = "SELECT bidder_id, amount, bid_time FROM bids WHERE auction_id = ? ORDER BY id";
         List<BidTransaction> bids = new ArrayList<>();
 
-        try (Connection connection = databaseManager.getConnection();
-            PreparedStatement statement = connection.prepareStatement(sql)) {
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, auctionId);
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {

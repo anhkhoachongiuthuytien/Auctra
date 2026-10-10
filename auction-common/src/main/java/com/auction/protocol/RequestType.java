@@ -5,6 +5,7 @@ package com.auction.protocol;
  */
 public enum RequestType {
     LOGIN,
+    LOGOUT,
     REGISTER,
     GET_REGISTRATION_ROLES,
     RESET_PASSWORD,

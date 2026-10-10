@@ -62,6 +62,18 @@ public class RegisterController {
         }
         try {
             UiEffects.showToast(rootPane, "Tạo tài khoản thành công", UiEffects.ToastType.SUCCESS, 1200);
+            if (result.user().getRecoveryCode() != null) {
+                javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.INFORMATION);
+                alert.setTitle("Lưu mã khôi phục tài khoản");
+                alert.setHeaderText("Giữ bí mật mã này. Mã chỉ được hiển thị một lần và dùng được một lần.");
+                javafx.scene.control.TextArea code = new javafx.scene.control.TextArea(result.user().getRecoveryCode());
+                code.setEditable(false);
+                code.setWrapText(true);
+                code.setPrefRowCount(2);
+                alert.getDialogPane().setContent(code);
+                alert.showAndWait();
+                result.user().setRecoveryCode(null);
+            }
             navigator.showHome(result.user());
         } catch (IOException ex) {
             showNavigationError("Không mở được màn hình sau đăng ký", ex);
