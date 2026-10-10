@@ -128,7 +128,6 @@ Mở một cửa sổ terminal mới (vẫn đứng tại thư mục gốc dự 
 
 ## 5. Tài Nguyên Đi Kèm
 - **Báo cáo chi tiết (PDF)**: https://drive.google.com/file/d/1tyttMCH6bK7X140k84u1ZG6bczcYUWMZ/view?usp=sharing
-- **Video Demo sản phẩm**: https://youtu.be/cOjOeHgrtVg
 
 ## 6. Bản sửa lỗi đấu giá và hướng dẫn kiểm chứng
 
